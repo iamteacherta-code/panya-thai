@@ -1,5 +1,5 @@
 /* global React, ReactDOM */
-const { useState, useEffect } = React;
+const { useState, useEffect, useRef } = React;
 const { HomePage, ActivityPage, LessonsPage, ReadingPage, WorksheetsPage } = window.Pages;
 const TOOLS = window.TOOLS;
 const Ico = window.Ico;
@@ -23,6 +23,50 @@ const CONS_MAP = { Common: "common", Standard: "noRare", "All 44": "all" };
 const VOW_MAP = { Basic: "basic", All: "all" };
 const TONE_MAP = { Basic: "basic", All: "all" };
 
+/* ---------- Nav dropdown (Lessons + sub-menu) ---------- */
+function NavDropdown({ label, icon, items, page, go }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  const activeHere = items.some((it) => it.id === page);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const onKey = (e) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => { document.removeEventListener("mousedown", onDoc); document.removeEventListener("keydown", onKey); };
+  }, [open]);
+
+  const choose = (id) => { setOpen(false); go(id); };
+  return (
+    <div className="nav-dd" ref={ref}>
+      <button className={"nav-btn" + (activeHere ? " active" : "")} onClick={() => setOpen((o) => !o)}
+        aria-haspopup="true" aria-expanded={open}>
+        <Ico name={icon} />
+        <span>{label}</span>
+        <svg className="nav-caret" viewBox="0 0 24 24" width="14" height="14" fill="none"
+          stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
+      {open && (
+        <div className="nav-menu" role="menu">
+          {items.map((it) => (
+            <button key={it.id} role="menuitem"
+              className={"nav-menu-item" + (page === it.id ? " active" : "")}
+              onClick={() => choose(it.id)}>
+              <Ico name={it.icon} />
+              <span className="nm-en">{it.en}</span>
+              <span className="nm-th">{it.th}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ---------- Nav ---------- */
 function NavBar({ page, go }) {
   const mk = (it) => (
@@ -35,20 +79,16 @@ function NavBar({ page, go }) {
     <header className="appbar">
       <div className="appbar-inner">
         <a className="brand" href="#" onClick={(e) => { e.preventDefault(); go("home"); }}>
-          <span className="brand-mark"><img src="images/panya-logo.png" alt="Panya logo" /></span>
+          <span className="brand-mark"><img src="images/panya-logo.png" alt="PANYA logo" /></span>
           <span>
-            <div className="brand-name">Panyaden International School</div>
-            <div className="brand-sub">Thai Literacy Studio · ห้องเรียนภาษาไทย · Chiang Mai</div>
+            <div className="brand-name">PANYA</div>
+            <div className="brand-sub">Thai Foundation</div>
           </span>
         </a>
         <nav className="nav">
           {mk({ id: "home", en: "Home", th: "หน้าหลัก", icon: "home" })}
-          <span className="nav-div" />
-          {DIGITAL_APPS.map((it) => mk(Object.assign({}, it,
-            it.id === "mat-beginner" ? { navEn: "Word Work · Beginner", navTh: "แผ่นเริ่มต้น" }
-            : it.id === "mat-intermediate" ? { navEn: "Word Work · Intermediate", navTh: "แผ่นระดับกลาง" } : {})))}
-          <span className="nav-div" />
-          {RESOURCES.map(mk)}
+          {DIGITAL_APPS.map(mk)}
+          <NavDropdown label="Lessons" icon="lesson" items={RESOURCES} page={page} go={go} />
         </nav>
       </div>
     </header>
@@ -73,20 +113,18 @@ function BoardPage({ t }) {
 }
 
 /* ---------- Word Work Mat page wrapper ---------- */
-function MatPage({ matId, t }) {
-  const cfg = THAI.MATS[matId];
+function MatPage({ t }) {
   return (
     <div>
       <div className="page-head">
         <span className="eyebrow"><Ico name="activity" style={{ width: 16, height: 16 }} /> Digital App · Word Work Mat</span>
-        <h1 className="page-title">{cfg.en} <span className="th">· {cfg.th}</span></h1>
+        <h1 className="page-title">Word Work Mat <span className="th">· แผ่นฝึกคำ</span></h1>
         <p className="page-sub">
-          {matId === "beginner"
-            ? "แตะตัวอักษรมาวางบนแผ่นเพื่อประสมคำ — ระดับเริ่มต้นเน้นพยัญชนะเดี่ยว + สระ (อ.3)"
-            : "สร้างคำที่มีตัวสะกดและผันวรรณยุกต์ — พยัญชนะครบ 44 ตัว รวมควบกล้ำ (ป.1–ป.2)"}
+          เลือกระดับชั้น (K2–Y3) จากเมนู แล้วแตะตัวอักษรมาประสมคำ —
+          ชุดพยัญชนะ สระ ตัวสะกด และวรรณยุกต์จะปรับความยากตามระดับชั้นที่เลือก
         </p>
       </div>
-      <WordWorkMat matId={matId} t={t} />
+      <WordWorkMat t={t} />
     </div>
   );
 }
@@ -94,7 +132,11 @@ function MatPage({ matId, t }) {
 /* ---------- App ---------- */
 function App() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
-  const [page, setPage] = useState(() => localStorage.getItem("panyaden_page") || "home");
+  const [page, setPage] = useState(() => {
+    let p = localStorage.getItem("panyaden_page") || "home";
+    if (p === "mat-beginner" || p === "mat-intermediate") p = "mat"; // legacy ids → single mat
+    return p;
+  });
 
   const go = (p) => { setPage(p); localStorage.setItem("panyaden_page", p); window.scrollTo({ top: 0 }); };
 
@@ -118,8 +160,7 @@ function App() {
   let body;
   if (page === "home") body = <HomePage go={go} />;
   else if (page === "board") body = <BoardPage t={bt} />;
-  else if (page === "mat-beginner") body = <MatPage matId="beginner" t={bt} />;
-  else if (page === "mat-intermediate") body = <MatPage matId="intermediate" t={bt} />;
+  else if (page === "mat") body = <MatPage t={bt} />;
   else if (page === "activity") body = <ActivityPage />;
   else if (page === "lesson") body = <LessonsPage />;
   else if (page === "reading") body = <ReadingPage />;

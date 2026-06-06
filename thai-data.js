@@ -157,12 +157,31 @@
       words: [{ i: "ต", v: "aa" }, { i: "ต", v: "aa", t: "ek" }, { i: "ต", v: "aa", t: "tho" }] },
   ];
 
-  // ---- Word Work Mats (แผ่นกิจกรรมฝึกคำ) ---------------------
-  // Exact grapheme inventories per the "Foundation of Systematic Thai
-  // Language Learning" spec. Each mat has CV and CVC modes.
-  const MATS = {
-    beginner: {
-      en: "Word Work Mat — Beginner", th: "แผ่นฝึกคำ ระดับเริ่มต้น", grade: "อนุบาล 3",
+  // ---- Word Work Mat — by grade (แผ่นฝึกคำ แยกตามระดับชั้น) ----
+  // One mat whose grapheme inventory scales with the selected grade
+  // (K2 → Y3). Easier grades expose fewer consonants/vowels and lock
+  // finals & tones; harder grades unlock the full system + clusters.
+  // Each grade has CV and CVC modes. Grapheme counts follow the
+  // "Foundation of Systematic Thai Language Learning" spec.
+  const GRADES = {
+    k2: {
+      id: "k2", en: "K2", th: "อนุบาล 2", grade: "K2",
+      note: "พยัญชนะกลุ่มแรก + สระเสียงยาว · วาง 1 พยัญชนะ + 1 สระ",
+      modes: {
+        cv: {
+          cons: "ก จ ด ต บ ป อ ม น".split(" "),
+          vowels: ["aa", "e", "ii", "uu"],
+          finals: null, tones: false,
+        },
+        cvc: {
+          cons: "ก ด ต บ ม น".split(" "),
+          vowels: ["aa", "ii", "uu"],
+          finals: ["kong", "kon", "kom"], tones: false,
+        },
+      },
+    },
+    k3: {
+      id: "k3", en: "K3", th: "อนุบาล 3", grade: "K3",
       note: "พยัญชนะเดี่ยว + สระรูปเดียว · วาง 1 พยัญชนะ + 1 สระ",
       modes: {
         cv: {
@@ -177,13 +196,46 @@
         },
       },
     },
-    intermediate: {
-      en: "Word Work Mat — Intermediate", th: "แผ่นฝึกคำ ระดับกลาง", grade: "ป.1–ป.2",
-      note: "ครบ 44 ตัว + สระเปลี่ยนรูป + ตัวสะกด + วรรณยุกต์",
+    y1: {
+      id: "y1", en: "Y1", th: "ประถม 1", grade: "Y1",
+      note: "เพิ่มสระหลายรูป + ตัวสะกดเสียงก้อง (ยังไม่ผันวรรณยุกต์)",
+      modes: {
+        cv: {
+          cons: "all",
+          vowels: ["aa", "e", "ae", "o", "ai2", "ai1", "i", "ii", "u", "uu"],
+          finals: null, tones: false, clusters: false,
+        },
+        cvc: {
+          cons: "all",
+          vowels: ["aa", "e", "ae", "o", "i", "ii", "u", "uu", "ue", "uue", "aw"],
+          finals: ["kong", "kon", "kom", "koei", "koew"], tones: false, clusters: false,
+        },
+      },
+    },
+    y2: {
+      id: "y2", en: "Y2", th: "ประถม 2", grade: "Y2",
+      note: "ครบ 44 ตัว + สระเปลี่ยนรูป + 8 มาตราตัวสะกด + วรรณยุกต์",
       modes: {
         cv: {
           cons: "all",
           vowels: ["aa", "e", "ae", "o", "ai2", "ai1", "i", "ii", "ue", "uue", "u", "uu", "aw", "aw_s"],
+          finals: null, tones: false, clusters: false,
+        },
+        cvc: {
+          cons: "all",
+          vowels: "all",
+          finals: ["kok", "kot", "kop", "kong", "kom", "koei", "koew", "kon"],
+          tones: true, clusters: false,
+        },
+      },
+    },
+    y3: {
+      id: "y3", en: "Y3", th: "ประถม 3", grade: "Y3",
+      note: "ครบทุกหน่วย + คำควบกล้ำ + สระประสม + ผันวรรณยุกต์เต็มรูปแบบ",
+      modes: {
+        cv: {
+          cons: "all",
+          vowels: "all",
           finals: null, tones: false, clusters: true,
         },
         cvc: {
@@ -195,6 +247,8 @@
       },
     },
   };
+  // dropdown order (easy → hard)
+  const GRADE_ORDER = ["k2", "k3", "y1", "y2", "y3"];
 
   // ---- Tones (วรรณยุกต์) -------------------------------------
   const tones = [
@@ -275,7 +329,7 @@
   }
 
   window.THAI = {
-    consonants, vowels, tones, finals, clusters, LEVELS, WORD_CHAINS, MATS,
+    consonants, vowels, tones, finals, clusters, LEVELS, WORD_CHAINS, GRADES, GRADE_ORDER,
     COMMON_CONS, CLASS_ORDER,
     DOT,
     vowelTemplate, toneTemplate, finalTemplate, vowelBare, toneBare,

@@ -4,8 +4,7 @@ const Placeholder = window.Placeholder;
 
 const DIGITAL_APPS = [
   { id: "board", en: "Blending Board", th: "กระดานประสมคำ", icon: "board", color: "var(--leaf)", desc: "Slide consonants, vowels and tones to blend syllables live — the UFLI blending drill." },
-  { id: "mat-beginner", en: "Word Work Mat · Beginner", th: "แผ่นฝึกคำ เริ่มต้น", icon: "activity", color: "#6f9b54", desc: "Build C+V words. 18 initials + 4 long vowels (อ.3). Finals & tones locked." },
-  { id: "mat-intermediate", en: "Word Work Mat · Intermediate", th: "แผ่นฝึกคำ ระดับกลาง", icon: "activity", color: "var(--earth)", desc: "All 44 initials, every vowel, 8 finals + tone marks (ป.1–2)." },
+  { id: "mat", en: "Word Work Mat", th: "แผ่นฝึกคำ", icon: "activity", color: "var(--earth)", desc: "Build C+V and C+V+C words. Choose a grade (K2–Y3) — letters, vowels, finals and tones scale to the level." },
 ];
 const RESOURCES = [
   { id: "lesson", en: "Lessons", th: "บทเรียน", icon: "lesson", color: "var(--clay)", desc: "Explicit, systematic phonics units in a UFLI-style scope & sequence." },

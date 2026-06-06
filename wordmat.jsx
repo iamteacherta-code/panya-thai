@@ -32,14 +32,22 @@
     );
   }
 
-  function WordWorkMat({ matId, t }) {
-    const cfg = THAI.MATS[matId];
+  function WordWorkMat({ t }) {
+    // selected grade (K2 → Y3) — drives the whole grapheme inventory
+    const [gradeId, setGradeId] = useState(() => {
+      const s = localStorage.getItem("panyaden_mat_grade");
+      return s && THAI.GRADES[s] ? s : "k3";
+    });
+    const changeGrade = (id) => { setGradeId(id); localStorage.setItem("panyaden_mat_grade", id); };
+    const cfg = THAI.GRADES[gradeId];
+    const cvcHasTones = !!cfg.modes.cvc.tones;
+
     const [mode, setMode] = useState("cv");
     const m = cfg.modes[mode];
 
     const consChars = m.cons === "all" ? THAI.consonants.map((c) => c.ch) : m.cons;
     const consBands = useMemo(() => consByClass(consChars), [consChars.join("")]);
-    const vowList = useMemo(() => resolveVowels(m.vowels), [mode, matId]);
+    const vowList = useMemo(() => resolveVowels(m.vowels), [mode, gradeId]);
     const finList = m.finals ? ["none"].concat(m.finals).map((id) => THAI.finals.find((f) => f.id === id)) : null;
     const toneList = m.tones ? THAI.tones : null;
     const showClusters = !!m.clusters;
@@ -52,12 +60,12 @@
     const [reveal, setReveal] = useState(false);
     const [feedback, setFeedback] = useState(null);
 
-    // sensible defaults on mount / mode change
+    // sensible defaults on mount / mode change / grade change
     useEffect(() => {
       setInitial(consChars[0] || "");
       setVowId(vowList[0] ? vowList[0].id : "");
       setFinId("none"); setToneId("none"); setActive("initial"); setReveal(false); setFeedback(null);
-    }, [mode, matId]);
+    }, [mode, gradeId]);
 
     const initObj = useMemo(() => THAI.getInitial(initial), [initial]);
     const vowObj = useMemo(() => THAI.vowels.find((v) => v.id === vowId) || null, [vowId]);
@@ -84,17 +92,25 @@
     };
 
     const clsLabel = initObj ? (initObj.cls === "H" ? "อักษรสูง" : initObj.cls === "M" ? "อักษรกลาง" : "อักษรต่ำ") : "";
-    const matClass = "mat-" + matId;
 
     return (
-      <div className={"board mat " + matClass}>
-        {/* mat toolbar: mode + grade */}
+      <div className="board mat mat-intermediate">
+        {/* mat toolbar: grade picker + mode */}
         <div className="mat-bar">
           <div className="mat-id">
-            <span className="mat-badge">{matId === "beginner" ? "B" : "I"}</span>
-            <div>
-              <div className="mat-title">{matId === "beginner" ? "Beginner" : "Intermediate"}</div>
-              <div className="mat-th">{cfg.th} · {cfg.grade}</div>
+            <span className="mat-badge">{cfg.en}</span>
+            <div className="mat-id-main">
+              <div className="mat-title">Word Work Mat <span className="mat-th">· แผ่นฝึกคำ</span></div>
+              <div className="mat-grade-row">
+                <label htmlFor="matGradeSel" className="mat-grade-lbl">ระดับชั้น · Grade</label>
+                <select id="matGradeSel" className="mat-grade-select" value={gradeId}
+                  onChange={(e) => changeGrade(e.target.value)}>
+                  {THAI.GRADE_ORDER.map((id) => {
+                    const g = THAI.GRADES[id];
+                    return <option key={id} value={id}>{g.en} · {g.th}</option>;
+                  })}
+                </select>
+              </div>
             </div>
           </div>
           <div className="mode-seg" role="tablist" aria-label="mode">
@@ -102,7 +118,7 @@
               C&nbsp;V <span className="th">พยัญชนะ + สระ</span>
             </button>
             <button className={mode === "cvc" ? "on" : ""} onClick={() => setMode("cvc")}>
-              {matId === "beginner" ? "C V C" : "C V C + วรรณยุกต์"} <span className="th">{matId === "beginner" ? "+ ตัวสะกด" : "+ สะกด/ผันเสียง"}</span>
+              {cvcHasTones ? "C V C + วรรณยุกต์" : "C V C"} <span className="th">{cvcHasTones ? "+ สะกด/ผันเสียง" : "+ ตัวสะกด"}</span>
             </button>
           </div>
           <span className="mat-note">{m.finals ? cfg.note : "วาง 1 พยัญชนะ + 1 สระ"}</span>
@@ -234,7 +250,7 @@
                 <span className="p-num">3</span>
                 <span className="p-en">Final consonants</span>
                 <span className="p-th">ตัวสะกด</span>
-                <span className="p-hint">{matId === "beginner" ? "แม่ที่ออกเสียงง่าย · ง น ม" : "8 มาตราตัวสะกด"}</span>
+                <span className="p-hint">{(finList.length - 1) <= 3 ? "แม่ที่ออกเสียงง่าย · ง น ม" : (finList.length - 1) + " มาตราตัวสะกด"}</span>
               </div>
               <div className="band">
                 <div className="band-label c-final">
@@ -284,9 +300,10 @@
         </div>{/* /board-cols */}
         {/* constraint note */}
         <div className="mat-foot">
-          {matId === "beginner"
-            ? "ระดับเริ่มต้น — เปิดเฉพาะพยัญชนะเดี่ยวและสระ" + (m.finals ? " พร้อมตัวสะกดง่าย (ง น ม) ยังไม่มีวรรณยุกต์" : " (ปิดช่องตัวสะกด/วรรณยุกต์)")
-            : "ระดับกลาง — พยัญชนะครบ 44 ตัว รวมควบกล้ำ" + (m.tones ? " มีตัวสะกดและวรรณยุกต์ครบ" : " และสระเปลี่ยนรูป/ลดรูป")}
+          {cfg.en} · {cfg.th} — {m.cons === "all" ? "พยัญชนะครบ 44 ตัว" : "พยัญชนะ " + consChars.length + " ตัว"}
+          {showClusters ? " รวมควบกล้ำ" : ""}
+          {finList ? " · มีตัวสะกด" : " · ไม่มีตัวสะกด"}
+          {toneList ? " · ผันวรรณยุกต์ได้" : " · ยังไม่มีวรรณยุกต์"}
         </div>
       </div>
     );
