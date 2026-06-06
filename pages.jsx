@@ -135,100 +135,162 @@ function ActivityPage() {
 }
 
 /* ---------------- LESSONS ---------------- */
-// A systematic Thai phonics scope & sequence (UFLI-style), introduced in a
-// deliberate order: the three consonant classes → finals (มาตราตัวสะกด) →
-// tone marks → short/special vowels → clusters & leading consonants.
-// Each lesson lists its new graphemes (name) and decodable example words (ex).
-const LESSON_UNITS = [
-  {
-    n: 1, en: "Mid-class consonants & long ‑า", th: "อักษรกลาง + สระอา",
-    lessons: [
-      { no: "L1", name: "ก จ", ex: "กา · จา", st: "done" },
-      { no: "L2", name: "ด ต", ex: "ดา · ตา", st: "done" },
-      { no: "L3", name: "บ ป อ", ex: "บา · ปา · อา", st: "current" },
-      { no: "L4", name: "ทบทวน", ex: "กา ตา ปา บา" },
-    ],
-  },
-  {
-    n: 2, en: "Long vowels", th: "สระเสียงยาว",
-    lessons: [
-      { no: "L5", name: "‑ี", ex: "กี · ดี · ปี" },
-      { no: "L6", name: "‑ู", ex: "ดู · ปู · ตู" },
-      { no: "L7", name: "เ‑ โ‑", ex: "เก · โต" },
-      { no: "L8", name: "แ‑ ‑อ", ex: "แก · กอ · บอ" },
-    ],
-  },
-  {
-    n: 3, en: "High-class consonants", th: "อักษรสูง",
-    lessons: [
-      { no: "L9", name: "ข ฉ ถ", ex: "ขา · ฉา · ถา" },
-      { no: "L10", name: "ผ ฝ", ex: "ผา · ฝา" },
-      { no: "L11", name: "ส ห ศ ษ", ex: "สา · หา · ศาลา" },
-    ],
-  },
-  {
-    n: 4, en: "Low-class consonants", th: "อักษรต่ำ",
-    lessons: [
-      { no: "L12", name: "ค ง", ex: "คา · งา" },
-      { no: "L13", name: "ช ซ ท น", ex: "ชา · ซา · ทา · นา" },
-      { no: "L14", name: "พ ฟ ม", ex: "พา · ฟา · มา" },
-      { no: "L15", name: "ย ร ล ว ฮ", ex: "ยา รา ลา วา ฮา" },
-    ],
-  },
-  {
-    n: 5, en: "Live finals", th: "มาตราตัวสะกดเสียงก้อง",
-    lessons: [
-      { no: "L16", name: "แม่กง ‑ง", ex: "กาง · ตาง" },
-      { no: "L17", name: "แม่กน ‑น", ex: "กิน · ดิน" },
-      { no: "L18", name: "แม่กม ‑ม", ex: "ลม · นม" },
-      { no: "L19", name: "แม่เกย/เกอว ‑ย ‑ว", ex: "ยาย · ดาว" },
-    ],
-  },
-  {
-    n: 6, en: "Dead finals", th: "มาตราตัวสะกดเสียงตาย",
-    lessons: [
-      { no: "L20", name: "แม่กก ‑ก", ex: "นก · ปาก" },
-      { no: "L21", name: "แม่กด ‑ด", ex: "มด · ตัด" },
-      { no: "L22", name: "แม่กบ ‑บ", ex: "กบ · จับ" },
-    ],
-  },
-  {
-    n: 7, en: "Tone marks", th: "วรรณยุกต์",
-    lessons: [
-      { no: "L23", name: "ไม้เอก ‑่ (กลาง)", ex: "ก่า · ต่า" },
-      { no: "L24", name: "ไม้โท ‑้ (กลาง)", ex: "ก้า · บ้า" },
-      { no: "L25", name: "ไม้ตรี ‑๊ จัตวา ‑๋", ex: "ก๊า · ก๋า" },
-      { no: "L26", name: "ผันอักษรสูง", ex: "ขา · ข่า · ข้า" },
-      { no: "L27", name: "ผันอักษรต่ำ", ex: "คา · ค่า · ค้า" },
-    ],
-  },
-  {
-    n: 8, en: "Short & special vowels", th: "สระเสียงสั้น/พิเศษ",
-    lessons: [
-      { no: "L28", name: "‑ะ ‑ิ ‑ุ", ex: "กะ · กิ · กุ" },
-      { no: "L29", name: "‑ำ ไ‑ ใ‑ เ‑า", ex: "กำ · ไก · ใจ · เรา" },
-      { no: "L30", name: "สระเปลี่ยนรูป ‑ัว ‑ั", ex: "ตัว · วัน" },
-    ],
-  },
-  {
-    n: 9, en: "Clusters & leading consonants", th: "คำควบกล้ำ / อักษรนำ",
-    lessons: [
-      { no: "L31", name: "กร กล กว", ex: "กราบ · กลอง · กวาง" },
-      { no: "L32", name: "ปร ปล ตร", ex: "ปลา · ตรง" },
-      { no: "L33", name: "พร พล คร คล", ex: "พระ · คลอง" },
-      { no: "L34", name: "อักษรนำ ห/อ นำ", ex: "หนู · อย่า" },
-    ],
-  },
-];
+// A systematic Thai phonics scope & sequence (UFLI-style), split by grade
+// level (K2 → Y3) to match the Word Work Mat grapheme inventories in
+// thai-data.js GRADES. Each grade is a small scope & sequence; every lesson
+// lists its new graphemes (name) and decodable example words (ex).
+const LESSONS_BY_GRADE = {
+  k2: [
+    {
+      n: 1, en: "First mid-class consonants & ‑า", th: "อักษรกลางกลุ่มแรก + สระอา",
+      lessons: [
+        { no: "L1", name: "ก จ", ex: "กา · จา", st: "done" },
+        { no: "L2", name: "ด ต", ex: "ดา · ตา", st: "done" },
+        { no: "L3", name: "บ ป อ", ex: "บา · ปา · อา", st: "current" },
+        { no: "L4", name: "ม น", ex: "มา · นา" },
+      ],
+    },
+    {
+      n: 2, en: "Long vowels", th: "สระเสียงยาว",
+      lessons: [
+        { no: "L5", name: "‑ี", ex: "ดี · ปี · มี" },
+        { no: "L6", name: "‑ู", ex: "ดู · ปู · งู" },
+        { no: "L7", name: "เ‑", ex: "เก · เต · เป" },
+        { no: "L8", name: "ทบทวน", ex: "กา ดี ดู เก" },
+      ],
+    },
+  ],
+  k3: [
+    {
+      n: 1, en: "High-class consonants", th: "อักษรสูง",
+      lessons: [
+        { no: "L1", name: "ข ค", ex: "ขา · คา" },
+        { no: "L2", name: "ผ พ", ex: "ผา · พา" },
+        { no: "L3", name: "ส ห", ex: "สา · หา" },
+      ],
+    },
+    {
+      n: 2, en: "More low-class consonants", th: "อักษรต่ำเพิ่ม",
+      lessons: [
+        { no: "L4", name: "ย ร ล ว", ex: "ยา · รา · ลา · วา" },
+        { no: "L5", name: "ทบทวน 18 ตัว", ex: "มา ขา รา สา" },
+      ],
+    },
+    {
+      n: 3, en: "Long vowels complete", th: "สระเสียงยาวครบ",
+      lessons: [
+        { no: "L6", name: "แ‑ โ‑", ex: "แก · โต" },
+        { no: "L7", name: "‑อ", ex: "กอ · บอ · รอ" },
+      ],
+    },
+    {
+      n: 4, en: "Simple finals", th: "ตัวสะกดง่าย",
+      lessons: [
+        { no: "L8", name: "แม่กง ‑ง", ex: "กาง · ตาง" },
+        { no: "L9", name: "แม่กน ‑น", ex: "กิน · ดิน" },
+        { no: "L10", name: "แม่กม ‑ม", ex: "ลม · นม" },
+      ],
+    },
+  ],
+  y1: [
+    {
+      n: 1, en: "Frequent consonants (all 3 classes)", th: "พยัญชนะที่พบบ่อย 3 หมู่",
+      lessons: [
+        { no: "L1", name: "ทบทวนอักษรกลาง", ex: "กา จา ดา ตา" },
+        { no: "L2", name: "ทบทวนอักษรสูง", ex: "ขา สา หา ผา" },
+        { no: "L3", name: "ทบทวนอักษรต่ำ", ex: "คา มา รา ลา" },
+      ],
+    },
+    {
+      n: 2, en: "Changing-form vowels", th: "สระเปลี่ยนรูป/หลายรูป",
+      lessons: [
+        { no: "L4", name: "ไ‑ ใ‑", ex: "ไก · ใจ" },
+        { no: "L5", name: "‑ำ เ‑า", ex: "กำ · เรา" },
+        { no: "L6", name: "‑ิ ‑ึ ‑ุ (สั้น)", ex: "กิ · กึ · กุ" },
+      ],
+    },
+    {
+      n: 3, en: "Live finals", th: "มาตราตัวสะกดเสียงก้อง",
+      lessons: [
+        { no: "L7", name: "แม่เกย ‑ย", ex: "ยาย · โดย" },
+        { no: "L8", name: "แม่เกอว ‑ว", ex: "ดาว · แมว" },
+        { no: "L9", name: "ทบทวน 5 มาตรา", ex: "กาง กิน ลม ดาว" },
+      ],
+    },
+  ],
+  y2: [
+    {
+      n: 1, en: "Dead finals", th: "มาตราตัวสะกดเสียงตาย",
+      lessons: [
+        { no: "L1", name: "แม่กก ‑ก", ex: "นก · ปาก" },
+        { no: "L2", name: "แม่กด ‑ด", ex: "มด · ตัด" },
+        { no: "L3", name: "แม่กบ ‑บ", ex: "กบ · จับ" },
+      ],
+    },
+    {
+      n: 2, en: "Tone marks (mid class)", th: "วรรณยุกต์ (อักษรกลาง)",
+      lessons: [
+        { no: "L4", name: "ไม้เอก ‑่", ex: "ก่า · ต่า" },
+        { no: "L5", name: "ไม้โท ‑้", ex: "ก้า · บ้า" },
+        { no: "L6", name: "ไม้ตรี ‑๊ จัตวา ‑๋", ex: "ก๊า · ก๋า" },
+      ],
+    },
+    {
+      n: 3, en: "Tone rules across classes", th: "ผันเสียงตามไตรยางศ์",
+      lessons: [
+        { no: "L7", name: "ผันอักษรสูง", ex: "ขา · ข่า · ข้า" },
+        { no: "L8", name: "ผันอักษรต่ำ", ex: "คา · ค่า · ค้า" },
+        { no: "L9", name: "ทบทวนผันเสียง", ex: "ป่า ป้า น่า น้า" },
+      ],
+    },
+  ],
+  y3: [
+    {
+      n: 1, en: "True clusters", th: "คำควบกล้ำแท้",
+      lessons: [
+        { no: "L1", name: "กร กล กว", ex: "กราบ · กลอง · กวาง" },
+        { no: "L2", name: "ปร ปล ตร", ex: "ปลา · ตรง" },
+        { no: "L3", name: "พร พล คร คล", ex: "พระ · คลอง" },
+      ],
+    },
+    {
+      n: 2, en: "Leading consonants", th: "อักษรนำ",
+      lessons: [
+        { no: "L4", name: "ห นำ", ex: "หนู · หมา · หญ้า" },
+        { no: "L5", name: "อ นำ", ex: "อย่า · อยาก · อยู่" },
+      ],
+    },
+    {
+      n: 3, en: "Diphthongs & special vowels", th: "สระประสม/พิเศษ",
+      lessons: [
+        { no: "L6", name: "เ‑ีย เ‑ือ", ex: "เสีย · เรือ" },
+        { no: "L7", name: "‑ัว", ex: "ตัว · วัว" },
+        { no: "L8", name: "ฤ ฤๅ", ex: "ฤดู · ฤๅษี" },
+      ],
+    },
+  ],
+};
 
-function LessonsPage() {
-  const total = LESSON_UNITS.reduce((s, u) => s + u.lessons.length, 0);
+// Lessons grade items for the "Lessons ▾" nav dropdown (one per grade).
+const LESSON_ITEMS = THAI.GRADE_ORDER.map((id) => ({
+  id: "lesson-" + id,
+  en: "Lessons · " + THAI.GRADES[id].en,
+  th: THAI.GRADES[id].th,
+  icon: "lesson",
+  grade: id,
+}));
+
+function LessonsPage({ grade }) {
+  const gid = LESSONS_BY_GRADE[grade] ? grade : THAI.GRADE_ORDER[0];
+  const g = THAI.GRADES[gid];
+  const units = LESSONS_BY_GRADE[gid];
+  const total = units.reduce((s, u) => s + u.lessons.length, 0);
   return (
     <div>
-      <PageHead eyebrow="Scope & Sequence" en="Lessons" th="บทเรียน"
-        sub={"A systematic path from single sounds to full syllables — " + total +
-          " lessons across " + LESSON_UNITS.length + " units. เรียงตามลำดับการสอน อักษร 3 หมู่ → ตัวสะกด → วรรณยุกต์ → สระพิเศษ → ควบกล้ำ"} />
-      {LESSON_UNITS.map((u) => (
+      <PageHead eyebrow={"Scope & Sequence · " + g.en} en="Lessons" th={"บทเรียน · " + g.th}
+        sub={"ลำดับการสอนสำหรับระดับ " + g.en + " (" + g.th + ") — " + total + " บทเรียน " +
+          units.length + " หน่วย · " + g.note} />
+      {units.map((u) => (
         <div className="unit" key={u.n}>
           <div className="unit-head">
             <span className="u-num">Unit {u.n}</span>
@@ -250,8 +312,64 @@ function LessonsPage() {
 }
 
 /* ---------------- READING ---------------- */
+// Full-screen reading mode: shows the passage as big word tiles, one row per
+// line, and highlights one word at a time so students can read along (great on
+// a projector). Tap a word, use ◀ ▶ / space to step, Esc to close.
+function ReadingMode({ passage, onClose }) {
+  const lineWords = React.useMemo(() => passage.lines.map((ln) => ln.split(/\s+/).filter(Boolean)), [passage]);
+  const starts = []; let acc = 0;
+  lineWords.forEach((ws) => { starts.push(acc); acc += ws.length; });
+  const totalW = acc;
+  const [wIdx, setWIdx] = React.useState(0);
+
+  React.useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose();
+      else if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); setWIdx((i) => Math.min(totalW - 1, i + 1)); }
+      else if (e.key === "ArrowLeft") setWIdx((i) => Math.max(0, i - 1));
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [totalW, onClose]);
+
+  return (
+    <div className="rd-overlay" onClick={onClose}>
+      <div className="rd-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="rd-head">
+          <div>
+            <div className="rd-title">{passage.en}</div>
+            <div className="rd-th">{passage.th}</div>
+          </div>
+          <button className="rd-close" onClick={onClose} aria-label="ปิด">✕</button>
+        </div>
+        <div className="rd-lines">
+          {lineWords.map((ws, li) => (
+            <div className="rd-line" key={li}>
+              {ws.map((w, wi) => {
+                const idx = starts[li] + wi;
+                return (
+                  <button key={wi} className={"rd-word" + (idx === wIdx ? " cur" : idx < wIdx ? " done" : "")}
+                    onClick={() => setWIdx(idx)}>{w}</button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+        <div className="rd-controls">
+          <button className="btn btn-ghost" onClick={() => setWIdx((i) => Math.max(0, i - 1))} disabled={wIdx === 0}>‹ ก่อนหน้า</button>
+          <span className="rd-progress">{wIdx + 1} / {totalW}</span>
+          <button className="btn btn-ghost" onClick={() => setWIdx(0)}>↺ เริ่มใหม่</button>
+          <button className="btn btn-leaf" onClick={() => setWIdx((i) => Math.min(totalW - 1, i + 1))} disabled={wIdx >= totalW - 1}>คำถัดไป ›</button>
+        </div>
+        <div className="rd-hint">แตะที่คำเพื่อไฮไลต์ · ใช้ลูกศร ◀ ▶ หรือสเปซบาร์เลื่อนทีละคำ · Esc ปิด</div>
+      </div>
+    </div>
+  );
+}
+
 function ReadingPage() {
   const [lvl, setLvl] = React.useState("A");
+  const [reader, setReader] = React.useState(null);
   const levels = [
     { id: "A", en: "Level A · long vowels" },
     { id: "B", en: "Level B · high-class" },
@@ -283,12 +401,13 @@ function ReadingPage() {
               {p.lines.map((ln, j) => <div key={j}>{ln}</div>)}
             </div>
             <div className="item-actions">
-              <button className="btn btn-sm btn-leaf"><Ico name="play" style={{ width: 15, height: 15 }} /> Read</button>
+              <button className="btn btn-sm btn-leaf" onClick={() => setReader(p)}><Ico name="play" style={{ width: 15, height: 15 }} /> Read</button>
               <button className="btn btn-sm btn-ghost"><Ico name="print" style={{ width: 15, height: 15 }} /> Print</button>
             </div>
           </div>
         ))}
       </div>
+      {reader && <ReadingMode passage={reader} onClose={() => setReader(null)} />}
     </div>
   );
 }
@@ -336,5 +455,6 @@ function WorksheetsPage() {
 window.TOOLS = TOOLS;
 window.DIGITAL_APPS = DIGITAL_APPS;
 window.RESOURCES = RESOURCES;
+window.LESSON_ITEMS = LESSON_ITEMS;
 window.Pages = { HomePage, ActivityPage, LessonsPage, ReadingPage, WorksheetsPage };
 window.Ico = Ico;

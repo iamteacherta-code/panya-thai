@@ -7,6 +7,7 @@ const BlendingBoard = window.BlendingBoard;
 const WordWorkMat = window.WordWorkMat;
 const DIGITAL_APPS = window.DIGITAL_APPS;
 const RESOURCES = window.RESOURCES;
+const LESSON_ITEMS = window.LESSON_ITEMS;
 const { useTweaks, TweaksPanel, TweakSection, TweakSlider, TweakRadio, TweakToggle, TweakColor } = window;
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
@@ -52,14 +53,16 @@ function NavDropdown({ label, icon, items, page, go }) {
       </button>
       {open && (
         <div className="nav-menu" role="menu">
-          {items.map((it) => (
-            <button key={it.id} role="menuitem"
-              className={"nav-menu-item" + (page === it.id ? " active" : "")}
-              onClick={() => choose(it.id)}>
-              <Ico name={it.icon} />
-              <span className="nm-en">{it.en}</span>
-              <span className="nm-th">{it.th}</span>
-            </button>
+          {items.map((it, i) => (
+            it.divider ? <div key={"d" + i} className="nav-menu-div" /> : (
+              <button key={it.id} role="menuitem"
+                className={"nav-menu-item" + (page === it.id ? " active" : "")}
+                onClick={() => choose(it.id)}>
+                <Ico name={it.icon} />
+                <span className="nm-en">{it.en}</span>
+                <span className="nm-th">{it.th}</span>
+              </button>
+            )
           ))}
         </div>
       )}
@@ -68,6 +71,9 @@ function NavDropdown({ label, icon, items, page, go }) {
 }
 
 /* ---------- Nav ---------- */
+// Lessons ▾ menu: one item per grade (K2–Y3), a divider, then the other resources.
+const LESSON_MENU = LESSON_ITEMS.concat([{ divider: true }], RESOURCES.filter((r) => r.id !== "lesson"));
+
 function NavBar({ page, go }) {
   const mk = (it) => (
     <button key={it.id} className={"nav-btn" + (page === it.id ? " active" : "")} onClick={() => go(it.id)}>
@@ -88,7 +94,7 @@ function NavBar({ page, go }) {
         <nav className="nav">
           {mk({ id: "home", en: "Home", th: "หน้าหลัก", icon: "home" })}
           {DIGITAL_APPS.map(mk)}
-          <NavDropdown label="Lessons" icon="lesson" items={RESOURCES} page={page} go={go} />
+          <NavDropdown label="Lessons" icon="lesson" items={LESSON_MENU} page={page} go={go} />
         </nav>
       </div>
     </header>
@@ -127,10 +133,14 @@ function App() {
   const [page, setPage] = useState(() => {
     let p = localStorage.getItem("panyaden_page") || "home";
     if (p === "mat-beginner" || p === "mat-intermediate") p = "mat"; // legacy ids → single mat
+    if (p === "lesson") p = "lesson-" + THAI.GRADE_ORDER[0];          // bare lesson → first grade
     return p;
   });
 
-  const go = (p) => { setPage(p); localStorage.setItem("panyaden_page", p); window.scrollTo({ top: 0 }); };
+  const go = (p) => {
+    if (p === "lesson") p = "lesson-" + THAI.GRADE_ORDER[0];
+    setPage(p); localStorage.setItem("panyaden_page", p); window.scrollTo({ top: 0 });
+  };
 
   // apply accent palette to CSS variables
   useEffect(() => {
@@ -154,7 +164,10 @@ function App() {
   else if (page === "board") body = <BoardPage t={bt} />;
   else if (page === "mat") body = <MatPage t={bt} />;
   else if (page === "activity") body = <ActivityPage />;
-  else if (page === "lesson") body = <LessonsPage />;
+  else if (page === "lesson" || page.indexOf("lesson-") === 0) {
+    const g = page === "lesson" ? THAI.GRADE_ORDER[0] : page.slice(7); // "lesson-y1" → "y1"
+    body = <LessonsPage grade={g} />;
+  }
   else if (page === "reading") body = <ReadingPage />;
   else if (page === "worksheet") body = <WorksheetsPage />;
   else body = <HomePage go={go} />;

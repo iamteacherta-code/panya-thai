@@ -87,11 +87,10 @@ button { font-family: inherit; cursor: pointer; }
 
 .nav {
   margin-left: auto;
-  display: flex; gap: 4px; flex-wrap: nowrap;
+  display: flex; gap: 4px; flex-wrap: wrap;
   justify-content: flex-end; align-items: center;
-  overflow-x: auto; scrollbar-width: none;
+  /* overflow must stay visible so the Lessons ▾ dropdown isn't clipped */
 }
-.nav::-webkit-scrollbar { display: none; }
 .nav-btn {
   border: 1px solid transparent; background: transparent;
   padding: 9px 15px; border-radius: 999px;
@@ -133,6 +132,7 @@ button { font-family: inherit; cursor: pointer; }
 .nav-menu-item.active { background: var(--leaf); color: #fff; }
 .nav-menu-item .nm-th { font-family: var(--font-thai); font-weight: 500; font-size: 12.5px; color: var(--ink-3); }
 .nav-menu-item.active .nm-th { color: rgba(255,255,255,.82); }
+.nav-menu-div { height: 1px; background: var(--line); margin: 6px 8px; }
 
 /* ---------- Layout ---------- */
 .page { max-width: 1280px; margin: 0 auto; padding: 30px 24px 80px; }
