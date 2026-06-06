@@ -61,15 +61,16 @@
 .unit-head .u-num { font-weight: 800; font-size: 13px; color: #fff; background: var(--leaf); padding: 4px 10px; border-radius: 999px; }
 .unit-head .u-title { font-weight: 800; font-size: 18px; }
 .unit-head .u-title .th { font-family: var(--font-thai); font-weight: 500; font-size: 14px; color: var(--ink-2); display: block; }
-.lesson-chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+.lesson-chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
 .lchip {
   border: 1.5px solid var(--line-2); background: var(--surface-2); border-radius: 13px;
-  padding: 12px 12px; min-height: 64px; display: flex; flex-direction: column; gap: 3px; text-align: left;
+  padding: 12px 13px 13px; min-height: 80px; display: flex; flex-direction: column; gap: 4px; text-align: left;
   transition: border-color .15s, background .15s;
 }
 .lchip:hover { border-color: var(--ink-3); background: #fff; }
 .lchip .l-no { font-size: 11px; font-weight: 800; letter-spacing: .08em; color: var(--ink-3); text-transform: uppercase; }
-.lchip .l-name { font-family: var(--font-thai); font-weight: 500; font-size: 15px; }
+.lchip .l-name { font-family: var(--font-thai); font-weight: 600; font-size: 15px; line-height: 1.25; }
+.lchip .l-ex { font-family: var(--font-thai); font-weight: 500; font-size: 13.5px; color: var(--ink-2); margin-top: auto; }
 .lchip.done { background: var(--leaf-l); border-color: var(--leaf); }
 .lchip.done .l-no { color: var(--leaf-d); }
 .lchip.current { border-color: var(--earth); border-width: 2px; box-shadow: 0 0 0 4px var(--earth-l); }

@@ -116,14 +116,6 @@ function BoardPage({ t }) {
 function MatPage({ t }) {
   return (
     <div>
-      <div className="page-head">
-        <span className="eyebrow"><Ico name="activity" style={{ width: 16, height: 16 }} /> Digital App · Word Work Mat</span>
-        <h1 className="page-title">Word Work Mat <span className="th">· แผ่นฝึกคำ</span></h1>
-        <p className="page-sub">
-          เลือกระดับชั้น (K2–Y3) จากเมนู แล้วแตะตัวอักษรมาประสมคำ —
-          ชุดพยัญชนะ สระ ตัวสะกด และวรรณยุกต์จะปรับความยากตามระดับชั้นที่เลือก
-        </p>
-      </div>
       <WordWorkMat t={t} />
     </div>
   );

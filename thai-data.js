@@ -163,13 +163,22 @@
   // finals & tones; harder grades unlock the full system + clusters.
   // Each grade has CV and CVC modes. Grapheme counts follow the
   // "Foundation of Systematic Thai Language Learning" spec.
+  // Cumulative consonant sets per grade (introduced in teaching order).
+  // Every grade exposes ONLY its own defined set — never the full alphabet,
+  // except the top grade (Y3). Each set builds on the one before it.
+  const SET_K2 = "ก จ ด ต บ ป อ ม น".split(" ");                          // 9  (mid core + ม น)
+  const SET_K3 = "ก ข ค จ ด ต บ ป ผ พ ม ย ร ล ว ส ห อ".split(" ");        // 18
+  const SET_Y1 = COMMON_CONS.slice();                                     // 23 (frequent letters)
+  const SET_Y2 = consonants.filter((c) => !c.rare).map((c) => c.ch);      // 42 (all but obsolete ฃ ฅ)
+  const SET_Y3 = consonants.map((c) => c.ch);                             // 44 (complete)
+
   const GRADES = {
     k2: {
       id: "k2", en: "K2", th: "อนุบาล 2", grade: "K2",
-      note: "พยัญชนะกลุ่มแรก + สระเสียงยาว · วาง 1 พยัญชนะ + 1 สระ",
+      note: "พยัญชนะกลุ่มแรก 9 ตัว + สระเสียงยาว · วาง 1 พยัญชนะ + 1 สระ",
       modes: {
         cv: {
-          cons: "ก จ ด ต บ ป อ ม น".split(" "),
+          cons: SET_K2,
           vowels: ["aa", "e", "ii", "uu"],
           finals: null, tones: false,
         },
@@ -182,10 +191,10 @@
     },
     k3: {
       id: "k3", en: "K3", th: "อนุบาล 3", grade: "K3",
-      note: "พยัญชนะเดี่ยว + สระรูปเดียว · วาง 1 พยัญชนะ + 1 สระ",
+      note: "พยัญชนะ 18 ตัว + สระรูปเดียว · วาง 1 พยัญชนะ + 1 สระ",
       modes: {
         cv: {
-          cons: "ก ข ค จ ด ต บ ป ผ พ ม ย ร ล ว ส ห อ".split(" "),
+          cons: SET_K3,
           vowels: ["aa", "e", "ii", "uu"],
           finals: null, tones: false,
         },
@@ -198,15 +207,15 @@
     },
     y1: {
       id: "y1", en: "Y1", th: "ประถม 1", grade: "Y1",
-      note: "เพิ่มสระหลายรูป + ตัวสะกดเสียงก้อง (ยังไม่ผันวรรณยุกต์)",
+      note: "พยัญชนะที่พบบ่อย 23 ตัว + สระหลายรูป + ตัวสะกดเสียงก้อง",
       modes: {
         cv: {
-          cons: "all",
+          cons: SET_Y1,
           vowels: ["aa", "e", "ae", "o", "ai2", "ai1", "i", "ii", "u", "uu"],
           finals: null, tones: false, clusters: false,
         },
         cvc: {
-          cons: "all",
+          cons: SET_Y1,
           vowels: ["aa", "e", "ae", "o", "i", "ii", "u", "uu", "ue", "uue", "aw"],
           finals: ["kong", "kon", "kom", "koei", "koew"], tones: false, clusters: false,
         },
@@ -214,16 +223,16 @@
     },
     y2: {
       id: "y2", en: "Y2", th: "ประถม 2", grade: "Y2",
-      note: "ครบ 44 ตัว + สระเปลี่ยนรูป + 8 มาตราตัวสะกด + วรรณยุกต์",
+      note: "พยัญชนะ 42 ตัว + สระเปลี่ยนรูป + 8 มาตราตัวสะกด + วรรณยุกต์",
       modes: {
         cv: {
-          cons: "all",
+          cons: SET_Y2,
           vowels: ["aa", "e", "ae", "o", "ai2", "ai1", "i", "ii", "ue", "uue", "u", "uu", "aw", "aw_s"],
           finals: null, tones: false, clusters: false,
         },
         cvc: {
-          cons: "all",
-          vowels: "all",
+          cons: SET_Y2,
+          vowels: ["aa", "e", "ae", "o", "ai2", "ai1", "i", "ii", "ue", "uue", "u", "uu", "aw", "aw_s"],
           finals: ["kok", "kot", "kop", "kong", "kom", "koei", "koew", "kon"],
           tones: true, clusters: false,
         },
@@ -231,15 +240,15 @@
     },
     y3: {
       id: "y3", en: "Y3", th: "ประถม 3", grade: "Y3",
-      note: "ครบทุกหน่วย + คำควบกล้ำ + สระประสม + ผันวรรณยุกต์เต็มรูปแบบ",
+      note: "ครบ 44 ตัว + คำควบกล้ำ + สระประสม + ผันวรรณยุกต์เต็มรูปแบบ",
       modes: {
         cv: {
-          cons: "all",
+          cons: SET_Y3,
           vowels: "all",
           finals: null, tones: false, clusters: true,
         },
         cvc: {
-          cons: "all",
+          cons: SET_Y3,
           vowels: "all",
           finals: ["kok", "kot", "kop", "kong", "kom", "koei", "koew", "kon"],
           tones: true, clusters: true,

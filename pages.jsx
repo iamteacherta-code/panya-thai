@@ -135,39 +135,100 @@ function ActivityPage() {
 }
 
 /* ---------------- LESSONS ---------------- */
+// A systematic Thai phonics scope & sequence (UFLI-style), introduced in a
+// deliberate order: the three consonant classes → finals (มาตราตัวสะกด) →
+// tone marks → short/special vowels → clusters & leading consonants.
+// Each lesson lists its new graphemes (name) and decodable example words (ex).
+const LESSON_UNITS = [
+  {
+    n: 1, en: "Mid-class consonants & long ‑า", th: "อักษรกลาง + สระอา",
+    lessons: [
+      { no: "L1", name: "ก จ", ex: "กา · จา", st: "done" },
+      { no: "L2", name: "ด ต", ex: "ดา · ตา", st: "done" },
+      { no: "L3", name: "บ ป อ", ex: "บา · ปา · อา", st: "current" },
+      { no: "L4", name: "ทบทวน", ex: "กา ตา ปา บา" },
+    ],
+  },
+  {
+    n: 2, en: "Long vowels", th: "สระเสียงยาว",
+    lessons: [
+      { no: "L5", name: "‑ี", ex: "กี · ดี · ปี" },
+      { no: "L6", name: "‑ู", ex: "ดู · ปู · ตู" },
+      { no: "L7", name: "เ‑ โ‑", ex: "เก · โต" },
+      { no: "L8", name: "แ‑ ‑อ", ex: "แก · กอ · บอ" },
+    ],
+  },
+  {
+    n: 3, en: "High-class consonants", th: "อักษรสูง",
+    lessons: [
+      { no: "L9", name: "ข ฉ ถ", ex: "ขา · ฉา · ถา" },
+      { no: "L10", name: "ผ ฝ", ex: "ผา · ฝา" },
+      { no: "L11", name: "ส ห ศ ษ", ex: "สา · หา · ศาลา" },
+    ],
+  },
+  {
+    n: 4, en: "Low-class consonants", th: "อักษรต่ำ",
+    lessons: [
+      { no: "L12", name: "ค ง", ex: "คา · งา" },
+      { no: "L13", name: "ช ซ ท น", ex: "ชา · ซา · ทา · นา" },
+      { no: "L14", name: "พ ฟ ม", ex: "พา · ฟา · มา" },
+      { no: "L15", name: "ย ร ล ว ฮ", ex: "ยา รา ลา วา ฮา" },
+    ],
+  },
+  {
+    n: 5, en: "Live finals", th: "มาตราตัวสะกดเสียงก้อง",
+    lessons: [
+      { no: "L16", name: "แม่กง ‑ง", ex: "กาง · ตาง" },
+      { no: "L17", name: "แม่กน ‑น", ex: "กิน · ดิน" },
+      { no: "L18", name: "แม่กม ‑ม", ex: "ลม · นม" },
+      { no: "L19", name: "แม่เกย/เกอว ‑ย ‑ว", ex: "ยาย · ดาว" },
+    ],
+  },
+  {
+    n: 6, en: "Dead finals", th: "มาตราตัวสะกดเสียงตาย",
+    lessons: [
+      { no: "L20", name: "แม่กก ‑ก", ex: "นก · ปาก" },
+      { no: "L21", name: "แม่กด ‑ด", ex: "มด · ตัด" },
+      { no: "L22", name: "แม่กบ ‑บ", ex: "กบ · จับ" },
+    ],
+  },
+  {
+    n: 7, en: "Tone marks", th: "วรรณยุกต์",
+    lessons: [
+      { no: "L23", name: "ไม้เอก ‑่ (กลาง)", ex: "ก่า · ต่า" },
+      { no: "L24", name: "ไม้โท ‑้ (กลาง)", ex: "ก้า · บ้า" },
+      { no: "L25", name: "ไม้ตรี ‑๊ จัตวา ‑๋", ex: "ก๊า · ก๋า" },
+      { no: "L26", name: "ผันอักษรสูง", ex: "ขา · ข่า · ข้า" },
+      { no: "L27", name: "ผันอักษรต่ำ", ex: "คา · ค่า · ค้า" },
+    ],
+  },
+  {
+    n: 8, en: "Short & special vowels", th: "สระเสียงสั้น/พิเศษ",
+    lessons: [
+      { no: "L28", name: "‑ะ ‑ิ ‑ุ", ex: "กะ · กิ · กุ" },
+      { no: "L29", name: "‑ำ ไ‑ ใ‑ เ‑า", ex: "กำ · ไก · ใจ · เรา" },
+      { no: "L30", name: "สระเปลี่ยนรูป ‑ัว ‑ั", ex: "ตัว · วัน" },
+    ],
+  },
+  {
+    n: 9, en: "Clusters & leading consonants", th: "คำควบกล้ำ / อักษรนำ",
+    lessons: [
+      { no: "L31", name: "กร กล กว", ex: "กราบ · กลอง · กวาง" },
+      { no: "L32", name: "ปร ปล ตร", ex: "ปลา · ตรง" },
+      { no: "L33", name: "พร พล คร คล", ex: "พระ · คลอง" },
+      { no: "L34", name: "อักษรนำ ห/อ นำ", ex: "หนู · อย่า" },
+    ],
+  },
+];
+
 function LessonsPage() {
-  const units = [
-    {
-      n: 1, en: "Mid-class consonants & long vowels", th: "อักษรกลาง + สระเสียงยาว",
-      lessons: [
-        { no: "L1", name: "ก จ ด ต", st: "done" },
-        { no: "L2", name: "บ ป อ", st: "done" },
-        { no: "L3", name: "สระ -า -ี", st: "current" },
-        { no: "L4", name: "สระ เ- แ-", st: "locked" },
-      ],
-    },
-    {
-      n: 2, en: "High-class consonants", th: "อักษรสูง",
-      lessons: [
-        { no: "L5", name: "ข ฉ ถ", st: "locked" },
-        { no: "L6", name: "ผ ฝ ส ห", st: "locked" },
-        { no: "L7", name: "ศ ษ", st: "locked" },
-      ],
-    },
-    {
-      n: 3, en: "Tone marks", th: "วรรณยุกต์ ่ ้",
-      lessons: [
-        { no: "L8", name: "ไม้เอก ไม้โท", st: "locked" },
-        { no: "L9", name: "ผันเสียง", st: "locked" },
-      ],
-    },
-  ];
+  const total = LESSON_UNITS.reduce((s, u) => s + u.lessons.length, 0);
   return (
     <div>
       <PageHead eyebrow="Scope & Sequence" en="Lessons" th="บทเรียน"
-        sub="A systematic path from single sounds to full syllables. Sounds are introduced in a deliberate order so every new lesson builds on the last." />
-      <FwNote />
-      {units.map((u) => (
+        sub={"A systematic path from single sounds to full syllables — " + total +
+          " lessons across " + LESSON_UNITS.length + " units. เรียงตามลำดับการสอน อักษร 3 หมู่ → ตัวสะกด → วรรณยุกต์ → สระพิเศษ → ควบกล้ำ"} />
+      {LESSON_UNITS.map((u) => (
         <div className="unit" key={u.n}>
           <div className="unit-head">
             <span className="u-num">Unit {u.n}</span>
@@ -175,9 +236,10 @@ function LessonsPage() {
           </div>
           <div className="lesson-chips">
             {u.lessons.map((l) => (
-              <button key={l.no} className={"lchip " + l.st}>
-                <span className="l-no">{l.no} {l.st === "done" ? "✓" : ""}</span>
+              <button key={l.no} className={"lchip " + (l.st || "")}>
+                <span className="l-no">{l.no} {l.st === "done" ? "✓" : l.st === "current" ? "● กำลังเรียน" : ""}</span>
                 <span className="l-name">{l.name}</span>
+                <span className="l-ex">{l.ex}</span>
               </button>
             ))}
           </div>
