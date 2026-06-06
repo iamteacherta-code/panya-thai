@@ -1,0 +1,87 @@
+/* ============================================================
+   Framework pages — grids & cards
+   ============================================================ */
+.hero {
+  background:
+    radial-gradient(140% 120% at 85% -10%, var(--leaf-l) 0%, transparent 55%),
+    radial-gradient(120% 130% at -10% 120%, var(--earth-l) 0%, transparent 50%),
+    var(--surface);
+  border: 1px solid var(--line); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow); padding: 38px 36px; margin-bottom: 28px;
+  position: relative; overflow: hidden;
+}
+.hero h1 { font-size: 40px; font-weight: 800; margin: 12px 0 8px; letter-spacing: -.015em; max-width: 20ch; }
+.hero h1 .th { display: block; font-family: var(--font-thai); font-weight: 500; font-size: 24px; color: var(--ink-2); margin-top: 4px; }
+.hero p { font-size: 17px; color: var(--ink-2); max-width: 56ch; line-height: 1.6; margin: 0 0 22px; }
+.hero-cta { display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* tool grid */
+.tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
+.tool-card {
+  text-align: left; background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px;
+  display: flex; flex-direction: column; gap: 12px; min-height: 168px;
+  transition: transform .12s, box-shadow .2s, border-color .2s; color: inherit;
+}
+.tool-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--line-2); }
+.tool-ico {
+  width: 52px; height: 52px; border-radius: 15px; display: grid; place-items: center; color: #fff; flex: none;
+  box-shadow: inset 0 -3px 0 rgba(0,0,0,.12);
+}
+.tool-ico svg { width: 27px; height: 27px; }
+.tool-card .t-en { font-weight: 800; font-size: 19px; line-height: 1.1; }
+.tool-card .t-th { font-family: var(--font-thai); font-weight: 500; color: var(--ink-2); font-size: 16px; }
+.tool-card .t-desc { font-size: 14px; color: var(--ink-3); line-height: 1.5; margin-top: 2px; }
+.tool-card .t-go { margin-top: auto; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; color: var(--earth-d); }
+.tool-card .t-go svg { width: 16px; height: 16px; }
+
+/* generic content grid */
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 18px; }
+
+.item-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.item-card h3 { margin: 0; font-size: 17px; font-weight: 800; }
+.item-card h3 .th { display:block; font-family: var(--font-thai); font-weight: 500; font-size: 14px; color: var(--ink-2); margin-top: 1px; }
+.item-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+.item-actions { display: flex; gap: 8px; margin-top: auto; }
+.btn-sm { min-height: 40px; padding: 8px 14px; font-size: 13.5px; }
+
+/* framework note banner */
+.fw-note {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--earth-l); border: 1px dashed var(--earth);
+  color: var(--earth-d); border-radius: var(--radius-sm);
+  padding: 12px 16px; font-size: 13.5px; font-weight: 600; margin-bottom: 22px;
+}
+.fw-note .th { font-family: var(--font-thai); font-weight: 500; }
+
+/* lessons scope & sequence */
+.unit { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 16px; }
+.unit-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; }
+.unit-head .u-num { font-weight: 800; font-size: 13px; color: #fff; background: var(--leaf); padding: 4px 10px; border-radius: 999px; }
+.unit-head .u-title { font-weight: 800; font-size: 18px; }
+.unit-head .u-title .th { font-family: var(--font-thai); font-weight: 500; font-size: 14px; color: var(--ink-2); display: block; }
+.lesson-chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+.lchip {
+  border: 1.5px solid var(--line-2); background: var(--surface-2); border-radius: 13px;
+  padding: 12px 12px; min-height: 64px; display: flex; flex-direction: column; gap: 3px; text-align: left;
+  transition: border-color .15s, background .15s;
+}
+.lchip:hover { border-color: var(--ink-3); background: #fff; }
+.lchip .l-no { font-size: 11px; font-weight: 800; letter-spacing: .08em; color: var(--ink-3); text-transform: uppercase; }
+.lchip .l-name { font-family: var(--font-thai); font-weight: 500; font-size: 15px; }
+.lchip.done { background: var(--leaf-l); border-color: var(--leaf); }
+.lchip.done .l-no { color: var(--leaf-d); }
+.lchip.current { border-color: var(--earth); border-width: 2px; box-shadow: 0 0 0 4px var(--earth-l); }
+.lchip.locked { opacity: .55; }
+
+/* reading levels */
+.level-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.level-tab { border: 1.5px solid var(--line-2); background: var(--surface-2); border-radius: 999px; padding: 9px 16px; min-height: 42px; font-weight: 700; font-size: 14px; color: var(--ink-2); }
+.level-tab.on { background: var(--leaf); color: #fff; border-color: var(--leaf-d); }
+.passage-thai { font-family: var(--font-thai); font-weight: 500; font-size: 26px; line-height: 1.9; color: var(--ink); }
+
+@media (max-width: 720px) {
+  .hero { padding: 26px 20px; }
+  .hero h1 { font-size: 30px; }
+}

@@ -1,0 +1,284 @@
+/* ============================================================
+   Thai language data for the Blending Board (กระดานประสมคำ)
+   Exposes window.THAI = { consonants, vowels, tones, buildSyllable, ... }
+   ============================================================ */
+(function () {
+  // ---- Consonants (พยัญชนะ) ----------------------------------
+  // class: H = high (สูง), M = mid (กลาง), L = low (ต่ำ)
+  // rare: obsolete letters (ฃ ฅ) — only shown in the "All" set
+  const consonants = [
+    { ch: "ก", name: "ไก่",     rom: "g",  cls: "M" },
+    { ch: "ข", name: "ไข่",     rom: "kh", cls: "H" },
+    { ch: "ฃ", name: "ขวด",    rom: "kh", cls: "H", rare: true },
+    { ch: "ค", name: "ควาย",   rom: "kh", cls: "L" },
+    { ch: "ฅ", name: "คน",      rom: "kh", cls: "L", rare: true },
+    { ch: "ฆ", name: "ระฆัง",   rom: "kh", cls: "L" },
+    { ch: "ง", name: "งู",       rom: "ng", cls: "L" },
+    { ch: "จ", name: "จาน",     rom: "j",  cls: "M" },
+    { ch: "ฉ", name: "ฉิ่ง",     rom: "ch", cls: "H" },
+    { ch: "ช", name: "ช้าง",     rom: "ch", cls: "L" },
+    { ch: "ซ", name: "โซ่",      rom: "s",  cls: "L" },
+    { ch: "ฌ", name: "เฌอ",     rom: "ch", cls: "L" },
+    { ch: "ญ", name: "หญิง",    rom: "y",  cls: "L" },
+    { ch: "ฎ", name: "ชฎา",     rom: "d",  cls: "M" },
+    { ch: "ฏ", name: "ปฏัก",    rom: "t",  cls: "M" },
+    { ch: "ฐ", name: "ฐาน",     rom: "th", cls: "H" },
+    { ch: "ฑ", name: "มณโฑ",    rom: "th", cls: "L" },
+    { ch: "ฒ", name: "ผู้เฒ่า",   rom: "th", cls: "L" },
+    { ch: "ณ", name: "เณร",     rom: "n",  cls: "L" },
+    { ch: "ด", name: "เด็ก",     rom: "d",  cls: "M" },
+    { ch: "ต", name: "เต่า",     rom: "t",  cls: "M" },
+    { ch: "ถ", name: "ถุง",      rom: "th", cls: "H" },
+    { ch: "ท", name: "ทหาร",    rom: "th", cls: "L" },
+    { ch: "ธ", name: "ธง",       rom: "th", cls: "L" },
+    { ch: "น", name: "หนู",      rom: "n",  cls: "L" },
+    { ch: "บ", name: "ใบไม้",    rom: "b",  cls: "M" },
+    { ch: "ป", name: "ปลา",     rom: "p",  cls: "M" },
+    { ch: "ผ", name: "ผึ้ง",      rom: "ph", cls: "H" },
+    { ch: "ฝ", name: "ฝา",       rom: "f",  cls: "H" },
+    { ch: "พ", name: "พาน",     rom: "ph", cls: "L" },
+    { ch: "ฟ", name: "ฟัน",      rom: "f",  cls: "L" },
+    { ch: "ภ", name: "สำเภา",   rom: "ph", cls: "L" },
+    { ch: "ม", name: "ม้า",      rom: "m",  cls: "L" },
+    { ch: "ย", name: "ยักษ์",    rom: "y",  cls: "L" },
+    { ch: "ร", name: "เรือ",     rom: "r",  cls: "L" },
+    { ch: "ล", name: "ลิง",      rom: "l",  cls: "L" },
+    { ch: "ว", name: "แหวน",    rom: "w",  cls: "L" },
+    { ch: "ศ", name: "ศาลา",    rom: "s",  cls: "H" },
+    { ch: "ษ", name: "ฤๅษี",     rom: "s",  cls: "H" },
+    { ch: "ส", name: "เสือ",     rom: "s",  cls: "H" },
+    { ch: "ห", name: "หีบ",      rom: "h",  cls: "H" },
+    { ch: "ฬ", name: "จุฬา",     rom: "l",  cls: "L" },
+    { ch: "อ", name: "อ่าง",     rom: "(อ)", cls: "M" },
+    { ch: "ฮ", name: "นกฮูก",   rom: "h",  cls: "L" },
+  ];
+
+  // A common, frequently-taught starter set (good for younger learners)
+  const COMMON_CONS = "ก ข ค ง จ ช ด ต ท น บ ป ผ พ ฟ ม ย ร ล ว ส ห อ".split(" ");
+
+  // Teaching order of the three consonant classes (easy -> hard)
+  const CLASS_ORDER = [
+    { cls: "M", en: "Mid class", th: "อักษรกลาง", cat: "mid" },
+    { cls: "H", en: "High class", th: "อักษรสูง", cat: "high" },
+    { cls: "L", en: "Low class", th: "อักษรต่ำ", cat: "low" },
+  ];
+
+  // ---- Vowels (สระ) ------------------------------------------
+  // Each vowel is rendered around a base consonant using parts:
+  //   before : characters placed BEFORE the consonant (e.g. เ แ โ ใ ไ)
+  //   above  : combining mark above/below the consonant (e.g. ◌ิ ◌ี ◌ุ ◌ู ◌ั)
+  //   after  : characters placed AFTER the consonant (e.g. ะ า อ)
+  // Display template uses ◌ (U+25CC dotted circle) as the consonant slot.
+  const DOT = "\u25CC";
+  const vowels = [
+    // --- short ---
+    { id: "a",   before: "", above: "", after: "\u0E30", rom: "a",  len: "short", set: "basic" },   // ะ
+    { id: "i",   before: "", above: "\u0E34", after: "", rom: "i",  len: "short", set: "basic" },   // ◌ิ
+    { id: "ue",  before: "", above: "\u0E36", after: "", rom: "ue", len: "short", set: "ext" },     // ◌ึ
+    { id: "u",   before: "", above: "\u0E38", after: "", rom: "u",  len: "short", set: "basic" },   // ◌ุ
+    { id: "e_s", before: "\u0E40", above: "", after: "\u0E30", rom: "e",  len: "short", set: "ext" }, // เ◌ะ
+    { id: "ae_s",before: "\u0E41", above: "", after: "\u0E30", rom: "ae", len: "short", set: "ext" }, // แ◌ะ
+    { id: "o_s", before: "\u0E42", above: "", after: "\u0E30", rom: "o",  len: "short", set: "ext" }, // โ◌ะ
+    { id: "aw_s",before: "\u0E40", above: "", after: "\u0E32\u0E30", rom: "aw", len: "short", set: "ext" }, // เ◌าะ
+    // --- long ---
+    { id: "aa",  before: "", above: "", after: "\u0E32", rom: "aa", len: "long", set: "basic" },    // า
+    { id: "ii",  before: "", above: "\u0E35", after: "", rom: "ii", len: "long", set: "basic" },    // ◌ี
+    { id: "uue", before: "", above: "\u0E37", after: "\u0E2D", rom: "ue", len: "long", set: "ext" },// ◌ือ
+    { id: "uu",  before: "", above: "\u0E39", after: "", rom: "uu", len: "long", set: "basic" },    // ◌ู
+    { id: "e",   before: "\u0E40", above: "", after: "", rom: "e",  len: "long", set: "basic" },    // เ◌
+    { id: "ae",  before: "\u0E41", above: "", after: "", rom: "ae", len: "long", set: "basic" },    // แ◌
+    { id: "o",   before: "\u0E42", above: "", after: "", rom: "o",  len: "long", set: "basic" },    // โ◌
+    { id: "aw",  before: "", above: "", after: "\u0E2D", rom: "aw", len: "long", set: "basic" },    // ◌อ
+    { id: "oe",  before: "\u0E40", above: "", after: "\u0E2D", rom: "oe", len: "long", set: "ext" },// เ◌อ
+    // --- diphthongs / special ---
+    { id: "ia",  before: "\u0E40", above: "\u0E35", after: "\u0E22", rom: "ia",  len: "long", set: "ext" },  // เ◌ีย
+    { id: "uea", before: "\u0E40", above: "\u0E37", after: "\u0E2D", rom: "uea", len: "long", set: "ext" },  // เ◌ือ
+    { id: "ua",  before: "", above: "\u0E31", after: "\u0E27", rom: "ua", len: "long", set: "ext" },         // ◌ัว
+    { id: "am",  before: "", above: "", after: "\u0E33", rom: "am", len: "short", set: "basic" },   // ◌ำ
+    { id: "ai1", before: "\u0E43", above: "", after: "", rom: "ai", len: "short", set: "basic" },   // ใ◌
+    { id: "ai2", before: "\u0E44", above: "", after: "", rom: "ai", len: "short", set: "basic" },   // ไ◌
+    { id: "ao",  before: "\u0E40", above: "", after: "\u0E32", rom: "ao", len: "short", set: "basic" }, // เ◌า
+  ];
+
+  // category of each vowel: long / short / dip(hthong) / special
+  const VOWEL_CAT = {
+    aa: "long", ii: "long", uu: "long", uue: "long", e: "long", ae: "long", o: "long", aw: "long", oe: "long",
+    a: "short", i: "short", ue: "short", u: "short", e_s: "short", ae_s: "short", o_s: "short", aw_s: "short",
+    ia: "dip", uea: "dip", ua: "dip",
+    am: "special", ai1: "special", ai2: "special", ao: "special",
+  };
+  vowels.forEach((v) => { v.cat = VOWEL_CAT[v.id] || "long"; });
+
+  // ---- Final consonants / มาตราตัวสะกด (8 มาตรา) ----------------
+  // Each มาตรา shows a representative final letter; live = sonorant (easier).
+  const finals = [
+    { id: "none", ch: "",  maatra: "ไม่มีตัวสะกด", en: "แม่ ก กา", rom: "",   live: true,  also: "" },
+    { id: "kong", ch: "ง", maatra: "แม่กง",  en: "-ng", rom: "ng", live: true,  also: "ง" },
+    { id: "kon",  ch: "น", maatra: "แม่กน",  en: "-n",  rom: "n",  live: true,  also: "น ณ ญ ร ล ฬ" },
+    { id: "kom",  ch: "ม", maatra: "แม่กม",  en: "-m",  rom: "m",  live: true,  also: "ม" },
+    { id: "koei", ch: "ย", maatra: "แม่เกย", en: "-i",  rom: "i",  live: true,  also: "ย" },
+    { id: "koew", ch: "ว", maatra: "แม่เกอว", en: "-o", rom: "o",  live: true,  also: "ว" },
+    { id: "kok",  ch: "ก", maatra: "แม่กก",  en: "-k",  rom: "k",  live: false, also: "ก ข ค ฆ" },
+    { id: "kot",  ch: "ด", maatra: "แม่กด",  en: "-t",  rom: "t",  live: false, also: "ด จ ต ถ ท ธ ส" },
+    { id: "kop",  ch: "บ", maatra: "แม่กบ",  en: "-p",  rom: "p",  live: false, also: "บ ป พ ฟ ภ" },
+  ];
+
+  // ---- Initial consonant clusters (พยัญชนะต้นควบกล้ำ) ---------
+  const clusters = [
+    { ch: "กร", rom: "gr" },  { ch: "กล", rom: "gl" },  { ch: "กว", rom: "gw" },
+    { ch: "ขร", rom: "khr" }, { ch: "ขล", rom: "khl" }, { ch: "ขว", rom: "khw" },
+    { ch: "คร", rom: "khr" }, { ch: "คล", rom: "khl" }, { ch: "คว", rom: "khw" },
+    { ch: "ตร", rom: "tr" },  { ch: "ปร", rom: "pr" },  { ch: "ปล", rom: "pl" },
+    { ch: "ผล", rom: "phl" }, { ch: "พร", rom: "phr" }, { ch: "พล", rom: "phl" },
+  ];
+
+  // ---- Teaching levels (การไล่ระดับความยาก / Scaffolding) ----
+  // Mirrors the UFLI progression adapted for Thai syllable structure.
+  const LEVELS = [
+    { id: "beginner",     en: "Foundation",   th: "พื้นฐาน", note: "พยัญชนะเดี่ยว + สระเสียงยาว",
+      vowelCats: ["long"],                              finals: false, tones: false, clusters: false },
+    { id: "intermediate", en: "Blending",     th: "ประสม", note: "+ สระเสียงสั้น และตัวสะกด (แม่ ก กา → เกย)",
+      vowelCats: ["long", "short"],                     finals: true,  tones: false, clusters: false },
+    { id: "advanced",     en: "Advanced",     th: "ขั้นสูง", note: "+ วรรณยุกต์ สระประสม และคำควบกล้ำ",
+      vowelCats: ["long", "short", "dip", "special"],   finals: true,  tones: true,  clusters: true },
+  ];
+
+  // ---- Word Chains (ชุดคำฝึก / Blending Drill) ---------------
+  // Each step changes ONE position — the heart of the UFLI blending drill.
+  // Components are specified (not raw strings) so they load cleanly onto the board.
+  const WORD_CHAINS = [
+    { id: "swap-init", en: "Change the initial", th: "เปลี่ยนพยัญชนะต้น", level: "beginner",
+      words: [{ i: "ก", v: "aa" }, { i: "ข", v: "aa" }, { i: "ต", v: "aa" }, { i: "ม", v: "aa" }] },
+    { id: "swap-vow", en: "Change the vowel", th: "เปลี่ยนสระ", level: "beginner",
+      words: [{ i: "ม", v: "aa" }, { i: "ม", v: "ii" }, { i: "ม", v: "uu" }, { i: "ม", v: "e" }] },
+    { id: "add-final", en: "Add a final", th: "เติมตัวสะกด", level: "intermediate",
+      words: [{ i: "ก", v: "aa" }, { i: "ก", v: "aa", f: "kong" }, { i: "ก", v: "aa", f: "kon" }, { i: "ก", v: "aa", f: "kot" }] },
+    { id: "add-tone", en: "Change the tone", th: "ผันวรรณยุกต์", level: "advanced",
+      words: [{ i: "ต", v: "aa" }, { i: "ต", v: "aa", t: "ek" }, { i: "ต", v: "aa", t: "tho" }] },
+  ];
+
+  // ---- Word Work Mats (แผ่นกิจกรรมฝึกคำ) ---------------------
+  // Exact grapheme inventories per the "Foundation of Systematic Thai
+  // Language Learning" spec. Each mat has CV and CVC modes.
+  const MATS = {
+    beginner: {
+      en: "Word Work Mat — Beginner", th: "แผ่นฝึกคำ ระดับเริ่มต้น", grade: "อนุบาล 3",
+      note: "พยัญชนะเดี่ยว + สระรูปเดียว · วาง 1 พยัญชนะ + 1 สระ",
+      modes: {
+        cv: {
+          cons: "ก ข ค จ ด ต บ ป ผ พ ม ย ร ล ว ส ห อ".split(" "),
+          vowels: ["aa", "e", "ii", "uu"],
+          finals: null, tones: false,
+        },
+        cvc: {
+          cons: "ก ด ต บ ป ม น".split(" "),
+          vowels: ["aa", "ii", "uu", "e"],
+          finals: ["kong", "kon", "kom"], tones: false,
+        },
+      },
+    },
+    intermediate: {
+      en: "Word Work Mat — Intermediate", th: "แผ่นฝึกคำ ระดับกลาง", grade: "ป.1–ป.2",
+      note: "ครบ 44 ตัว + สระเปลี่ยนรูป + ตัวสะกด + วรรณยุกต์",
+      modes: {
+        cv: {
+          cons: "all",
+          vowels: ["aa", "e", "ae", "o", "ai2", "ai1", "i", "ii", "ue", "uue", "u", "uu", "aw", "aw_s"],
+          finals: null, tones: false, clusters: true,
+        },
+        cvc: {
+          cons: "all",
+          vowels: "all",
+          finals: ["kok", "kot", "kop", "kong", "kom", "koei", "koew", "kon"],
+          tones: true, clusters: true,
+        },
+      },
+    },
+  };
+
+  // ---- Tones (วรรณยุกต์) -------------------------------------
+  const tones = [
+    { id: "none", mark: "",        name: "สามัญ",     th: "ไม่มีรูป", rom: "" },
+    { id: "ek",   mark: "\u0E48",  name: "ไม้เอก",    th: "เอก",     rom: "\u00E8" },   // ่
+    { id: "tho",  mark: "\u0E49",  name: "ไม้โท",     th: "โท",      rom: "\u00EA" },   // ้
+    { id: "tri",  mark: "\u0E4A",  name: "ไม้ตรี",    th: "ตรี",     rom: "\u0301" },   // ๊
+    { id: "chat", mark: "\u0E4B",  name: "ไม้จัตวา",  th: "จัตวา",   rom: "\u030C" },   // ๋
+  ];
+
+  // ---- Builders ----------------------------------------------
+  // Template shown on a vowel KEY (uses dotted-circle placeholder)
+  function vowelTemplate(v) {
+    const base = v.above ? DOT + v.above : DOT;
+    return v.before + base + v.after;
+  }
+  // Template shown on a tone KEY
+  function toneTemplate(t) {
+    return t.mark ? DOT + t.mark : DOT;
+  }
+  // Template shown on a final-consonant KEY
+  function finalTemplate(f) {
+    return f.ch ? DOT + f.ch : DOT;
+  }
+  // Bare glyphs (no dotted-circle placeholder) for clean tile display.
+  // Combining marks need *something* to sit on, so we use a non-breaking
+  // space (invisible) as a neutral stand-in for the consonant slot —
+  // no circle, no dash, just the mark in its natural position.
+  function vowelBare(v) {
+    const carrier = v.above ? "\u00A0" : "";
+    return v.before + carrier + v.above + v.after;
+  }
+  function toneBare(t) {
+    return t.mark ? "\u00A0" + t.mark : "";
+  }
+  // Build the full combined syllable string in correct Unicode order:
+  //   before + initial + above/below + tone + after + final
+  function buildSyllable(initialChar, vowel, tone, finalChar) {
+    const c = initialChar || DOT;
+    const v = vowel || { before: "", above: "", after: "" };
+    const tmark = (tone && tone.mark) || "";
+    const fin = finalChar || "";
+    return v.before + c + v.above + tmark + v.after + fin;
+  }
+  // Rough romanized reading (for display only — not a strict transliteration)
+  function romanize(cons, vowel, tone, fin) {
+    if (!cons && !vowel) return "";
+    const cr = cons ? cons.rom.replace(/[()]/g, "") : "";
+    const vr = vowel ? vowel.rom : "";
+    const fr = fin && fin.rom ? fin.rom : "";
+    let out = (cr + vr + fr).trim();
+    if (tone && tone.rom) out += tone.rom;
+    return out;
+  }
+  // Consonants grouped & ordered by class (mid -> high -> low)
+  function consonantsByClass(setKey) {
+    let list = consonants;
+    if (setKey === "common") list = consonants.filter((c) => COMMON_CONS.includes(c.ch));
+    else if (setKey === "noRare") list = consonants.filter((c) => !c.rare);
+    return CLASS_ORDER.map((g) => ({
+      ...g,
+      items: list.filter((c) => c.cls === g.cls),
+    }));
+  }
+
+  // Resolve an initial (single consonant OR cluster) to an info object
+  function clusterClass(ch) {
+    const first = consonants.find((c) => c.ch === ch[0]);
+    return first ? first.cls : "M";
+  }
+  function getInitial(ch) {
+    if (!ch) return null;
+    const c = consonants.find((x) => x.ch === ch);
+    if (c) return c;
+    const cl = clusters.find((x) => x.ch === ch);
+    if (cl) return { ch: cl.ch, rom: cl.rom, name: "ควบกล้ำ", cls: clusterClass(cl.ch), cluster: true };
+    return null;
+  }
+
+  window.THAI = {
+    consonants, vowels, tones, finals, clusters, LEVELS, WORD_CHAINS, MATS,
+    COMMON_CONS, CLASS_ORDER,
+    DOT,
+    vowelTemplate, toneTemplate, finalTemplate, vowelBare, toneBare,
+    buildSyllable, romanize, consonantsByClass, getInitial,
+  };
+})();
