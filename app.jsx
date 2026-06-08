@@ -8,6 +8,7 @@ const WordWorkMat = window.WordWorkMat;
 const DIGITAL_APPS = window.DIGITAL_APPS;
 const RESOURCES = window.RESOURCES;
 const LESSON_ITEMS = window.LESSON_ITEMS;
+const MAT_ITEMS = window.MAT_ITEMS;
 const { useTweaks, TweaksPanel, TweakSection, TweakSlider, TweakRadio, TweakToggle, TweakColor } = window;
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
@@ -93,7 +94,9 @@ function NavBar({ page, go }) {
         </a>
         <nav className="nav">
           {mk({ id: "home", en: "Home", th: "หน้าหลัก", icon: "home" })}
-          {DIGITAL_APPS.map(mk)}
+          {DIGITAL_APPS.map((app) => app.id === "mat"
+            ? <NavDropdown key="mat" label={app.navEn || app.en} icon={app.icon} items={MAT_ITEMS} page={page} go={go} />
+            : mk(app))}
           <NavDropdown label="Lessons" icon="lesson" items={LESSON_MENU} page={page} go={go} />
         </nav>
       </div>
@@ -119,10 +122,10 @@ function BoardPage({ t }) {
 }
 
 /* ---------- Word Work Mat page wrapper ---------- */
-function MatPage({ t }) {
+function MatPage({ t, level }) {
   return (
     <div>
-      <WordWorkMat t={t} />
+      <WordWorkMat t={t} level={level} />
     </div>
   );
 }
@@ -130,15 +133,16 @@ function MatPage({ t }) {
 /* ---------- App ---------- */
 function App() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
-  const [page, setPage] = useState(() => {
-    let p = localStorage.getItem("panyaden_page") || "home";
-    if (p === "mat-beginner" || p === "mat-intermediate") p = "mat"; // legacy ids → single mat
-    if (p === "lesson") p = "lesson-" + THAI.GRADE_ORDER[0];          // bare lesson → first grade
+  // normalise bare "mat"/"lesson" ids to their first level/grade
+  const norm = (p) => {
+    if (p === "mat") return "mat-" + THAI.MAT_LEVELS[0];
+    if (p === "lesson") return "lesson-" + THAI.GRADE_ORDER[0];
     return p;
-  });
+  };
+  const [page, setPage] = useState(() => norm(localStorage.getItem("panyaden_page") || "home"));
 
   const go = (p) => {
-    if (p === "lesson") p = "lesson-" + THAI.GRADE_ORDER[0];
+    p = norm(p);
     setPage(p); localStorage.setItem("panyaden_page", p); window.scrollTo({ top: 0 });
   };
 
@@ -162,7 +166,10 @@ function App() {
   let body;
   if (page === "home") body = <HomePage go={go} />;
   else if (page === "board") body = <BoardPage t={bt} />;
-  else if (page === "mat") body = <MatPage t={bt} />;
+  else if (page === "mat" || page.indexOf("mat-") === 0) {
+    const lvl = page === "mat" ? THAI.MAT_LEVELS[0] : page.slice(4); // "mat-beginner" → "beginner"
+    body = <MatPage t={bt} level={lvl} />;
+  }
   else if (page === "activity") body = <ActivityPage />;
   else if (page === "lesson" || page.indexOf("lesson-") === 0) {
     const g = page === "lesson" ? THAI.GRADE_ORDER[0] : page.slice(7); // "lesson-y1" → "y1"

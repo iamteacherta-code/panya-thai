@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · Activity Sheets — Letter Formation (Beginner)</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+<style>
+/* ============================================================
+   PANYA · Letter Formation Activity Sheets (Beginner)
+   Printable A4 worksheets — warm earth-wood-leaf design system,
+   matching the Thai Literacy Studio app.
+   ============================================================ */
+:root{
+  --bg:#f4efe4; --surface:#fbf8f1; --line:#e3d9c4; --line-2:#d6c8ab;
+  --ink:#2f2a20; --ink-2:#5c5341; --ink-3:#8a7e66;
+  --leaf:#5b7a4b; --leaf-d:#45603a; --leaf-l:#e6eddf;
+  --earth:#c98a3b; --earth-d:#a86d24; --earth-l:#f6e8d2;
+  --clay:#b05c3c; --sky:#6f9bb0;
+  --ghost:#d8cdb4;          /* hollow trace-letter outline */
+  --font-ui:"Sarabun",system-ui,-apple-system,sans-serif;
+  --font-thai:"TH Sarabun","Sarabun",sans-serif;
+  --font-hand:"Mali","Sarabun",sans-serif;
+}
+
+/* Embedded Thai face (same mapping as the app) */
+@font-face{
+  font-family:"TH Sarabun";
+  src:url("fonts/Sarabun-Regular.ttf") format("truetype");
+  font-weight:100 500; font-style:normal; font-display:swap;
+}
+@font-face{
+  font-family:"TH Sarabun";
+  src:url("fonts/Sarabun-Bold.ttf") format("truetype");
+  font-weight:501 900; font-style:normal; font-display:swap;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--font-ui); color:var(--ink);
+  background:var(--bg);
+  background-image:radial-gradient(circle at 1px 1px, rgba(120,100,60,.07) 1px, transparent 0);
+  background-size:22px 22px;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+
+/* ---------- Toolbar (screen only) ---------- */
+.toolbar{
+  position:sticky; top:0; z-index:50;
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  padding:12px 22px; background:rgba(251,248,241,.92); backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.toolbar .tb-title{font-weight:800; letter-spacing:.04em;}
+.toolbar .tb-title small{display:block; font-weight:600; color:var(--ink-3); font-size:12px; letter-spacing:.02em;}
+.toolbar .spacer{margin-left:auto;}
+.btn{
+  display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line-2);
+  background:var(--surface); color:var(--ink); font-family:inherit; font-weight:700; font-size:14px;
+  padding:10px 16px; border-radius:999px; cursor:pointer;
+}
+.btn-primary{background:var(--earth); color:#fff; border-color:var(--earth-d); box-shadow:inset 0 -3px 0 rgba(0,0,0,.12);}
+.btn-primary:hover{background:var(--earth-d);}
+.btn-home{text-decoration:none; background:var(--leaf); color:#fff; border-color:var(--leaf-d); box-shadow:inset 0 -3px 0 rgba(0,0,0,.12); margin-right:4px;}
+.btn-home:hover{background:var(--leaf-d);}
+.hint{color:var(--ink-3); font-size:13px;}
+
+/* ---------- Sheet (A4) ---------- */
+.sheets{padding:26px 14px 60px; display:flex; flex-direction:column; align-items:center; gap:26px;}
+.sheet{
+  width:210mm; min-height:297mm; background:#fff; color:var(--ink);
+  border:1px solid var(--line); border-radius:10px;
+  box-shadow:0 2px 6px rgba(60,48,28,.08), 0 22px 50px -22px rgba(60,48,28,.30);
+  padding:15mm 14mm 13mm; position:relative; overflow:hidden;
+}
+
+/* ---------- Sheet header (logo + name fields) ---------- */
+.sh-head{display:flex; align-items:flex-start; gap:16px; padding-bottom:12px; border-bottom:2px solid var(--leaf-l);}
+.sh-brand{display:flex; align-items:center; gap:11px; flex:none;}
+.sh-mark{width:46px; height:46px; flex:none; display:grid; place-items:center;}
+.sh-mark img{width:100%; height:100%; object-fit:contain;}
+.sh-mark .fallback{
+  width:42px; height:42px; border-radius:11px; background:var(--leaf);
+  color:#fff; display:grid; place-items:center; font-weight:800; font-size:20px;
+  box-shadow:inset 0 -3px 0 rgba(0,0,0,.15);
+}
+.sh-brand .bn{font-weight:800; font-size:18px; letter-spacing:.26em; line-height:1;}
+.sh-brand .bs{font-size:10.5px; color:var(--ink-3); letter-spacing:.04em; margin-top:2px;}
+.sh-meta{flex:1;}
+.sh-tag-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+.eyebrow{
+  font-size:10.5px; font-weight:800; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--earth-d);
+}
+.badge{
+  display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:800;
+  padding:3px 10px; border-radius:999px; background:var(--leaf-l); color:var(--leaf-d);
+}
+.badge.earth{background:var(--earth-l); color:var(--earth-d);}
+.sh-title{font-size:21px; font-weight:800; margin:5px 0 1px; letter-spacing:-.01em;}
+.sh-title .th{font-family:var(--font-thai); font-weight:500; color:var(--ink-2); font-size:17px;}
+.sh-fields{flex:none; display:flex; flex-direction:column; gap:7px; min-width:188px;}
+.fld{display:flex; align-items:flex-end; gap:7px; font-size:12px; font-weight:700; color:var(--ink-2);}
+.fld .th{font-family:var(--font-thai); font-weight:500; color:var(--ink-3); font-size:11px;}
+.fld .ln{flex:1; border-bottom:1.6px dotted var(--line-2); height:17px;}
+.fld.small{min-width:0;}
+
+/* shared section label inside a sheet */
+.instruct{
+  display:flex; align-items:center; gap:10px; margin:13px 0 10px;
+  font-size:13.5px; color:var(--ink-2);
+}
+.instruct .n{
+  flex:none; width:24px; height:24px; border-radius:8px; background:var(--earth);
+  color:#fff; font-weight:800; display:grid; place-items:center; font-size:13px;
+  box-shadow:inset 0 -2px 0 rgba(0,0,0,.14);
+}
+.instruct b{color:var(--ink);}
+.instruct .th{font-family:var(--font-thai); font-weight:500; color:var(--ink-3);}
+
+.legend{
+  display:inline-flex; align-items:center; gap:7px; font-size:11.5px; color:var(--ink-3);
+  font-family:var(--font-thai); font-weight:500;
+}
+.dot-start{width:12px; height:12px; border-radius:999px; background:var(--leaf); border:2px solid #fff; box-shadow:0 0 0 1.5px var(--leaf);}
+
+/* ---------- Thai glyph helpers ---------- */
+.thai{font-family:var(--font-thai);}
+/* hollow letter the child traces over */
+.ghost{
+  font-family:var(--font-thai); color:transparent;
+  -webkit-text-stroke:1.4px var(--ghost); text-stroke:1.4px var(--ghost);
+}
+.model{font-family:var(--font-thai); color:var(--leaf);}
+
+/* Glyphs that must sit ON a writing baseline.
+   Measured for "TH Sarabun": ascent 103, descent 22 (per 96px em), and the
+   feet of consonants land on the alphabetic baseline (inkDescent ≈ 0).
+   With line-height:1 the baseline sits (1 - A + D)/2 ≈ 0.078em ABOVE the
+   glyph's box bottom. So we bottom-align the glyph (no negative pull) and
+   place the writing line that same 0.078em above the glyph box bottom — i.e.
+   line bottom = cell padding-bottom + 0.078 × font-size. Each cell sets
+   --fs (its glyph size) and --pb (breathing room below the line); the line
+   position is then computed, so feet rest exactly on the line at any size. */
+.trace-row .lead .m, .trace-row .cell .g,
+.wbox .m, .write-row .wbox .m, .s5-card .writebar .wbox .m,
+.grow .gl-prac .c .g{
+  line-height:1; margin-bottom:0;
+}
+.baseline-cell{
+  display:flex; align-items:flex-end; justify-content:center;
+  position:relative; padding-bottom:var(--pb,16px);
+}
+.baseline-cell::after{
+  content:""; position:absolute; left:10%; right:10%;
+  bottom:calc(var(--pb,16px) + 0.078 * var(--fs,40px));
+  border-bottom:1.5px solid #e7ddc6;
+}
+
+/* baseline writing box */
+.wbox{
+  --fs:62px; --pb:18px;
+  border:1.6px solid var(--line); border-radius:9px; background:#fff;
+  position:relative; display:flex; align-items:flex-end; justify-content:center;
+  padding-bottom:var(--pb);
+}
+.wbox::after{
+  content:""; position:absolute; left:8%; right:8%;
+  bottom:calc(var(--pb) + 0.078 * var(--fs));
+  border-bottom:1.5px solid #e7ddc6;
+}
+
+/* ---------- Sheet 1 · Big trace ---------- */
+.s1-hero{display:grid; grid-template-columns:1.15fr .85fr; gap:14px; align-items:stretch; margin-bottom:6px;}
+.s1-focus{
+  border:2px solid var(--leaf-l); border-radius:16px; background:var(--leaf-l);
+  position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:10px; padding:16px 10px;
+}
+/* static focus letter — the font glyph with a start-dot marking the head */
+.s1-focus .big{ position:relative; font-family:var(--font-thai); font-size:150px; line-height:1; color:var(--leaf-d); }
+.s1-focus .start{
+  position:absolute; left:36%; bottom:2%;
+  width:18px; height:18px; border-radius:999px; background:var(--clay); border:3px solid #fff;
+  box-shadow:0 0 0 2px var(--clay);
+}
+.s1-cap{ display:inline-flex; align-items:center; gap:7px; font-family:var(--font-thai); font-weight:600; font-size:12px; color:var(--clay); }
+.s1-cap .d{ width:11px; height:11px; border-radius:999px; background:var(--clay); border:2px solid #fff; box-shadow:0 0 0 1.5px var(--clay); flex:none; }
+.s1-key{
+  border:1.6px solid var(--line); border-radius:16px; background:var(--surface);
+  display:grid; grid-template-rows:1fr auto; gap:8px; padding:12px;
+}
+.s1-key .pic{
+  border:1.6px dashed var(--line-2); border-radius:12px;
+  background:repeating-linear-gradient(45deg, transparent 0 10px, rgba(170,140,90,.05) 10px 20px);
+  display:grid; place-items:center; text-align:center; color:var(--ink-3); min-height:120px;
+}
+.s1-key .pic .th{font-family:var(--font-thai); font-size:15px;}
+.s1-key .word{text-align:center;}
+.s1-key .word .w{display:block; font-family:var(--font-thai); font-size:34px; font-weight:600; color:var(--ink); line-height:1.4;}
+.s1-key .word .r{display:block; margin-top:2px; font-size:12px; color:var(--ink-3); letter-spacing:.04em;}
+
+.trace-row{display:flex; gap:0; align-items:stretch; border:1.6px solid var(--line); border-radius:12px; overflow:hidden; background:#fff;}
+.trace-row .cell{--fs:96px; --pb:18px; flex:1; display:flex; align-items:flex-end; justify-content:center; padding:10px 0 var(--pb); border-right:1.4px dashed #ece2cc; position:relative; min-height:132px;}
+.trace-row .cell:last-child{border-right:none;}
+.trace-row .cell::after{content:""; position:absolute; left:10%; right:10%; bottom:calc(var(--pb) + 0.078 * var(--fs)); border-bottom:1.5px solid #e7ddc6;}
+.trace-row .cell .g{font-size:96px;}
+/* lead model sits on the SAME line as the trace cells: line is at pb+0.078*96
+   = 18+7.5 = 25.5px from row bottom, so feet of the 54px model must reach 25.5
+   → its padding-bottom = 25.5 - 0.078*54 ≈ 21px */
+.trace-row .lead{flex:none; width:62px; background:var(--earth-l); border-right:1.6px solid var(--line); display:flex; align-items:flex-end; justify-content:center; padding-bottom:21px;}
+.trace-row .lead .m{font-family:var(--font-thai); font-size:54px; color:var(--earth-d);}
+
+.write-row{display:grid; grid-template-columns:repeat(7,1fr); gap:9px; margin-top:11px;}
+.write-row .wbox{height:96px;}
+.write-row .wbox .m{font-family:var(--font-thai); font-size:62px; color:var(--ghost); line-height:1;}
+
+/* ---------- Sheet 2 · Strokes & direction ---------- */
+.s2-strokes{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:4px;}
+.s2-step{border:1.6px solid var(--line); border-radius:14px; background:var(--surface); padding:10px; text-align:center; position:relative;}
+.s2-step .no{position:absolute; top:8px; left:10px; width:22px; height:22px; border-radius:7px; background:var(--leaf); color:#fff; font-weight:800; font-size:12px; display:grid; place-items:center;}
+.s2-step .gl{font-family:var(--font-thai); font-size:78px; line-height:1; color:var(--leaf-d); margin-top:4px;}
+.s2-step .cap{font-size:11px; color:var(--ink-3); font-family:var(--font-thai); font-weight:500;}
+.s2-arrowbar{display:flex; align-items:center; justify-content:center; gap:8px; color:var(--clay); font-weight:700; font-size:12.5px; margin:2px 0 4px;}
+
+/* ---------- Sheet 3 · Letter family grid ---------- */
+.grid-rows{display:flex; flex-direction:column; border:1.6px solid var(--line); border-radius:14px; overflow:hidden;}
+.grow{display:grid; grid-template-columns:108px 1fr; border-bottom:1.4px solid var(--line); min-height:84px;}
+.grow:last-child{border-bottom:none;}
+.grow .gl-lead{display:flex; align-items:center; gap:8px; padding:0 12px; background:var(--leaf-l); border-right:1.6px solid var(--line);}
+.grow .gl-lead .m{font-family:var(--font-thai); font-size:46px; color:var(--leaf-d); line-height:1;}
+.grow .gl-lead .kw{font-family:var(--font-thai); font-size:13px; color:var(--ink-2); font-weight:600; line-height:1.15;}
+.grow .gl-prac{display:grid; grid-template-columns:repeat(8,1fr); align-items:center;}
+.grow .gl-prac .c{--fs:46px; --pb:14px; display:flex; align-items:flex-end; justify-content:center; height:100%; border-right:1.4px dashed #ece2cc; position:relative; padding-bottom:var(--pb);}
+.grow .gl-prac .c:last-child{border-right:none;}
+.grow .gl-prac .c::after{content:""; position:absolute; left:14%; right:14%; bottom:calc(var(--pb) + 0.078 * var(--fs)); border-bottom:1.3px solid #ebe1ca;}
+.grow .gl-prac .c .g{font-family:var(--font-thai); font-size:46px;}
+.grow .gl-prac .c.trace .g{color:transparent; -webkit-text-stroke:1.3px var(--ghost);}
+
+/* ---------- Sheet 4 · Find & trace ---------- */
+.hunt{
+  border:1.6px solid var(--line); border-radius:14px; background:var(--surface);
+  padding:14px 16px; line-height:1.9; font-family:var(--font-thai); font-size:34px; color:var(--ink-2);
+  letter-spacing:.18em; text-align:center;
+}
+.hunt .target{color:var(--clay); font-weight:700;}
+.find-key{
+  display:inline-flex; align-items:center; gap:10px; padding:8px 14px; border-radius:12px;
+  background:var(--earth-l); border:1.6px solid var(--line-2); margin-bottom:10px;
+}
+.find-key .m{font-family:var(--font-thai); font-size:42px; color:var(--earth-d); line-height:1;}
+.find-key .lbl{font-size:12.5px; color:var(--ink-2); font-weight:700;}
+.find-key .lbl .th{display:block; font-family:var(--font-thai); font-weight:500; color:var(--ink-3); font-size:11.5px;}
+.tally{display:flex; align-items:center; gap:10px; margin:12px 0; font-size:13px; color:var(--ink-2); font-family:var(--font-thai);}
+.tally .box{width:54px; height:40px; border:1.6px solid var(--line-2); border-radius:9px;}
+
+/* ---------- Sheet 5 · Picture + word + write ---------- */
+.s5-grid{display:grid; grid-template-columns:1fr 1fr; gap:13px;}
+.s5-card{border:1.6px solid var(--line); border-radius:16px; overflow:hidden; background:var(--surface);}
+.s5-card .top{display:grid; grid-template-columns:1fr 1fr; gap:0;}
+.s5-card .pic{
+  border-right:1.4px dashed #ece2cc; min-height:118px; display:grid; place-items:center; text-align:center; color:var(--ink-3);
+  background:repeating-linear-gradient(45deg, transparent 0 10px, rgba(170,140,90,.05) 10px 20px);
+}
+.s5-card .pic .th{font-family:var(--font-thai); font-size:13px;}
+.s5-card .letter{display:grid; place-items:center; background:var(--leaf-l);}
+.s5-card .letter .m{font-family:var(--font-thai); font-size:78px; color:var(--leaf-d); line-height:1;}
+.s5-card .wordline{padding:8px 12px 7px; border-top:1.6px solid var(--line); text-align:center;}
+/* line-height must reserve room for ABOVE marks (ม้า ้ / เต่า ่) and BELOW
+   vowels (งู ◌ู) so the ghost word never overlaps the romanization below. */
+.s5-card .wordline .gw{display:block; font-family:var(--font-thai); font-size:40px; color:transparent; -webkit-text-stroke:1.4px var(--ghost); line-height:1.55;}
+.s5-card .wordline .r{display:block; margin-top:3px; font-size:11px; color:var(--ink-3); letter-spacing:.05em;}
+.s5-card .writebar{display:grid; grid-template-columns:repeat(4,1fr); gap:7px; padding:10px 12px 12px;}
+.s5-card .writebar .wbox{--fs:40px; --pb:13px; height:62px;}
+.s5-card .writebar .wbox .m{font-family:var(--font-thai); font-size:40px; color:var(--ghost); line-height:1;}
+
+/* ---------- Sheet footer ---------- */
+.sh-foot{
+  position:absolute; left:14mm; right:14mm; bottom:8mm;
+  display:flex; align-items:center; justify-content:space-between;
+  font-size:10.5px; color:var(--ink-3); border-top:1.4px solid var(--line); padding-top:7px;
+}
+.sh-foot .th{font-family:var(--font-thai);}
+.star-row{display:flex; align-items:center; gap:6px;}
+.star{width:15px; height:15px; border:1.6px solid var(--line-2); border-radius:4px;}
+
+/* ---------- Print ---------- */
+@media print{
+  @page{size:A4; margin:0;}
+  body{background:#fff; background-image:none;}
+  .toolbar{display:none !important;}
+  .sheets{padding:0; gap:0;}
+  .sheet{
+    width:210mm; min-height:297mm; box-shadow:none; border:none; border-radius:0;
+    page-break-after:always; break-after:page;
+  }
+  .sheet:last-child{page-break-after:auto; break-after:auto;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ Toolbar (screen only) ============ -->
+<div class="toolbar">
+  <a class="btn btn-home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก · Home</a>
+  <div class="tb-title">PANYA · Activity Sheets
+    <small>Letter Formation · การคัดลายมือ — Beginner</small>
+  </div>
+  <span class="spacer"></span>
+  <span class="hint">5 แผ่น · พิมพ์ลงกระดาษ A4</span>
+  <button class="btn btn-primary" onclick="window.print()">🖨️ พิมพ์ / Print</button>
+</div>
+
+<div class="sheets">
+
+  <!-- ===================== SHEET 1 — BIG TRACE ก ===================== -->
+  <section class="sheet">
+    <header class="sh-head">
+      <div class="sh-brand">
+        <div class="sh-mark"><img src="images/panya-logo.png" alt="PANYA"
+             onerror="this.style.display='none';this.parentNode.innerHTML='<div class=&quot;fallback&quot;>P</div>'"></div>
+        <div><div class="bn">PANYA</div><div class="bs">Thai Foundation</div></div>
+      </div>
+      <div class="sh-meta">
+        <div class="sh-tag-row">
+          <span class="eyebrow">Letter Formation</span>
+          <span class="badge">Beginner · เริ่มต้น</span>
+          <span class="badge earth">แบบที่ 1 · Trace</span>
+        </div>
+        <div class="sh-title">Trace the letter <span class="th">· ลากตามรอยตัวอักษร</span></div>
+      </div>
+      <div class="sh-fields">
+        <div class="fld">ชื่อ <span class="th">Name</span> <span class="ln"></span></div>
+        <div class="fld small">วันที่ <span class="th">Date</span> <span class="ln"></span>
+          &nbsp;ห้อง <span class="th">Class</span> <span class="ln"></span></div>
+      </div>
+    </header>
+
+    <div class="instruct">
+      <span class="n">1</span>
+      <span><b>Trace</b> the big letter, then write it on your own.
+        <span class="th">ลากตามรอยตัวใหญ่ แล้วฝึกเขียนเอง · เริ่มที่จุด ● ด้านล่างซ้าย แล้วลากตามทิศ</span></span>
+      <span style="margin-left:auto"></span>
+      <span class="legend"><span class="dot-start"></span> จุดเริ่ม · start here</span>
+    </div>
+
+    <div class="s1-hero">
+      <div class="s1-focus">
+        <span class="big thai">ก<span class="start"></span></span>
+        <div class="s1-cap"><span class="d"></span> เริ่มที่ด้านล่างซ้าย · start at the lower-left (ก ไม่มีหัว)</div>
+      </div>
+      <div class="s1-key">
+        <div class="pic">วาดหรือระบายภาพ<br><span class="th">ไก่</span><br><span style="font-size:11px">draw / colour the chicken</span></div>
+        <div class="word"><div class="w">ก ไก่</div><div class="r">gɔɔ · gài (chicken)</div></div>
+      </div>
+    </div>
+
+    <div class="instruct"><span class="n">2</span><b>Trace</b> &nbsp;<span class="th">ลากตามรอย</span></div>
+    <div class="trace-row">
+      <div class="lead"><span class="m">ก</span></div>
+      <div class="cell"><span class="ghost g">ก</span></div>
+      <div class="cell"><span class="ghost g">ก</span></div>
+      <div class="cell"><span class="ghost g">ก</span></div>
+      <div class="cell"><span class="ghost g">ก</span></div>
+    </div>
+
+    <div class="instruct"><span class="n">3</span><b>Write</b> on your own &nbsp;<span class="th">เขียนเอง</span></div>
+    <div class="write-row">
+      <div class="wbox"><span class="m">ก</span></div>
+      <div class="wbox"></div><div class="wbox"></div><div class="wbox"></div>
+      <div class="wbox"></div><div class="wbox"></div><div class="wbox"></div>
+    </div>
+
+    <footer class="sh-foot">
+      <span class="th">PANYA Thai Foundation · ใบงานคัดลายมือ — Letter Formation</span>
+      <span class="star-row">ระบายดาวเมื่อทำเสร็จ <span class="star"></span><span class="star"></span><span class="star"></span></span>
+    </footer>
+  </section>
+
+  <!-- ===================== SHEET 2 — STROKES & DIRECTION ===================== -->
+  <section class="sheet">
+    <header class="sh-head">
+      <div class="sh-brand">
+        <div class="sh-mark"><img src="images/panya-logo.png" alt="PANYA"
+             onerror="this.style.display='none';this.parentNode.innerHTML='<div class=&quot;fallback&quot;>P</div>'"></div>
+        <div><div class="bn">PANYA</div><div class="bs">Thai Foundation</div></div>
+      </div>
+      <div class="sh-meta">
+        <div class="sh-tag-row">
+          <span class="eyebrow">Letter Formation</span>
+          <span class="badge">Beginner · เริ่มต้น</span>
+          <span class="badge earth">แบบที่ 2 · Strokes</span>
+        </div>
+        <div class="sh-title">How to build the letter <span class="th">· ลำดับเส้นและทิศทาง</span></div>
+      </div>
+      <div class="sh-fields">
+        <div class="fld">ชื่อ <span class="th">Name</span> <span class="ln"></span></div>
+        <div class="fld small">วันที่ <span class="th">Date</span> <span class="ln"></span>
+          &nbsp;ห้อง <span class="th">Class</span> <span class="ln"></span></div>
+      </div>
+    </header>
+
+    <div class="instruct">
+      <span class="n">1</span>
+      <span><b>Follow the steps</b> 1 → 4, then trace and write.
+        <span class="th">ดูลำดับเส้น 1 → 4 เริ่มที่ด้านล่างซ้าย แล้วลากตามรอยและเขียนเอง</span></span>
+    </div>
+
+    <div class="s2-strokes">
+      <div class="s2-step"><span class="no">1</span><div class="gl thai">ก</div><div class="cap">เริ่มที่ด้านล่างซ้าย · start lower-left</div></div>
+      <div class="s2-step"><span class="no">2</span><div class="gl thai">ก</div><div class="cap">ลากขึ้นก้านซ้าย · up the left stem</div></div>
+      <div class="s2-step"><span class="no">3</span><div class="gl thai">ก</div><div class="cap">โค้งหลังคาไปขวา · curve over right</div></div>
+      <div class="s2-step"><span class="no">4</span><div class="gl thai">ก</div><div class="cap">ลงก้านขวา · down the right leg</div></div>
+    </div>
+    <div class="s2-arrowbar">▶ ทิศทางเขียน · write left → right, top → bottom ▼</div>
+
+    <div class="instruct"><span class="n">2</span><b>Trace</b> &nbsp;<span class="th">ลากตามรอย</span></div>
+    <div class="trace-row">
+      <div class="lead"><span class="m">ก</span></div>
+      <div class="cell"><span class="ghost g">ก</span></div>
+      <div class="cell"><span class="ghost g">ก</span></div>
+      <div class="cell"><span class="ghost g">ก</span></div>
+      <div class="cell"><span class="ghost g">ก</span></div>
+    </div>
+
+    <div class="instruct"><span class="n">3</span><b>Now you try</b> &nbsp;<span class="th">เขียนเอง 2 แถว</span></div>
+    <div class="write-row">
+      <div class="wbox"><span class="m">ก</span></div>
+      <div class="wbox"></div><div class="wbox"></div><div class="wbox"></div>
+      <div class="wbox"></div><div class="wbox"></div><div class="wbox"></div>
+    </div>
+    <div class="write-row" style="margin-top:9px">
+      <div class="wbox"><span class="m">ก</span></div>
+      <div class="wbox"></div><div class="wbox"></div><div class="wbox"></div>
+      <div class="wbox"></div><div class="wbox"></div><div class="wbox"></div>
+    </div>
+
+    <footer class="sh-foot">
+      <span class="th">PANYA Thai Foundation · ใบงานคัดลายมือ — Letter Formation</span>
+      <span class="star-row">ระบายดาวเมื่อทำเสร็จ <span class="star"></span><span class="star"></span><span class="star"></span></span>
+    </footer>
+  </section>
+
+  <!-- ===================== SHEET 3 — LETTER FAMILY GRID ===================== -->
+  <section class="sheet">
+    <header class="sh-head">
+      <div class="sh-brand">
+        <div class="sh-mark"><img src="images/panya-logo.png" alt="PANYA"
+             onerror="this.style.display='none';this.parentNode.innerHTML='<div class=&quot;fallback&quot;>P</div>'"></div>
+        <div><div class="bn">PANYA</div><div class="bs">Thai Foundation</div></div>
+      </div>
+      <div class="sh-meta">
+        <div class="sh-tag-row">
+          <span class="eyebrow">Letter Formation</span>
+          <span class="badge">Beginner · เริ่มต้น</span>
+          <span class="badge earth">แบบที่ 3 · Letter set</span>
+        </div>
+        <div class="sh-title">Beginner letter set <span class="th">· คัดพยัญชนะกลุ่มแรก</span></div>
+      </div>
+      <div class="sh-fields">
+        <div class="fld">ชื่อ <span class="th">Name</span> <span class="ln"></span></div>
+        <div class="fld small">วันที่ <span class="th">Date</span> <span class="ln"></span>
+          &nbsp;ห้อง <span class="th">Class</span> <span class="ln"></span></div>
+      </div>
+    </header>
+
+    <div class="instruct">
+      <span class="n">1</span>
+      <span><b>Trace</b> the grey letters, then <b>write</b> the rest of the row.
+        <span class="th">ลากตามรอยตัวสีจาง แล้วเขียนต่อจนเต็มแถว</span></span>
+    </div>
+
+    <div class="grid-rows">
+      <!-- row template: lead model + keyword, then 8 practice cells (3 trace + 5 write) -->
+      <div class="grow">
+        <div class="gl-lead"><span class="m">ก</span><span class="kw">ก<br>ไก่</span></div>
+        <div class="gl-prac">
+          <div class="c trace"><span class="g">ก</span></div><div class="c trace"><span class="g">ก</span></div><div class="c trace"><span class="g">ก</span></div>
+          <div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div>
+        </div>
+      </div>
+      <div class="grow">
+        <div class="gl-lead"><span class="m">ข</span><span class="kw">ข<br>ไข่</span></div>
+        <div class="gl-prac">
+          <div class="c trace"><span class="g">ข</span></div><div class="c trace"><span class="g">ข</span></div><div class="c trace"><span class="g">ข</span></div>
+          <div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div>
+        </div>
+      </div>
+      <div class="grow">
+        <div class="gl-lead"><span class="m">ค</span><span class="kw">ค<br>ควาย</span></div>
+        <div class="gl-prac">
+          <div class="c trace"><span class="g">ค</span></div><div class="c trace"><span class="g">ค</span></div><div class="c trace"><span class="g">ค</span></div>
+          <div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div>
+        </div>
+      </div>
+      <div class="grow">
+        <div class="gl-lead"><span class="m">ง</span><span class="kw">ง<br>งู</span></div>
+        <div class="gl-prac">
+          <div class="c trace"><span class="g">ง</span></div><div class="c trace"><span class="g">ง</span></div><div class="c trace"><span class="g">ง</span></div>
+          <div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div>
+        </div>
+      </div>
+      <div class="grow">
+        <div class="gl-lead"><span class="m">จ</span><span class="kw">จ<br>จาน</span></div>
+        <div class="gl-prac">
+          <div class="c trace"><span class="g">จ</span></div><div class="c trace"><span class="g">จ</span></div><div class="c trace"><span class="g">จ</span></div>
+          <div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div>
+        </div>
+      </div>
+      <div class="grow">
+        <div class="gl-lead"><span class="m">ด</span><span class="kw">ด<br>เด็ก</span></div>
+        <div class="gl-prac">
+          <div class="c trace"><span class="g">ด</span></div><div class="c trace"><span class="g">ด</span></div><div class="c trace"><span class="g">ด</span></div>
+          <div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div>
+        </div>
+      </div>
+      <div class="grow">
+        <div class="gl-lead"><span class="m">ต</span><span class="kw">ต<br>เต่า</span></div>
+        <div class="gl-prac">
+          <div class="c trace"><span class="g">ต</span></div><div class="c trace"><span class="g">ต</span></div><div class="c trace"><span class="g">ต</span></div>
+          <div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div>
+        </div>
+      </div>
+      <div class="grow">
+        <div class="gl-lead"><span class="m">บ</span><span class="kw">บ<br>ใบไม้</span></div>
+        <div class="gl-prac">
+          <div class="c trace"><span class="g">บ</span></div><div class="c trace"><span class="g">บ</span></div><div class="c trace"><span class="g">บ</span></div>
+          <div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div>
+        </div>
+      </div>
+      <div class="grow">
+        <div class="gl-lead"><span class="m">ป</span><span class="kw">ป<br>ปลา</span></div>
+        <div class="gl-prac">
+          <div class="c trace"><span class="g">ป</span></div><div class="c trace"><span class="g">ป</span></div><div class="c trace"><span class="g">ป</span></div>
+          <div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div>
+        </div>
+      </div>
+      <div class="grow">
+        <div class="gl-lead"><span class="m">อ</span><span class="kw">อ<br>อ่าง</span></div>
+        <div class="gl-prac">
+          <div class="c trace"><span class="g">อ</span></div><div class="c trace"><span class="g">อ</span></div><div class="c trace"><span class="g">อ</span></div>
+          <div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="sh-foot">
+      <span class="th">PANYA Thai Foundation · พยัญชนะกลุ่มเริ่มต้น (อ.3) — ก ข ค ง จ ด ต บ ป อ</span>
+      <span class="star-row">ระบายดาวเมื่อทำเสร็จ <span class="star"></span><span class="star"></span><span class="star"></span></span>
+    </footer>
+  </section>
+
+  <!-- ===================== SHEET 4 — FIND & TRACE ===================== -->
+  <section class="sheet">
+    <header class="sh-head">
+      <div class="sh-brand">
+        <div class="sh-mark"><img src="images/panya-logo.png" alt="PANYA"
+             onerror="this.style.display='none';this.parentNode.innerHTML='<div class=&quot;fallback&quot;>P</div>'"></div>
+        <div><div class="bn">PANYA</div><div class="bs">Thai Foundation</div></div>
+      </div>
+      <div class="sh-meta">
+        <div class="sh-tag-row">
+          <span class="eyebrow">Letter Formation</span>
+          <span class="badge">Beginner · เริ่มต้น</span>
+          <span class="badge earth">แบบที่ 4 · Find &amp; trace</span>
+        </div>
+        <div class="sh-title">Find it, then trace it <span class="th">· ค้นหาตัวอักษร แล้วคัด</span></div>
+      </div>
+      <div class="sh-fields">
+        <div class="fld">ชื่อ <span class="th">Name</span> <span class="ln"></span></div>
+        <div class="fld small">วันที่ <span class="th">Date</span> <span class="ln"></span>
+          &nbsp;ห้อง <span class="th">Class</span> <span class="ln"></span></div>
+      </div>
+    </header>
+
+    <div class="find-key">
+      <span class="m">ด</span>
+      <span class="lbl">วงกลมตัว “ด” ทุกตัวที่เจอ<span class="th">circle every “ด” you can find</span></span>
+    </div>
+
+    <div class="instruct"><span class="n">1</span><b>Circle</b> the target letter <span class="th">· วงกลมตัวที่กำหนด</span></div>
+    <div class="hunt">
+      บ <span class="target">ด</span> ต บ <span class="target">ด</span> ค ต <span class="target">ด</span> ป ก<br>
+      <span class="target">ด</span> ต บ ก <span class="target">ด</span> ป ต <span class="target">ด</span> ค บ<br>
+      ต ป <span class="target">ด</span> ก บ <span class="target">ด</span> ต ค <span class="target">ด</span> ป<br>
+      <span class="target">ด</span> ก ต บ ป <span class="target">ด</span> ค ต <span class="target">ด</span> บ
+    </div>
+
+    <div class="tally"><span class="n" style="width:24px;height:24px;border-radius:8px;background:var(--earth);color:#fff;font-weight:800;display:grid;place-items:center;font-size:13px">2</span>
+      เจอทั้งหมดกี่ตัว? · How many did you find? <span class="box"></span> ตัว</div>
+
+    <div class="instruct"><span class="n">3</span><b>Trace &amp; write</b> the letter you found <span class="th">· ลากตามรอยแล้วเขียนเอง</span></div>
+    <div class="trace-row">
+      <div class="lead"><span class="m">ด</span></div>
+      <div class="cell"><span class="ghost g">ด</span></div>
+      <div class="cell"><span class="ghost g">ด</span></div>
+      <div class="cell"><span class="ghost g">ด</span></div>
+      <div class="cell"><span class="ghost g">ด</span></div>
+    </div>
+    <div class="write-row">
+      <div class="wbox"><span class="m">ด</span></div>
+      <div class="wbox"></div><div class="wbox"></div><div class="wbox"></div>
+      <div class="wbox"></div><div class="wbox"></div><div class="wbox"></div>
+    </div>
+
+    <footer class="sh-foot">
+      <span class="th">PANYA Thai Foundation · ใบงานค้นหา + คัดลายมือ — Letter Formation</span>
+      <span class="star-row">ระบายดาวเมื่อทำเสร็จ <span class="star"></span><span class="star"></span><span class="star"></span></span>
+    </footer>
+  </section>
+
+  <!-- ===================== SHEET 5 — PICTURE + WORD + WRITE ===================== -->
+  <section class="sheet">
+    <header class="sh-head">
+      <div class="sh-brand">
+        <div class="sh-mark"><img src="images/panya-logo.png" alt="PANYA"
+             onerror="this.style.display='none';this.parentNode.innerHTML='<div class=&quot;fallback&quot;>P</div>'"></div>
+        <div><div class="bn">PANYA</div><div class="bs">Thai Foundation</div></div>
+      </div>
+      <div class="sh-meta">
+        <div class="sh-tag-row">
+          <span class="eyebrow">Letter Formation</span>
+          <span class="badge">Beginner · เริ่มต้น</span>
+          <span class="badge earth">แบบที่ 5 · Picture &amp; word</span>
+        </div>
+        <div class="sh-title">Letter · picture · word <span class="th">· ภาพ–คำ–คัดลายมือ</span></div>
+      </div>
+      <div class="sh-fields">
+        <div class="fld">ชื่อ <span class="th">Name</span> <span class="ln"></span></div>
+        <div class="fld small">วันที่ <span class="th">Date</span> <span class="ln"></span>
+          &nbsp;ห้อง <span class="th">Class</span> <span class="ln"></span></div>
+      </div>
+    </header>
+
+    <div class="instruct">
+      <span class="n">1</span>
+      <span><b>Colour</b> the picture, <b>trace</b> the word, then <b>write</b> the letter.
+        <span class="th">ระบายภาพ ลากตามรอยคำ แล้วคัดตัวอักษร</span></span>
+    </div>
+
+    <div class="s5-grid">
+      <!-- card: ม ม้า -->
+      <div class="s5-card">
+        <div class="top">
+          <div class="pic">ระบายภาพ<br><span class="th">ม้า</span><br>colour the horse</div>
+          <div class="letter"><span class="m">ม</span></div>
+        </div>
+        <div class="wordline"><div class="gw">ม้า</div><div class="r">máa · horse</div></div>
+        <div class="writebar">
+          <div class="wbox"><span class="m">ม</span></div>
+          <div class="wbox"></div><div class="wbox"></div><div class="wbox"></div>
+        </div>
+      </div>
+      <!-- card: ป ปลา -->
+      <div class="s5-card">
+        <div class="top">
+          <div class="pic">ระบายภาพ<br><span class="th">ปลา</span><br>colour the fish</div>
+          <div class="letter"><span class="m">ป</span></div>
+        </div>
+        <div class="wordline"><div class="gw">ปลา</div><div class="r">plaa · fish</div></div>
+        <div class="writebar">
+          <div class="wbox"><span class="m">ป</span></div>
+          <div class="wbox"></div><div class="wbox"></div><div class="wbox"></div>
+        </div>
+      </div>
+      <!-- card: ง งู -->
+      <div class="s5-card">
+        <div class="top">
+          <div class="pic">ระบายภาพ<br><span class="th">งู</span><br>colour the snake</div>
+          <div class="letter"><span class="m">ง</span></div>
+        </div>
+        <div class="wordline"><div class="gw">งู</div><div class="r">nguu · snake</div></div>
+        <div class="writebar">
+          <div class="wbox"><span class="m">ง</span></div>
+          <div class="wbox"></div><div class="wbox"></div><div class="wbox"></div>
+        </div>
+      </div>
+      <!-- card: ต เต่า -->
+      <div class="s5-card">
+        <div class="top">
+          <div class="pic">ระบายภาพ<br><span class="th">เต่า</span><br>colour the turtle</div>
+          <div class="letter"><span class="m">ต</span></div>
+        </div>
+        <div class="wordline"><div class="gw">เต่า</div><div class="r">tào · turtle</div></div>
+        <div class="writebar">
+          <div class="wbox"><span class="m">ต</span></div>
+          <div class="wbox"></div><div class="wbox"></div><div class="wbox"></div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="sh-foot">
+      <span class="th">PANYA Thai Foundation · ภาพ–คำ–คัดลายมือ — Letter Formation</span>
+      <span class="star-row">ระบายดาวเมื่อทำเสร็จ <span class="star"></span><span class="star"></span><span class="star"></span></span>
+    </footer>
+  </section>
+
+</div>
+</body>
+</html>

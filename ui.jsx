@@ -39,6 +39,47 @@
     );
   }
 
+  // Keypad category filters — checkable chips to choose which sections
+  // (พยัญชนะ/สระ/ตัวสะกด/วรรณยุกต์) and which consonant classes (กลาง/สูง/ต่ำ/ควบ)
+  // are shown on the right-hand tile panel. Shared by both boards.
+  function KeypadFilters({ sections, sec, onSec, classes, cls, onCls, finals, fin, onFin }) {
+    const Chip = ({ on, color, label, onClick }) => (
+      <button type="button" className={"kf-chip" + (color ? " " + color : "") + (on ? " on" : "")}
+        onClick={onClick} aria-pressed={on}>
+        <span className="kf-box">{on ? "✓" : ""}</span>
+        {color && <span className={"kf-sw " + color} />}
+        <span className="kf-tx">{label}</span>
+      </button>
+    );
+    return (
+      <div className="kf">
+        <div className="kf-group">
+          <span className="kf-lbl">หมวด · Show</span>
+          {sections.map((s) => (
+            <Chip key={s.key} on={sec[s.key]} label={s.label} onClick={() => onSec(s.key)} />
+          ))}
+        </div>
+        {classes && classes.length > 0 && sec.cons && (
+          <div className="kf-group">
+            <span className="kf-lbl">อักษร · Class</span>
+            {classes.map((c) => (
+              <Chip key={c.key} on={cls[c.key]} color={c.color} label={c.label} onClick={() => onCls(c.key)} />
+            ))}
+          </div>
+        )}
+        {finals && finals.length > 0 && sec.final && (
+          <div className="kf-group">
+            <span className="kf-lbl">ตัวสะกด · แม่</span>
+            {finals.map((f) => (
+              <Chip key={f.key} on={fin[f.key]} color="c-final" label={f.label} onClick={() => onFin(f.key)} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   window.Icons = Icons;
   window.Placeholder = Placeholder;
+  window.KeypadFilters = KeypadFilters;
 })();

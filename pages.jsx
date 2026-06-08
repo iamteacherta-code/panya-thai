@@ -3,8 +3,8 @@ const Icons = window.Icons;
 const Placeholder = window.Placeholder;
 
 const DIGITAL_APPS = [
+  { id: "mat", en: "Word Work Mat", th: "แผ่นฝึกคำ", icon: "activity", color: "var(--earth)", desc: "Build C+V and C+V+C words at the Beginner level (อ.2–ป.2) — consonants, vowels, finals and tones." },
   { id: "board", en: "Blending Board", th: "กระดานประสมคำ", icon: "board", color: "var(--leaf)", desc: "Slide consonants, vowels and tones to blend syllables live — the UFLI blending drill." },
-  { id: "mat", en: "Word Work Mat", th: "แผ่นฝึกคำ", icon: "activity", color: "var(--earth)", desc: "Build C+V and C+V+C words. Choose a grade (K2–Y3) — letters, vowels, finals and tones scale to the level." },
 ];
 const RESOURCES = [
   { id: "lesson", en: "Lessons", th: "บทเรียน", icon: "lesson", color: "var(--clay)", desc: "Explicit, systematic phonics units in a UFLI-style scope & sequence." },
@@ -100,28 +100,53 @@ function HomePage({ go }) {
 }
 
 /* ---------------- ACTIVITY SHEETS ---------------- */
+/* shared 3-level selector — Beginner / Intermediate / Advanced (optional "All") */
+function LevelBar({ value, onChange, withAll }) {
+  const opts = (withAll ? [{ key: "all", n: "•", en: "All", th: "ทั้งหมด" }] : []).concat([
+    { key: "beginner", n: "1", en: "Beginner", th: "พื้นฐาน" },
+    { key: "intermediate", n: "2", en: "Intermediate", th: "ปานกลาง" },
+    { key: "advanced", n: "3", en: "Advanced", th: "ขั้นสูง" },
+  ]);
+  return (
+    <div className="level-bar">
+      <span className="lvl-lead">ระดับ <span className="en">· Level</span></span>
+      <div className="lvl-seg">
+        {opts.map((L) => (
+          <button key={L.key} className={value === L.key ? "on" : ""} onClick={() => onChange(L.key)}>
+            <span className="lvl-step">{L.n}</span>
+            <span className="lvl-txt"><b>{L.en}</b><span className="th">{L.th}</span></span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function ActivityPage() {
   const items = [
-    { en: "Letter Formation", th: "คัดลายมือพยัญชนะ", tag: "Tracing", tagc: "earth" },
-    { en: "Sound Sort", th: "แยกเสียงสระสั้น–ยาว", tag: "Phonemic", tagc: "" },
-    { en: "Picture & Word Match", th: "จับคู่ภาพกับคำ", tag: "Vocabulary", tagc: "sky" },
-    { en: "Tone Mark Hunt", th: "ตามหาวรรณยุกต์", tag: "Tones", tagc: "earth" },
-    { en: "Build-a-Word", th: "ต่อคำจากพยางค์", tag: "Blending", tagc: "" },
-    { en: "Read & Color", th: "อ่านแล้วระบายสี", tag: "Fluency", tagc: "sky" },
+    { en: "Letter Formation", th: "คัดลายมือพยัญชนะ", tag: "Tracing", tagc: "earth", level: "Beginner" },
+    { en: "Sound Sort", th: "แยกเสียงสระสั้น–ยาว", tag: "Phonemic", tagc: "", level: "Beginner" },
+    { en: "Picture & Word Match", th: "จับคู่ภาพกับคำ", tag: "Vocabulary", tagc: "sky", level: "Intermediate" },
+    { en: "Tone Mark Hunt", th: "ตามหาวรรณยุกต์", tag: "Tones", tagc: "earth", level: "Advanced" },
+    { en: "Build-a-Word", th: "ต่อคำจากพยางค์", tag: "Blending", tagc: "", level: "Intermediate" },
+    { en: "Read & Color", th: "อ่านแล้วระบายสี", tag: "Fluency", tagc: "sky", level: "Advanced" },
   ];
+  const [lvl, setLvl] = React.useState("all");
+  const shown = lvl === "all" ? items : items.filter((it) => it.level.toLowerCase() === lvl);
   return (
     <div>
       <PageHead eyebrow="Practice" en="Activity Sheets" th="แผ่นกิจกรรม"
         sub="Hands-on, printable practice that reinforces each lesson's target sounds — designed for tablets and paper alike." />
       <FwNote />
+      <LevelBar value={lvl} onChange={setLvl} withAll />
       <div className="grid-3">
-        {items.map((it, i) => (
+        {shown.map((it, i) => (
           <div className="item-card" key={i}>
             <Placeholder label="activity thumbnail" h={120} />
             <h3>{it.en}<span className="th">{it.th}</span></h3>
             <div className="item-meta">
               <span className={"tag " + it.tagc}>{it.tag}</span>
-              <span className="tag sky">อ.–ป.6</span>
+              <span className="tag sky">{it.level}</span>
             </div>
             <div className="item-actions">
               <button className="btn btn-sm btn-leaf"><Ico name="play" style={{ width: 15, height: 15 }} /> Open</button>
@@ -280,18 +305,24 @@ const LESSON_ITEMS = THAI.GRADE_ORDER.map((id) => ({
   grade: id,
 }));
 
+const LESSON_LEVELS = { beginner: ["k2", "k3", "y1"], intermediate: ["y2"], advanced: ["y3"] };
+const lessonGradeLevel = (gg) => Object.keys(LESSON_LEVELS).find((L) => LESSON_LEVELS[L].includes(gg)) || "beginner";
 function LessonsPage({ grade }) {
-  const gid = LESSONS_BY_GRADE[grade] ? grade : THAI.GRADE_ORDER[0];
-  const g = THAI.GRADES[gid];
-  const units = LESSONS_BY_GRADE[gid];
-  const total = units.reduce((s, u) => s + u.lessons.length, 0);
+  const [lvl, setLvl] = React.useState(() => lessonGradeLevel(grade));
+  const grades = (LESSON_LEVELS[lvl] || []).filter((id) => LESSONS_BY_GRADE[id]);
   return (
     <div>
-      <PageHead eyebrow={"Scope & Sequence · " + g.en} en="Lessons" th={"บทเรียน · " + g.th}
-        sub={"ลำดับการสอนสำหรับระดับ " + g.en + " (" + g.th + ") — " + total + " บทเรียน " +
-          units.length + " หน่วย · " + g.note} />
+      <PageHead eyebrow="Scope & Sequence" en="Lessons" th="บทเรียน"
+        sub="ลำดับการสอนแบบเป็นระบบ (UFLI-style) — เลือกระดับเพื่อดูหน่วยและบทเรียน" />
+      <LevelBar value={lvl} onChange={setLvl} />
+      {grades.map((gid) => {
+        const g = THAI.GRADES[gid];
+        const units = LESSONS_BY_GRADE[gid] || [];
+        return (
+          <div key={gid}>
+            <h3 className="page-title" style={{ fontSize: 18, marginTop: 20, marginBottom: 2 }}>{g.en}<span className="th"> · {g.th}</span></h3>
       {units.map((u) => (
-        <div className="unit" key={u.n}>
+        <div className="unit" key={gid + "-" + u.n}>
           <div className="unit-head">
             <span className="u-num">Unit {u.n}</span>
             <span className="u-title">{u.en}<span className="th">{u.th}</span></span>
@@ -307,6 +338,9 @@ function LessonsPage({ grade }) {
           </div>
         </div>
       ))}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -368,35 +402,99 @@ function ReadingMode({ passage, onClose }) {
 }
 
 function ReadingPage() {
-  const [lvl, setLvl] = React.useState("A");
+  const [lvl, setLvl] = React.useState("beginner");
   const [reader, setReader] = React.useState(null);
-  const levels = [
-    { id: "A", en: "Level A · long vowels" },
-    { id: "B", en: "Level B · high-class" },
-    { id: "C", en: "Level C · tone marks" },
-  ];
   const passages = [
-    { en: "Ka the crow", th: "กาตาดี", lines: ["กา มี ตา", "กา ดู ปู", "ปู มา หา กา"] },
-    { en: "At the pond", th: "ที่สระน้ำ", lines: ["ปู อยู่ ใน น้ำ", "ปลา ว่าย มา"] },
+    // ----- Beginner (B1–B20) · designed scope & sequence (CV only) -----
+    // สระทีละตัว: –า –ี –ู (B1–B4)
+    { en: "Vowel –า", th: "สระอา · กา ตา มา", level: "beginner", lines: ["กา ตา มา นา", "ปา หา ลา ดา", "บา จา อา ขา", "ทา ชา วา ผา"] },
+    { en: "Vowel –ี", th: "สระอี · ดี มี ปี", level: "beginner", lines: ["ดี มี ปี ตี", "สี ที วี กี", "ผี ฝี นี ลี", "ชี บี ซี รี"] },
+    { en: "Vowel –ู", th: "สระอู · ดู ปู งู", level: "beginner", lines: ["ดู ปู งู รู", "หู ตู มู คู", "กู จู ลู ภู", "ชู ทู บู ซู"] },
+    { en: "Read · –า –ี –ู", th: "อ่าน · ตา มี ปู", level: "beginner", lines: ["ตา มี ปู", "ปู ดู งู", "งู มา หา ตา", "ตา ดู ปู นา"] },
+    // สระ เ– แ– โ– (B5–B8)
+    { en: "Vowel เ–", th: "สระเอ · เก เต เป", level: "beginner", lines: ["เก เต เป เด", "เม เน เล เว", "เซ เท เพ เจ", "เค เข เผ เถ"] },
+    { en: "Vowel แ–", th: "สระแอ · แก แต แป", level: "beginner", lines: ["แก แต แป แม", "แน แล แว แห", "แด แบ แค แพ", "แข แผ แถ แช"] },
+    { en: "Vowel โ–", th: "สระโอ · โต โม โพ", level: "beginner", lines: ["โต โม โพ โน", "โล โก โด โบ", "โป โร โซ โท", "โข โค โผ โถ"] },
+    { en: "Read · เ แ โ", th: "อ่าน · ตา ดู โต", level: "beginner", lines: ["ตา ดู โต", "โต มี ตา", "โต มา หา ตา", "ตา พา โต มา"] },
+    // สระ ไ ใ เ–า –ำ (B9–B12)
+    { en: "Vowel ไ ใ", th: "สระไอ ใอ · ไป ใจ", level: "beginner", lines: ["ไป ไก ไต ไม", "ไว ไห ไถ ไข", "ใจ ใน ใส ใบ", "ใย ไร ไล ไซ"] },
+    { en: "Vowel เ–า", th: "สระเอา · เรา เขา", level: "beginner", lines: ["เกา เตา เปา เมา", "เนา เลา เรา เขา", "เดา เบา เสา เอา", "เกา เดา เลา เรา"] },
+    { en: "Vowel –ำ", th: "สระอำ · ดำ ทำ", level: "beginner", lines: ["กำ ตำ ดำ นำ", "จำ ลำ ขำ ทำ", "รำ คำ ยำ งำ"] },
+    { en: "Read · ไ ใ เ–า –ำ", th: "อ่าน · ตา ไป นา", level: "beginner", lines: ["ตา ไป นา", "ตา เอา ปู มา", "ดำ ดี มี ตา", "ใจ ดี มา หา"] },
+    // คำสองพยางค์ (B13–B14)
+    { en: "Two-syllable words", th: "คำสองพยางค์ · ตาดี ปูนา", level: "beginner", lines: ["ตาดี ปูนา ดูงู", "มาหา ตามา ดูตา", "นาดี กาดี ตาโต", "มีตา มีปู มีงู"] },
+    { en: "Two-syllable words", th: "คำสองพยางค์ · อีกา ปูนา", level: "beginner", lines: ["อีกา ปูนา ตาดี", "มานา หาปู ดูตา", "กามา นามา ตามา", "ดูดี มีดี ตาดี"] },
+    // สระ –อ + ทบทวน (B15–B16)
+    { en: "Vowel –อ", th: "สระออ · ขอ รอ พอ", level: "beginner", lines: ["กอ ตอ ขอ รอ", "พอ มอ ลอ หอ", "คอ ดอ บอ ซอ", "ตอ นอ ยอ วอ"] },
+    { en: "Review · ขา ตา", th: "ทบทวน · ตา มี ขา", level: "beginner", lines: ["ตา มี ขา", "ขา โต ดี", "ตา ดู ขา", "ขา พา ตา มา"] },
+    // ประโยคสั้น (B17–B20)
+    { en: "Sentences · ตา & ปู", th: "ประโยค · ตา ดู ปู", level: "beginner", lines: ["ตา พา มา นา", "ตา ดู ปู", "ปู มา หา ตา", "ตา ดี ดู ปู"] },
+    { en: "Sentences · Manee", th: "ประโยค · มานี มา", level: "beginner", lines: ["มานี มา หา", "มานี ดู ตา", "ตา พา มานี มา", "มานี มี ตา ดี"] },
+    { en: "Sentences · กา & ปู", th: "ประโยค · กา หา ปู", level: "beginner", lines: ["กา มา หา ปู", "ปู ดู กา", "กา พา ปู มา นา", "ปู กา มา ดู ตา"] },
+    { en: "Review story", th: "ทบทวน · ตา มี ปู", level: "beginner", lines: ["ตา มี ปู", "ปู มี งู", "งู มา หา ตา", "ตา พา ปู ไป นา"] },
+    // ----- Y2 Guided Reading · Intermediate (I1–I20) -----
+    { en: "B1 · In the field", th: "นา มี ปู งู", level: "intermediate", lines: ["อา มี นา นา มี งู", "นา มี ปู กา ดู ปู", "งู ดู ปู มานี มา นา อา"] },
+    { en: "B2 · Single words", th: "ตา ปู งู หู", level: "intermediate", lines: ["ตา ปู งู หู", "ตา มา ปา พา", "นา หา อา กา", "ตี มี ปี ดี"] },
+    { en: "B3 · Two-word blends", th: "ตา ดู ปู นา", level: "intermediate", lines: ["ตาปู ปูนา หูตา", "ตีตาปู ดูดีดี อาดูกา", "ตาดูงู มาหาตา ดูปูนา"] },
+    { en: "B4 · Manee & Toh", th: "มานี พา โต", level: "intermediate", lines: ["นา มี รู งู นา มี รู ปู", "มานี พา โต มา หา อา", "มานี พา โต มา นา", "มานี พา โต หา ปู", "มานี พา โต ดู ปู"] },
+    { en: "B5 · Long vowels โ-", th: "โต โพ โป โม โห", level: "intermediate", lines: ["โต โพ โป โม โห", "นา ตา ปา อา วา", "ดี ตี มี วี รี", "ดู รู ปู หู งู"] },
+    { en: "B6 · โมโห", th: "ตาโต โมโห", level: "intermediate", lines: ["ตาโต โมโห ปูนา กากี", "นาดี อีกา อารี", "มีโมโห โตตาดี มีงูมา", "พามานา อาดูปู"] },
+    { en: "B7 · Vowels ไ ใ", th: "ไป ไว ใจ ใน", level: "intermediate", lines: ["ไป ไว ไอ ไร", "ไม ไต ไห ไส", "ใจ ใน ใด ใส"] },
+    { en: "B8 · ใจดี", th: "ใจดี มีใจ", level: "intermediate", lines: ["ใจดี มีใจ ไปนา มาไว", "ชาดี สีใด ในใจ ไปหา", "ปีใด พาไป กาสี ไปดี", "โตดีใจ ไปปีใด ไปไวไว"] },
+    { en: "B9 · Toh the dog", th: "โต มี อะไร", level: "intermediate", lines: ["โต มี ตา โต มี ขา", "โต มี หู หู โต มี อะไร", "โต เอา ขา ถู หู"] },
+    { en: "B10 · Vowels อะ เอา", th: "กะ จะ เกา เขา", level: "intermediate", lines: ["กะ จะ ปะ อะ สะ", "ชะ ทะ นะ มะ ระ", "เกา เดา เตา เอา เรา", "เงา เขา เหา เสา เถา"] },
+    // ----- Y2 Guided Reading (Set 3–5 · B11–B20) -----
+    { en: "B11 · Vowel grid", th: "ตา ตี โต ไต เตา", level: "intermediate", lines: ["ตา ตี โต ไต เตา", "มา มี โม ไม เมา", "นา นี โน ไน เนา", "ขา ขี โข ไข เขา"] },
+    { en: "B12 · Manee & Mana", th: "มานี มานะ จะปะ", level: "intermediate", lines: ["มานี มานะ จะปะ กะทะ", "มะระ อะไร จะไป จะดู", "ชะนี ดูใจ ไถนา หาเหา", "ในเตา เอาใจ มีเงา เสาโต"] },
+    { en: "B13 · The crab", th: "ปู นา มี สี ดำ", level: "intermediate", lines: ["ปู นา มี สี ดำ โต ก็ มี หู สี ดำ", "หู โต มี ปู นา มานี จะ ตี ปู นา", "ปู นา ไป ใน รู"] },
+    { en: "B14 · Manee's medicine", th: "มานี ทา ยา", level: "intermediate", lines: ["มานี เท ยา", "ทา หู โต", "มานี ทา ยา เบา เบา", "โต เอา ขา เกา หู"] },
+    { en: "B15 · จะดูงู", th: "จะดูงู จะดูปู", level: "intermediate", lines: ["จะดูงู จะดูปู จะดูกา", "ถูกะทะ เถามะระ เอาอะไร", "อาจะไอ เขาไถนา ไถไปไวไว", "เอาขาถู เอาใจเขา เดาดูที"] },
+    { en: "B16 · In our field", th: "ในนาเรา", level: "intermediate", lines: ["หาเสามา ในนาเรา เอาใจเรา", "มาดีดี สีเทาเทา เกาไวไว", "ไปดูปู ในรูงู"] },
+    { en: "B17 · Vowel grid เ–", th: "เท เอ เย เก เม", level: "intermediate", lines: ["เท เอ เย เก เม", "เส เห เข เท เจ", "ทา ไท ทำ เทา เรา", "ขา เข ไข ขำ เขา"] },
+    { en: "B18 · ทำนา", th: "ตาดำ ทำนา", level: "intermediate", lines: ["ตาดำ ทำนา พาไป ไถนา", "นาที สีดำ ขำดี มีรำ", "นาดำ จำเจ เกเร"] },
+    { en: "B19 · สระ –ำ", th: "ชาดำ กำยำ ตำรา", level: "intermediate", lines: ["เรไร โมเม โยเย เทยา", "ทายา ชาดำ กำยำ ตำรา", "งาดำ นำไป ลำไย ตะไบ"] },
+    { en: "B20 · ทำดี", th: "หากำไร กาสีดำ", level: "intermediate", lines: ["หากำไร กาสีดำ รำดีดี", "ขากำยำ ทำจำเจ เทกะทะ", "จะทำดี ตาสีดำ ถูเบาเบา", "ดูเขาทำนา ทายาสีดำ"] },
+    // ----- Advanced (A1–A20) · designed scope & sequence -----
+    // มาตราตัวสะกด 8 แม่ (A1–A8)
+    { en: "Final ง (แม่กง)", th: "แม่กง · ลิง ยุง", level: "advanced", lines: ["ลิง ยุง หาง นาง", "ทาง บาง ของ สอง", "วิ่ง ดัง ฟัง ร้อง"] },
+    { en: "Final น (แม่กน)", th: "แม่กน · กิน ดิน", level: "advanced", lines: ["กิน ดิน บิน ปีน", "จาน บาน งาน นาน", "คน ฝน ขน ต้น"] },
+    { en: "Final ม (แม่กม)", th: "แม่กม · ลม ชม", level: "advanced", lines: ["ลม ชม ดม ตม", "นาม ยาม ถาม งาม", "ริม ส้ม ยิ้ม อิ่ม"] },
+    { en: "Final ย (แม่เกย)", th: "แม่เกย · ขาย ยาย", level: "advanced", lines: ["ขาย ยาย สาย ตาย", "นาย ลาย ทาย หาย", "ง่าย ร้าย ป้าย โดย"] },
+    { en: "Final ว (แม่เกอว)", th: "แม่เกอว · ดาว แมว", level: "advanced", lines: ["ดาว แมว หิว เลว", "ขาว หนาว สาว ยาว", "เร็ว แล้ว กาว ทิว"] },
+    { en: "Final ก (แม่กก)", th: "แม่กก · นก ปาก", level: "advanced", lines: ["นก ปาก มาก จาก", "รัก ผัก ตก ยก", "บอก ออก ดอก ลูก"] },
+    { en: "Final ด (แม่กด)", th: "แม่กด · มด ปิด", level: "advanced", lines: ["มด กด จด ปิด", "ตัด ขาด หมด รด", "รถ สด พูด มืด"] },
+    { en: "Final บ (แม่กบ)", th: "แม่กบ · กบ จับ", level: "advanced", lines: ["กบ จับ รับ พบ", "ตอบ ขับ ทับ ลูบ", "รูป ภาพ บาป ดาบ"] },
+    // วรรณยุกต์ (A9–A12)
+    { en: "Tone · ไม้เอก", th: "ไม้เอก · ป่า ไก่", level: "advanced", lines: ["ป่า ปู่ ไก่ ใส่", "พ่อ น่า ที่ ไม่", "อ่าน ก่อน ห่าง บ่าย"] },
+    { en: "Tone · ไม้โท", th: "ไม้โท · แม่ น้ำ", level: "advanced", lines: ["แม่ น้ำ ใช้ ได้", "บ้าน ห้า ม้า ช้าง", "ไม้ น้อง ซ้าย ค้า"] },
+    { en: "Tone · ไม้ตรี ไม้จัตวา", th: "ตรี จัตวา · โต๊ะ จ๋า", level: "advanced", lines: ["โต๊ะ จ๊ะ ตุ๊ก กิ๊ก", "จ๋า ตี๋ จิ๋ว เป๋", "เดี๋ยว เกี๊ยว เอ๋ย ปิ๊ง"] },
+    { en: "Tone · ผันวรรณยุกต์", th: "ผันเสียง · ข้า ค่า", level: "advanced", lines: ["ข้า ค่า ช้า ล่า", "ป้า ย่า พ่อ แม่", "ไก่ ไข่ ข้าว เก้า"] },
+    // อักษรควบกล้ำ (A13–A16)
+    { en: "Cluster กร กล กว", th: "ควบกล้ำ · กลอง กวาง", level: "advanced", lines: ["กรอบ กลอง กวาง ไกล", "กลาง กล้า กรง กราบ", "กลม กลัว กว่า ใกล้"] },
+    { en: "Cluster ขว คร คล คว", th: "ควบกล้ำ · ครู ควาย", level: "advanced", lines: ["ขวา ขวด ขลุ่ย ขวาน", "ครู คลอง ความ ควาย", "คราว คลาย คว้า ครัว"] },
+    { en: "Cluster ปร ปล พล ผล", th: "ควบกล้ำ · ปลา พระ", level: "advanced", lines: ["ปลา ปลูก ปลอม ปลด", "ปรับ ปราบ ปรุง โปรด", "พระ พลอย ผล แปลก"] },
+    { en: "Cluster ตร · review", th: "ควบกล้ำ · ตรง พริก", level: "advanced", lines: ["ตรง ตรา ตรวจ ตรี", "พริก พรม ใคร ใกล้", "ปลาย คลาย กลาย ขวาง"] },
+    // สระประสม (A17–A19) + ทบทวน (A20)
+    { en: "Diphthong เ–ีย", th: "สระเอีย · เขียน เรียน", level: "advanced", lines: ["เสีย เมีย เปีย เลีย", "เขียน เรียน เพียง เสียง", "เลี้ยง เกลียด เปลี่ยน เรียก"] },
+    { en: "Diphthong เ–ือ", th: "สระเอือ · เสือ เรือ", level: "advanced", lines: ["เสือ เรือ เมือง เดือน", "เชื่อ เหลือ เกลือ เนื้อ", "เพื่อน เมื่อ เรื่อง เครื่อง"] },
+    { en: "Diphthong –ัว", th: "สระอัว · ตัว หัว", level: "advanced", lines: ["ตัว หัว วัว รั้ว", "บัว ครัว มัว ชั่ว", "กลัว ทั่ว ผัว ด้วง"] },
+    { en: "Review · short sentences", th: "ทบทวน · ประโยคสั้น", level: "advanced", lines: ["พ่อ พา ลูก ไป นา", "แม่ เลี้ยง ไก่ กับ หมา", "เสือ ตัว ใหญ่ วิ่ง เร็ว", "เพื่อน เรียน เขียน หนังสือ"] },
   ];
+  const shown = passages.filter((p) => p.level === lvl);
   return (
     <div>
       <PageHead eyebrow="Decodable Texts" en="Reading Passages" th="บทอ่าน"
         sub="Short passages built only from sounds students have already learned — so they can read every word with success." />
       <FwNote />
-      <div className="level-tabs">
-        {levels.map((l) => (
-          <button key={l.id} className={"level-tab" + (lvl === l.id ? " on" : "")} onClick={() => setLvl(l.id)}>{l.en}</button>
-        ))}
-      </div>
+      <LevelBar value={lvl} onChange={setLvl} />
       <div className="grid-2">
-        {passages.map((p, i) => (
+        {shown.map((p, i) => (
           <div className="item-card" key={i}>
             <div className="item-meta">
-              <span className="tag">{lvl === "A" ? "Long vowels" : lvl === "B" ? "High-class" : "Tones"}</span>
-              <span className="tag earth">Decodable</span>
+              <span className="tag">{p.level === "beginner" ? "Beginner" : p.level === "intermediate" ? "Intermediate" : "Advanced"}</span>
+              <span className="tag earth">{p.level === "beginner" ? (/Vowel/.test(p.en) ? "Phonics" : /word/i.test(p.en) ? "Words" : "Decodable") : "Decodable"}</span>
             </div>
-            <h3>{p.en}<span className="th">{p.th}</span></h3>
+            <h3>{(p.level === "advanced" ? "A" : p.level === "intermediate" ? "I" : "B") + (i + 1) + " · " + p.en.replace(/^[ABI]\d+\s*·\s*/, "")}<span className="th">{p.th}</span></h3>
             <div className="passage-thai">
               {p.lines.map((ln, j) => <div key={j}>{ln}</div>)}
             </div>
@@ -413,9 +511,81 @@ function ReadingPage() {
 }
 
 /* ---------------- WORKSHEETS ---------------- */
+// Printable "Trace & Say" worksheets for Beginner — each row gives a solid model
+// then light "ghost" copies for the child to trace over, and a word to say aloud.
+const TRACE_SHEETS = [
+  {
+    en: "Trace & Say · Mid-class letters", th: "คัดอักษรกลาง + สระอา", type: "Tracing", level: "beginner",
+    sub: "คัดตามรอยพยัญชนะ แล้วอ่านออกเสียงคำตัวอย่าง · Trace each letter, then say the word.",
+    rows: [
+      { t: "ก", w: "กา" }, { t: "จ", w: "จาน" }, { t: "ด", w: "ดี" }, { t: "ต", w: "ตา" },
+      { t: "บ", w: "ใบ" }, { t: "ป", w: "ปู" }, { t: "อ", w: "อา" },
+    ],
+  },
+  {
+    en: "Trace & Say · Long-vowel words", th: "คัดคำ สระเสียงยาว", type: "Tracing", level: "beginner",
+    sub: "คัดตามรอยคำ แล้วอ่านออกเสียง · Trace each word, then say it aloud.",
+    rows: [
+      { t: "ตา", w: "eye" }, { t: "กา", w: "crow" }, { t: "ดี", w: "good" },
+      { t: "ปู", w: "crab" }, { t: "งู", w: "snake" }, { t: "มา", w: "come" },
+    ],
+  },
+  {
+    en: "Trace & Say · Vowels เ แ โ", th: "คัดสระ เ แ โ", type: "Tracing", level: "beginner",
+    sub: "คัดตามรอยพยางค์ สังเกตรูปสระ แล้วอ่านออกเสียง · Trace, notice the vowel, then say it.",
+    rows: [
+      { t: "เก", w: "สระเอ" }, { t: "แก", w: "สระแอ" }, { t: "โก", w: "สระโอ" },
+      { t: "เต", w: "" }, { t: "แต", w: "" }, { t: "โต", w: "" },
+    ],
+  },
+];
+
+function WorksheetSheet({ sheet, onClose }) {
+  return (
+    <div className="ws-overlay" onClick={onClose}>
+      <div className="ws-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="ws-bar no-print">
+          <button className="btn btn-sm btn-leaf" onClick={() => window.print()}><Ico name="print" style={{ width: 15, height: 15 }} /> พิมพ์ · Print</button>
+          <button className="btn btn-sm btn-ghost" onClick={onClose}>✕ ปิด</button>
+        </div>
+        <div className="ws-sheet">
+          <div className="ws-head">
+            <img className="ws-logo" src="images/panya-logo.png" alt="PANYA" />
+            <div className="ws-htext">
+              <div className="ws-brand">PANYA · Thai Foundation</div>
+              <div className="ws-title">{sheet.en}</div>
+              <div className="ws-th">{sheet.th}</div>
+            </div>
+            <div className="ws-namebox">
+              <div className="ws-field">ชื่อ Name <span className="ws-line-fill" /></div>
+              <div className="ws-field">วันที่ Date <span className="ws-line-fill ws-line-sm" /></div>
+            </div>
+          </div>
+          <div className="ws-sub">{sheet.sub}</div>
+          <div className="ws-rows">
+            {sheet.rows.map((r, i) => (
+              <div className="ws-row" key={i}>
+                <span className="ws-model">{r.t}</span>
+                <div className="ws-write">
+                  {[0, 1, 2, 3, 4].map((k) => <span className="ws-ghost" key={k}>{r.t}</span>)}
+                </div>
+                <span className="ws-word">{r.w}</span>
+              </div>
+            ))}
+          </div>
+          <div className="ws-foot">คัดตามรอย แล้วพูดออกเสียงดัง ๆ · Trace, then say it aloud 🗣️</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function WorksheetsPage() {
   const [filter, setFilter] = React.useState("All");
+  const [lvl, setLvl] = React.useState("all");
+  const [sheet, setSheet] = React.useState(null);
   const filters = ["All", "Tracing", "Blending", "Dictation", "Assessment"];
+  const sheetLevels = ["beginner", "intermediate", "intermediate", "advanced", "beginner", "advanced"];
   const sheets = [
     { en: "Trace & Say: ก จ ด ต", th: "คัด ก จ ด ต", type: "Tracing" },
     { en: "Blend the syllable", th: "ประสมพยางค์", type: "Blending" },
@@ -424,12 +594,14 @@ function WorksheetsPage() {
     { en: "Vowel match -า -ี -ู", th: "จับคู่สระ", type: "Blending" },
     { en: "Trace tone marks", th: "คัดวรรณยุกต์", type: "Tracing" },
   ];
-  const shown = filter === "All" ? sheets : sheets.filter((s) => s.type === filter);
+  const withLvl = TRACE_SHEETS.concat(sheets.map((s, i) => ({ ...s, level: sheetLevels[i] })));
+  const shown = withLvl.filter((s) => (lvl === "all" || s.level === lvl) && (filter === "All" || s.type === filter));
   return (
     <div>
       <PageHead eyebrow="Print & Assess" en="Worksheets" th="ใบงาน"
         sub="Ready-to-print worksheets and quick checks, organised by skill so you can pull exactly what today's lesson needs." />
       <FwNote />
+      <LevelBar value={lvl} onChange={setLvl} withAll />
       <div className="level-tabs">
         {filters.map((f) => (
           <button key={f} className={"level-tab" + (filter === f ? " on" : "")} onClick={() => setFilter(f)}>{f}</button>
@@ -438,23 +610,39 @@ function WorksheetsPage() {
       <div className="grid-3">
         {shown.map((s, i) => (
           <div className="item-card" key={i}>
-            <Placeholder label="worksheet preview" h={150} />
+            {s.rows
+              ? <div className="ws-card-preview" onClick={() => setSheet(s)}>{s.rows.slice(0, 4).map((r, k) => <span key={k}>{r.t}</span>)}</div>
+              : <Placeholder label="worksheet preview" h={150} />}
             <h3>{s.en}<span className="th">{s.th}</span></h3>
-            <div className="item-meta"><span className="tag earth">{s.type}</span></div>
+            <div className="item-meta">
+              {s.level && <span className="tag">{s.level === "beginner" ? "Beginner" : s.level === "intermediate" ? "Intermediate" : "Advanced"}</span>}
+              <span className="tag earth">{s.type}</span>
+            </div>
             <div className="item-actions">
-              <button className="btn btn-sm btn-primary"><Ico name="print" style={{ width: 15, height: 15 }} /> Print PDF</button>
-              <button className="btn btn-sm btn-ghost">Preview</button>
+              <button className="btn btn-sm btn-primary" onClick={() => s.rows && setSheet(s)} disabled={!s.rows}><Ico name="print" style={{ width: 15, height: 15 }} /> Print PDF</button>
+              <button className="btn btn-sm btn-ghost" onClick={() => s.rows && setSheet(s)} disabled={!s.rows}>Preview</button>
             </div>
           </div>
         ))}
       </div>
+      {sheet && <WorksheetSheet sheet={sheet} onClose={() => setSheet(null)} />}
     </div>
   );
 }
+
+// Word Work Mat level items for the "Word Work Mat ▾" nav dropdown (one per level).
+const MAT_ITEMS = THAI.MAT_LEVELS.map((id) => ({
+  id: "mat-" + id,
+  en: THAI.GRADES[id].en,
+  th: THAI.GRADES[id].th,
+  icon: "activity",
+  level: id,
+}));
 
 window.TOOLS = TOOLS;
 window.DIGITAL_APPS = DIGITAL_APPS;
 window.RESOURCES = RESOURCES;
 window.LESSON_ITEMS = LESSON_ITEMS;
+window.MAT_ITEMS = MAT_ITEMS;
 window.Pages = { HomePage, ActivityPage, LessonsPage, ReadingPage, WorksheetsPage };
 window.Ico = Ico;

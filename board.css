@@ -15,19 +15,20 @@
 .c-clus   { --c-bg: #cfe7e2; --c-bd: #84bcb0; }
 .c-tone   { --c-bg: #f0d2c4; --c-bd: #d6a78f; }
 
-/* ---------- top toolbar: ? · word · undo ---------- */
-.bb-top {
-  display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: stretch;
-}
+/* ---------- word display + in-frame ? · undo buttons ---------- */
+.bb-top { display: block; }
+/* เฉลย / ล้าง float inside the display frame at the top corners */
 .round-btn {
-  width: 72px; border: none; border-radius: 20px; background: var(--surface-2);
-  border: 2px solid var(--line-2); color: var(--ink-2);
+  position: absolute; top: 12px; z-index: 2;
+  border: none; background: transparent; color: var(--ink-2);
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-  box-shadow: var(--shadow); transition: transform .08s, background .15s, color .15s;
+  transition: transform .08s, color .15s;
 }
-.round-btn:hover { background: #fff; color: var(--ink); }
+.round-btn.q { left: 16px; }
+.round-btn.undo { right: 16px; }
+.round-btn:hover { color: var(--ink); }
 .round-btn:active { transform: translateY(1px); }
-.round-btn .rb-glyph { font-size: 30px; font-weight: 800; line-height: 1; }
+.round-btn .rb-glyph { font-size: 40px; font-weight: 800; line-height: 1; }
 .round-btn .rb-lbl { font-size: 10.5px; font-weight: 700; }
 .round-btn.q .rb-glyph { color: var(--earth-d); }
 .round-btn.undo .rb-glyph { color: var(--clay); }
@@ -42,37 +43,54 @@
 }
 .bb-display::after { content: ""; position: absolute; inset: 8px; border-radius: 20px; border: 1.5px dashed rgba(170,140,90,.28); pointer-events: none; }
 .bb-word {
-  font-family: var(--font-thai); font-weight: 500; line-height: 1.05; color: var(--ink);
-  display: flex; align-items: center; justify-content: center; min-height: 1.1em;
+  font-family: var(--font-thai); font-weight: 500; line-height: 1.5; color: var(--ink);
+  display: flex; align-items: center; justify-content: center; min-height: 1.5em;
+  padding-block: .06em;   /* breathing room for stacked upper vowels + tone, and descenders */
 }
 .bb-word .slot-dot { color: var(--ink-3); opacity: .4; }
 .bb-read { font-size: 22px; font-weight: 800; color: var(--earth-d); letter-spacing: .02em; min-height: 1.4em; }
-.bb-read .hidden-q { color: var(--ink-3); letter-spacing: .25em; }
+.bb-read .hidden-q {
+  display: block; width: 100%; text-align: center;
+  font-style: normal; font-weight: 600; font-size: 14px; letter-spacing: .04em;
+  color: var(--ink-3);
+}
 .bb-read .cls { font-family: var(--font-thai); font-weight: 500; font-size: 14px; color: var(--ink-3); margin-left: 8px; }
+/* "ถูกต้อง! ✓" reward shown when a real word is composed */
+.bb-correct { display: inline-flex; align-items: center; gap: 8px; color: var(--leaf-d); font-weight: 800; }
+.bb-correct-ico {
+  display: inline-grid; place-items: center; width: 26px; height: 26px; flex: none;
+  border-radius: 999px; background: var(--leaf); color: #fff; font-size: 15px; font-weight: 900;
+  box-shadow: 0 2px 6px -1px color-mix(in srgb, var(--leaf) 55%, transparent);
+  animation: bb-pop .4s cubic-bezier(.2,1.4,.4,1) both;
+}
+.bb-correct-txt { font-family: var(--font-thai); font-weight: 600; }
+.bb-correct-txt b { font-weight: 800; color: var(--leaf-d); }
+@keyframes bb-pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
 
-/* ---------- recipe slots (build boxes) ---------- */
-.slots { display: flex; align-items: stretch; gap: 8px; flex-wrap: wrap; justify-content: center; }
+/* ---------- recipe slots + check button (one compact row) ---------- */
+.build-row { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.slots { display: flex; align-items: stretch; gap: 5px; flex-wrap: wrap; justify-content: center; }
 .slot {
-  position: relative; flex: 1 1 0; min-width: 130px; max-width: 230px;
-  border: 2.5px solid var(--line-2); border-radius: 16px; background: var(--surface-2);
-  padding: 10px 12px 12px; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  position: relative; flex: 0 1 auto; min-width: 80px; max-width: 108px;
+  border: 1.5px solid var(--line-2); border-radius: 11px; background: var(--surface-2);
+  padding: 4px 8px 6px; display: flex; flex-direction: column; align-items: center; gap: 1px;
   cursor: pointer; transition: border-color .15s, box-shadow .15s, background .15s;
 }
-.slot .s-label { font-size: 11px; font-weight: 800; letter-spacing: .04em; color: var(--ink-3); }
-.slot .s-label .en { color: var(--ink-2); }
-.slot .s-glyph { font-family: var(--font-thai); font-weight: 500; font-size: 38px; line-height: 1; min-height: 56px; display: flex; align-items: center; justify-content: center; padding-top: 6px; }
-.slot .s-glyph .empty { color: var(--ink-3); opacity: .3; font-size: 26px; }
-.slot .s-sub { font-family: var(--font-thai); font-size: 12px; color: var(--ink-3); min-height: 1.1em; font-weight: 500; }
+.slot .s-label { font-size: 9px; font-weight: 800; letter-spacing: .02em; color: var(--ink-3); line-height: 1.2; text-align: center; padding: 0 12px; }
+.slot .s-label .en { display: block; color: var(--ink-2); font-weight: 700; }
+.slot .s-glyph { font-family: var(--font-thai); font-weight: 500; font-size: 23px; line-height: 1.3; min-height: 34px; display: flex; align-items: center; justify-content: center; padding-top: 2px; overflow: visible; }
+.slot .s-glyph .empty { color: var(--ink-3); opacity: .3; font-size: 17px; }
+.slot .s-sub { font-family: var(--font-thai); font-size: 10px; color: var(--ink-3); min-height: 1.05em; font-weight: 500; }
 .slot.active { border-color: var(--earth); box-shadow: 0 0 0 4px var(--earth-l); }
 .slot.filled { background: #fff; }
 .slot .s-x {
-  position: absolute; top: 6px; right: 7px; width: 22px; height: 22px; border-radius: 999px;
-  border: none; background: var(--bg-2); color: var(--ink-2); font-size: 14px; line-height: 1;
+  position: absolute; top: 4px; right: 5px; width: 18px; height: 18px; border-radius: 999px;
+  border: none; background: var(--bg-2); color: var(--ink-2); font-size: 12px; line-height: 1;
   display: none; align-items: center; justify-content: center;
 }
 .slot.filled .s-x { display: flex; }
 .slot .s-x:hover { background: var(--clay); color: #fff; }
-.slot-plus { align-self: center; color: var(--ink-3); font-weight: 800; font-size: 20px; }
+.slot-plus { align-self: center; color: var(--ink-3); font-weight: 800; font-size: 16px; }
 
 /* ---------- tile panels ---------- */
 .panels { display: flex; flex-direction: column; gap: 16px; }
@@ -146,11 +164,15 @@
 }
 .lvl-lead { font-weight: 800; font-size: 14px; color: var(--ink); }
 .lvl-lead .en { color: var(--ink-3); font-weight: 700; }
-.lvl-seg { display: inline-flex; background: var(--bg-2); border: 1px solid var(--line); border-radius: 14px; padding: 4px; gap: 3px; }
+/* three separate level buttons (not a joined segment) */
+.lvl-seg { display: inline-flex; gap: 8px; flex-wrap: wrap; }
 .lvl-seg button {
-  border: none; background: transparent; border-radius: 11px; padding: 7px 14px; min-height: 48px;
+  border: 1.5px solid var(--line-2); background: var(--surface-2); border-radius: 12px;
+  padding: 7px 14px; min-height: 48px;
   display: flex; align-items: center; gap: 9px; color: var(--ink-2);
+  transition: border-color .15s, background .15s, color .15s, box-shadow .15s;
 }
+.lvl-seg button:hover { border-color: var(--leaf); background: #fff; }
 .lvl-seg button .lvl-step {
   width: 24px; height: 24px; border-radius: 999px; background: var(--line); color: var(--ink-2);
   display: grid; place-items: center; font-weight: 800; font-size: 13px; flex: none;
@@ -158,7 +180,7 @@
 .lvl-seg button .lvl-txt { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; }
 .lvl-seg button .lvl-txt b { font-size: 14px; }
 .lvl-seg button .lvl-txt .th { font-family: var(--font-thai); font-weight: 500; font-size: 12px; color: var(--ink-3); }
-.lvl-seg button.on { background: var(--leaf); color: #fff; box-shadow: var(--shadow); }
+.lvl-seg button.on { background: var(--leaf); color: #fff; border-color: var(--leaf-d); box-shadow: var(--shadow); }
 .lvl-seg button.on .lvl-step { background: rgba(255,255,255,.25); color: #fff; }
 .lvl-seg button.on .lvl-txt .th { color: rgba(255,255,255,.85); }
 .lvl-note { font-family: var(--font-thai); font-weight: 500; font-size: 13.5px; color: var(--ink-2); }
@@ -180,9 +202,8 @@
 .s-arrow:active { transform: scale(.92); }
 .slot.active { border-color: var(--slot-accent, var(--earth)); box-shadow: 0 0 0 4px color-mix(in srgb, var(--slot-accent, var(--earth)) 22%, transparent); }
 
-/* ---------- check row + feedback ---------- */
-.check-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-.check-btn { font-size: 16px; padding: 13px 24px; min-height: 52px; }
+/* ---------- check button + feedback ---------- */
+.check-btn { font-size: 15px; padding: 10px 20px; min-height: 46px; white-space: nowrap; }
 .feedback {
   display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px;
   font-family: var(--font-thai); padding: 10px 16px; border-radius: 14px; flex: 1 1 auto; min-width: 0;
@@ -199,17 +220,27 @@
 .chains-head .ch-en { font-weight: 800; font-size: 17px; white-space: nowrap; }
 .chains-head .ch-th { font-family: var(--font-thai); font-weight: 500; color: var(--ink-2); font-size: 15px; }
 .chains-head .ch-hint { margin-left: auto; font-size: 12.5px; color: var(--ink-3); font-weight: 600; }
-.chain-rows { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; }
-.chain-row { display: flex; flex-direction: column; gap: 8px; background: var(--bg); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; }
-.chain-label { display: flex; align-items: baseline; gap: 8px; }
-.chain-label b { font-family: var(--font-thai); font-weight: 500; font-size: 15px; color: var(--ink); }
-.chain-label .en { font-size: 11.5px; font-weight: 700; color: var(--ink-3); }
+/* chain selector — one button per drill (replaces the cluttered grid) */
+.chain-picker { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.chain-pick {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
+  background: var(--bg); border: 1.5px solid var(--line-2); border-radius: 12px;
+  padding: 7px 14px; min-height: 44px; text-align: left; color: var(--ink-2);
+  transition: transform .08s, border-color .15s, background .15s, color .15s;
+}
+.chain-pick b { font-family: var(--font-thai); font-weight: 500; font-size: 14px; color: inherit; }
+.chain-pick .en { font-size: 10.5px; font-weight: 700; color: var(--ink-3); letter-spacing: .01em; }
+.chain-pick:hover { border-color: var(--leaf); background: var(--leaf-l); }
+.chain-pick:active { transform: translateY(1px); }
+.chain-pick.on { background: var(--leaf); border-color: var(--leaf-d); color: #fff; }
+.chain-pick.on .en { color: rgba(255,255,255,.8); }
 .chain-words { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.chain-active { justify-content: center; background: var(--bg); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
 .chain-arrow { color: var(--ink-3); font-weight: 800; font-size: 15px; }
 .chain-word {
-  font-family: var(--font-thai); font-weight: 500; font-size: 30px; line-height: 1;
+  font-family: var(--font-thai); font-weight: 500; font-size: 30px; line-height: 1.3;
   border: 2px solid var(--line-2); background: var(--surface-2); color: var(--ink);
-  border-radius: 12px; padding: 6px 14px; min-height: 52px; min-width: 52px;
+  border-radius: 12px; padding: 8px 14px; min-height: 56px; min-width: 52px;
   transition: transform .08s, border-color .15s, background .15s;
 }
 .chain-word:hover { border-color: var(--leaf); background: var(--leaf-l); }
@@ -235,13 +266,65 @@
 .board-keys .tiles.vow .tile .g, .board-keys .tiles.tone .tile .g { font-size: 30px; height: 34px; }
 .board-keys .tile.sel::before { width: 18px; height: 18px; font-size: 11px; top: -7px; right: -6px; }
 
-/* keep the big word from overflowing the narrower stage */
-.board-stage .bb-word { max-width: 100%; overflow: hidden; }
+/* Don't clip the word itself in any direction — Thai leading vowels (เ แ โ ใ ไ),
+   upper vowels/tones and descenders paint beyond the text box. The .bb-display
+   box (with its padding as a safe zone) contains genuinely oversized words. */
+.board-stage .bb-word { max-width: 100%; overflow: visible; }
+
+/* ---------- Word Work Mat keypad: one frame; colour = category ---------- */
+/* (scoped to .keypad so the Blending Board's .panel layout is untouched) */
+.keypad {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 14px; display: flex; flex-direction: column; gap: 12px;
+}
+.kp-sec { display: flex; flex-direction: column; gap: 7px; }
+.kp-sec + .kp-sec { border-top: 1px dashed var(--line); padding-top: 11px; }
+.kp-head { display: flex; align-items: baseline; gap: 8px; }
+.kp-head .kp-en, .kp-head .p-en { font-weight: 800; font-size: 14px; }
+.kp-head .kp-th, .kp-head .p-th { font-family: var(--font-thai); font-weight: 500; color: var(--ink-2); font-size: 13px; }
+.kp-head .kp-hint, .kp-head .p-hint { margin-left: auto; font-size: 11.5px; color: var(--ink-3); font-weight: 600; }
+.kp-sec .band { display: contents; }   /* leftover wrapper on finals/tones — ignore its box */
+/* compact tiles that fill each row evenly */
+.keypad .tiles { gap: 6px; }
+.keypad .tiles.cons  { grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); }
+.keypad .tiles.vow   { grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); }
+.keypad .tiles.final { grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); }
+.keypad .tiles.tone  { grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); }
+.keypad .tile { min-height: 44px; border-radius: 10px; padding: 4px 3px; }
+.keypad .tile .g { font-size: 21px; }
+.keypad .tiles.vow .tile, .keypad .tiles.tone .tile { min-height: 50px; }
+.keypad .tiles.vow .tile .g, .keypad .tiles.tone .tile .g { font-size: 27px; height: 30px; }
+.keypad .tile .nm { font-size: 9px; }
+.keypad .tile.sel::before { width: 17px; height: 17px; font-size: 10px; top: -6px; right: -5px; }
+
+/* keypad category filters (checkable chips) */
+.kf {
+  display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center;
+  padding: 10px 12px; margin-bottom: 12px;
+  background: var(--bg); border: 1px dashed var(--line-2); border-radius: 12px;
+}
+.kf-group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.kf-lbl { font-family: var(--font-thai); font-weight: 600; font-size: 11px; color: var(--ink-3); margin-right: 2px; }
+.kf-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--font-thai); font-weight: 500; font-size: 12.5px; color: var(--ink-3);
+  background: var(--surface-2); border: 1.5px solid var(--line-2); border-radius: 999px;
+  padding: 3px 11px 3px 5px; min-height: 30px; transition: border-color .15s, background .15s, color .15s;
+}
+.kf-chip:hover { border-color: var(--leaf); }
+.kf-box {
+  width: 16px; height: 16px; flex: none; border-radius: 5px; background: #fff;
+  border: 1.5px solid var(--line-2); display: grid; place-items: center;
+  font-size: 11px; font-weight: 800; color: #fff; line-height: 1;
+}
+.kf-sw { width: 11px; height: 11px; flex: none; border-radius: 4px; background: var(--c-bg, #ddd); border: 1.5px solid var(--c-bd, #bbb); }
+.kf-chip.on { color: var(--ink); border-color: var(--leaf); background: var(--leaf-l); }
+.kf-chip.on .kf-box { background: var(--leaf); border-color: var(--leaf); }
 
 @media (max-width: 980px) {
   .board-cols { grid-template-columns: 1fr; }
   .board-stage { position: static; }
-  .board-keys .tiles.cons { grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); }
+  .keypad .tiles.cons { grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); }
 }
 
 /* ---------- Word Work Mat ---------- */
@@ -276,6 +359,13 @@
 .mat-grade-select:hover { background-color: #fff; border-color: var(--earth); }
 .mat-grade-select:focus { outline: none; border-color: var(--earth); box-shadow: 0 0 0 3px var(--earth-l); }
 .mat-grade-select option { font-family: var(--font-ui); }
+/* single-level indicator (when the mat offers only one level) */
+.mat-grade-static {
+  display: inline-flex; align-items: center; min-height: 40px;
+  font-family: var(--font-ui); font-weight: 700; font-size: 14px; color: var(--ink);
+  background-color: var(--surface-2); border: 1.5px solid var(--line-2); border-radius: 10px;
+  padding: 7px 14px; line-height: 1.1;
+}
 .mode-seg { display: inline-flex; background: var(--bg-2); border: 1px solid var(--line); border-radius: 14px; padding: 4px; gap: 3px; }
 .mode-seg button {
   border: none; background: transparent; border-radius: 11px; padding: 8px 16px; min-height: 48px;
@@ -341,9 +431,10 @@
 .board-keys .tile:active { cursor: grabbing; }
 
 @media (max-width: 760px) {
-  .bb-top { grid-template-columns: 1fr; }
-  .round-btn { width: 100%; flex-direction: row; gap: 10px; min-height: 52px; }
-  .round-btn .rb-glyph { font-size: 22px; }
+  .round-btn { top: 10px; }
+  .round-btn.q { left: 10px; }
+  .round-btn.undo { right: 10px; }
+  .round-btn .rb-glyph { font-size: 30px; }
   .band { grid-template-columns: 1fr; gap: 8px; }
   .band-label { text-align: left; }
   .tiles.cons { grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); }

@@ -1,6 +1,7 @@
 /* global React, THAI */
 (function () {
   const { useState, useMemo, useEffect, useCallback, useRef } = React;
+  const KeypadFilters = window.KeypadFilters;
   const CLS_COLOR = { mid: "c-mid", high: "c-high", low: "c-low" };
   const vowColor = (cat) => (cat === "long" ? "c-vlong" : cat === "short" ? "c-vshort" : cat === "dip" ? "c-dip" : "c-spec");
   const vowSub = (cat) => (cat === "long" ? "เสียงยาว" : cat === "short" ? "เสียงสั้น" : cat === "dip" ? "สระประสม" : "สระพิเศษ");
@@ -49,13 +50,19 @@
     );
   }
 
-  function WordWorkMat({ t }) {
-    // selected grade (K2 → Y3) — drives the whole grapheme inventory
+  function WordWorkMat({ t, level }) {
+    // selected mat level — driven by the "Word Work Mat ▾" nav menu (level prop),
+    // falling back to the last-used level. Decoupled from the Lessons grade list.
     const [gradeId, setGradeId] = useState(() => {
+      if (level && THAI.MAT_LEVELS.includes(level)) return level;
       const s = localStorage.getItem("panyaden_mat_grade");
-      return s && THAI.GRADES[s] ? s : "k3";
+      return s && THAI.MAT_LEVELS.includes(s) ? s : THAI.MAT_LEVELS[0];
     });
-    const changeGrade = (id) => { setGradeId(id); localStorage.setItem("panyaden_mat_grade", id); };
+    useEffect(() => {
+      if (level && THAI.MAT_LEVELS.includes(level) && level !== gradeId) {
+        setGradeId(level); localStorage.setItem("panyaden_mat_grade", level);
+      }
+    }, [level]); // eslint-disable-line
     const cfg = THAI.GRADES[gradeId];
     const cvcHasTones = !!cfg.modes.cvc.tones;
 
@@ -81,6 +88,20 @@
     const hasFinals = !!m.finals;
     const hasTones = !!m.tones;
 
+    // which categories the right keypad shows (teacher control)
+    const [secOn, setSecOn] = useState({ cons: true, vow: true, final: true, tone: true });
+    const [clsOn, setClsOn] = useState({ mid: true, high: true, low: true, clus: true });
+    const toggleSec = (k) => setSecOn((s) => ({ ...s, [k]: !s[k] }));
+    const toggleCls = (k) => setClsOn((s) => ({ ...s, [k]: !s[k] }));
+    const sectionDefs = [{ key: "cons", label: "พยัญชนะ" }, { key: "vow", label: "สระ" }]
+      .concat(finList ? [{ key: "final", label: "ตัวสะกด" }] : [])
+      .concat(toneList ? [{ key: "tone", label: "วรรณยุกต์" }] : []);
+    const classDefs = [
+      { key: "mid", label: "กลาง", color: "c-mid" },
+      { key: "high", label: "สูง", color: "c-high" },
+      { key: "low", label: "ต่ำ", color: "c-low" },
+    ].concat(showClusters ? [{ key: "clus", label: "ควบกล้ำ", color: "c-clus" }] : []);
+
     /* ===================== build mode (compose + check) ===================== */
     const [initial, setInitial] = useState("");
     const [vowId, setVowId] = useState("");
@@ -88,12 +109,13 @@
     const [toneId, setToneId] = useState("none");
     const [active, setActive] = useState("initial");
     const [reveal, setReveal] = useState(false);
+    const [checked, setChecked] = useState(false);   // Check pressed → hide slots, show result
     const [feedback, setFeedback] = useState(null);
 
     useEffect(() => {
       setInitial(consChars[0] || "");
       setVowId(vowList[0] ? vowList[0].id : "");
-      setFinId("none"); setToneId("none"); setActive("initial"); setReveal(false); setFeedback(null);
+      setFinId("none"); setToneId("none"); setActive("initial"); setReveal(false); setChecked(false); setFeedback(null);
     }, [mode, gradeId]);
 
     const initObj = useMemo(() => THAI.getInitial(initial), [initial]);
@@ -106,17 +128,19 @@
     const rom = THAI.romanize(initObj, vowObj, toneObj, finObj);
     const has = !!(initial || vowObj);
     const clsLabel = initObj ? (initObj.cls === "H" ? "อักษรสูง" : initObj.cls === "M" ? "อักษรกลาง" : "อักษรต่ำ") : "";
+    // meaning for the composed word, if it is a real decodable word
+    const meaning = (THAI.WORDS && has && word) ? THAI.WORDS[word] : null;
 
-    const pickInitial = (ch) => { setInitial(ch); setActive("vowel"); setFeedback(null); };
-    const pickVowel = (id) => { setVowId(id); setActive(hasFinals ? "final" : "initial"); setFeedback(null); };
-    const pickFinal = (id) => { setFinId(id); setActive(hasTones ? "tone" : "initial"); setFeedback(null); };
-    const pickTone = (id) => { setToneId(id); setFeedback(null); };
-    const clearAll = useCallback(() => { setInitial(""); setVowId(""); setFinId("none"); setToneId("none"); setActive("initial"); setFeedback(null); }, []);
+    // editing again after a check → bring the slots back
+    const pickInitial = (ch) => { setInitial(ch); setActive("vowel"); setFeedback(null); setChecked(false); };
+    const pickVowel = (id) => { setVowId(id); setActive(hasFinals ? "final" : "initial"); setFeedback(null); setChecked(false); };
+    const pickFinal = (id) => { setFinId(id); setActive(hasTones ? "tone" : "initial"); setFeedback(null); setChecked(false); };
+    const pickTone = (id) => { setToneId(id); setFeedback(null); setChecked(false); };
+    const clearAll = useCallback(() => { setInitial(""); setVowId(""); setFinId("none"); setToneId("none"); setActive("initial"); setReveal(false); setChecked(false); setFeedback(null); }, []);
     const check = () => {
       if (!initial) { setFeedback({ ok: false, msg: "วางพยัญชนะต้นก่อนนะ" }); return; }
       if (!vowObj) { setFeedback({ ok: false, msg: "ใส่สระให้พยางค์อ่านออกเสียงได้" }); return; }
-      setReveal(true);
-      setFeedback({ ok: true, msg: "ประสมคำได้แล้ว อ่านว่า “" + word + "” เก่งมาก!" });
+      setFeedback(null); setReveal(true); setChecked(true);  // hide slots, reveal the result
     };
 
     /* ===================== free mode (drag anywhere) ===================== */
@@ -181,22 +205,16 @@
 
     /* ===================== render ===================== */
     return (
-      <div className="board mat mat-intermediate">
+      <div className={"board mat mat-" + gradeId}>
         {/* mat toolbar: grade · stage · mode */}
         <div className="mat-bar">
           <div className="mat-id">
-            <span className="mat-badge">{cfg.en}</span>
+            <span className="mat-badge">{cfg.badge || cfg.en}</span>
             <div className="mat-id-main">
               <div className="mat-title">Word Work Mat <span className="mat-th">· แผ่นฝึกคำ</span></div>
               <div className="mat-grade-row">
-                <label htmlFor="matGradeSel" className="mat-grade-lbl">ระดับชั้น · Grade</label>
-                <select id="matGradeSel" className="mat-grade-select" value={gradeId}
-                  onChange={(e) => changeGrade(e.target.value)}>
-                  {THAI.GRADE_ORDER.map((id) => {
-                    const g = THAI.GRADES[id];
-                    return <option key={id} value={id}>{g.en} · {g.th}</option>;
-                  })}
-                </select>
+                <span className="mat-grade-lbl">ระดับ · Level</span>
+                <span className="mat-grade-static">{cfg.en} · {cfg.th}</span>
               </div>
             </div>
           </div>
@@ -250,136 +268,122 @@
             /* ---- build mat (compose + check) ---- */
             <>
               <div className="bb-top">
-                <button className="round-btn q" onClick={() => setReveal((r) => !r)} title="เฉลย / ซ่อนคำอ่าน">
-                  <span className="rb-glyph">?</span><span className="rb-lbl">{reveal ? "ซ่อน" : "เฉลย"}</span>
-                </button>
                 <div className="bb-display">
-                  <div className="bb-word" style={{ fontSize: t.letterSize + "px" }}>
+                  <button className="round-btn q" onClick={() => setReveal((r) => !r)} title="เฉลย / ซ่อนคำอ่าน">
+                    <span className="rb-glyph">?</span><span className="rb-lbl">{reveal ? "ซ่อน" : "เฉลย"}</span>
+                  </button>
+                  <button className="round-btn undo" onClick={clearAll} title="ล้างทั้งหมด">
+                    <span className="rb-glyph">↺</span><span className="rb-lbl">ล้าง</span>
+                  </button>
+                  <div className="bb-word" style={{ fontSize: Math.round(t.letterSize * THAI.displayScale(initial, vowObj)) + "px", transform: has ? "translateY(" + THAI.displayOffset(word) + "em)" : undefined }}>
                     {has ? word : <span className="slot-dot">{" "}</span>}
                   </div>
-                  {reveal && (
+                  {(reveal || checked) && (
                     <div className="bb-read">
-                      {!has ? <span className="hidden-q" style={{ fontStyle: "italic" }}>แตะตัวอักษรมาประสมคำ…</span>
-                        : <>{rom || "—"}{clsLabel && <span className="cls">· {clsLabel}</span>}</>}
+                      {!has ? <span className="hidden-q">แตะตัวอักษรมาประสมคำ…</span>
+                        : checked && meaning ? (
+                          <span className="bb-correct">
+                            <span className="bb-correct-ico">✓</span>
+                            <span className="bb-correct-txt">ถูกต้อง! <b>{word}</b> · {meaning}</span>
+                          </span>
+                        ) : <>{rom || "—"}{clsLabel && <span className="cls">· {clsLabel}</span>}</>}
                     </div>
                   )}
                 </div>
-                <button className="round-btn undo" onClick={clearAll} title="ล้างทั้งหมด">
-                  <span className="rb-glyph">↺</span><span className="rb-lbl">ล้าง</span>
-                </button>
               </div>
 
-              <div className="slots">
-                <MatSlot label="พยัญชนะต้น" en="Initial" glyph={initObj ? initObj.ch : ""} sub={initObj ? (initObj.cluster ? "ควบกล้ำ" : initObj.name) : "—"}
-                  filled={!!initial} active={active === "initial"} accent="#5b7a4b"
-                  onSelect={() => setActive("initial")} onClear={() => { setInitial(""); setActive("initial"); }} />
-                <span className="slot-plus">+</span>
-                <MatSlot label="สระ" en="Vowel" glyph={vowObj ? THAI.vowelBare(vowObj) : ""}
-                  sub={vowObj ? vowSub(vowObj.cat) : "—"}
-                  filled={!!vowObj} active={active === "vowel"} accent="#c98a3b"
-                  onSelect={() => setActive("vowel")} onClear={() => { setVowId(""); setActive("vowel"); }} />
-                {hasFinals && <>
-                  <span className="slot-plus">+</span>
-                  <MatSlot label="ตัวสะกด" en="Final" glyph={finChar} sub={finObj && finObj.id !== "none" ? finObj.maatra : "—"}
-                    filled={!!finChar} active={active === "final"} accent="#7a5fb0"
-                    onSelect={() => setActive("final")} onClear={() => { setFinId("none"); setActive("final"); }} />
-                </>}
-                {hasTones && <>
-                  <span className="slot-plus">+</span>
-                  <MatSlot label="วรรณยุกต์" en="Tone" glyph={toneObj ? THAI.toneBare(toneObj) : ""} sub={toneObj && toneObj.id !== "none" ? toneObj.name : "—"}
-                    filled={!!(toneObj && toneObj.id !== "none")} active={active === "tone"} accent="#b05c3c"
-                    onSelect={() => setActive("tone")} onClear={() => { setToneId("none"); setActive("tone"); }} />
-                </>}
+              <div className="build-row">
+                {!checked && (
+                  <div className="slots">
+                    <MatSlot label="พยัญชนะต้น" en="Initial" glyph={initObj ? initObj.ch : ""} sub={initObj ? (initObj.cluster ? "ควบกล้ำ" : initObj.name) : "—"}
+                      filled={!!initial} active={active === "initial"} accent="#5b7a4b"
+                      onSelect={() => setActive("initial")} onClear={() => { setInitial(""); setActive("initial"); }} />
+                    <span className="slot-plus">+</span>
+                    <MatSlot label="สระ" en="Vowel" glyph={vowObj ? THAI.vowelBare(vowObj) : ""}
+                      sub={vowObj ? vowSub(vowObj.cat) : "—"}
+                      filled={!!vowObj} active={active === "vowel"} accent="#c98a3b"
+                      onSelect={() => setActive("vowel")} onClear={() => { setVowId(""); setActive("vowel"); }} />
+                    {hasFinals && <>
+                      <span className="slot-plus">+</span>
+                      <MatSlot label="ตัวสะกด" en="Final" glyph={finChar} sub={finObj && finObj.id !== "none" ? finObj.maatra : "—"}
+                        filled={!!finChar} active={active === "final"} accent="#7a5fb0"
+                        onSelect={() => setActive("final")} onClear={() => { setFinId("none"); setActive("final"); }} />
+                    </>}
+                    {hasTones && <>
+                      <span className="slot-plus">+</span>
+                      <MatSlot label="วรรณยุกต์" en="Tone" glyph={toneObj ? THAI.toneBare(toneObj) : ""} sub={toneObj && toneObj.id !== "none" ? toneObj.name : "—"}
+                        filled={!!(toneObj && toneObj.id !== "none")} active={active === "tone"} accent="#b05c3c"
+                        onSelect={() => setActive("tone")} onClear={() => { setToneId("none"); setActive("tone"); }} />
+                    </>}
+                  </div>
+                )}
+                {!checked ? (
+                  <button className="btn btn-leaf check-btn" onClick={check}>
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5 10 17 19 7" /></svg>
+                    ตรวจคำ · Check
+                  </button>
+                ) : (
+                  <button className="btn btn-ghost check-btn" onClick={clearAll}>↺ แต่งคำใหม่ · New</button>
+                )}
               </div>
-
-              <div className="check-row">
-                <button className="btn btn-leaf check-btn" onClick={check}>
-                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5 10 17 19 7" /></svg>
-                  ตรวจคำ · Check
-                </button>
-                {feedback && <div className={"feedback " + (feedback.ok ? "ok" : "no")}><span className="fb-ico">{feedback.ok ? "✓" : "!"}</span>{feedback.msg}</div>}
-              </div>
+              {feedback && !checked && (
+                <div className={"feedback " + (feedback.ok ? "ok" : "no")}><span className="fb-ico">{feedback.ok ? "✓" : "!"}</span>{feedback.msg}</div>
+              )}
             </>
           )}
         </div>
 
         <div className="board-keys">
-        {/* tile trays */}
-        <div className="panels">
-          {/* consonants */}
-          <div className="panel">
-            <div className="panel-head">
-              <span className="p-num">1</span>
-              <span className="p-en">Initial consonants</span>
-              <span className="p-th">พยัญชนะต้น</span>
-              <span className="p-hint">{consFull ? "ครบ 44 ตัว · ตามไตรยางศ์" : consChars.length + " ตัว · ตามระดับชั้น"}</span>
+        {/* tile trays — one frame; colour signals the category (no class labels) */}
+        <div className="keypad">
+          <KeypadFilters sections={sectionDefs} sec={secOn} onSec={toggleSec} classes={classDefs} cls={clsOn} onCls={toggleCls} />
+          {/* consonants — all classes flow together, colour = mid / high / low */}
+          {secOn.cons && (
+          <div className="kp-sec">
+            <div className="kp-head">
+              <span className="kp-en">Initial consonants</span>
+              <span className="kp-th">พยัญชนะต้น</span>
+              <span className="kp-hint">{consFull ? "ครบ 44 ตัว" : consChars.length + " ตัว"}</span>
             </div>
-            {consBands.map((b) => (
-              <div className="band" key={b.cls}>
-                <div className={"band-label " + CLS_COLOR[b.cat]}>
-                  <span className="bl-en">{b.en}<span className="bl-dot" /></span>
-                  <span className="bl-th">{b.th} · {b.items.length}</span>
-                </div>
-                <div className="tiles cons">
-                  {b.items.map((c) => (
-                    <TrayTile key={c.ch} free={free} color={CLS_COLOR[b.cat]} glyph={c.ch} name={t.showNames ? c.name : ""}
-                      selected={initial === c.ch} onTap={() => pickInitial(c.ch)} onSpawn={startSpawn} />
-                  ))}
-                </div>
-              </div>
-            ))}
-            {showClusters && (
-              <div className="band">
-                <div className="band-label c-clus">
-                  <span className="bl-en">Clusters<span className="bl-dot" /></span>
-                  <span className="bl-th">ควบกล้ำ · {THAI.clusters.length}</span>
-                </div>
-                <div className="tiles cons">
-                  {THAI.clusters.map((c) => (
-                    <TrayTile key={c.ch} free={free} color="c-clus" glyph={c.ch}
-                      selected={initial === c.ch} onTap={() => pickInitial(c.ch)} onSpawn={startSpawn} />
-                  ))}
-                </div>
-              </div>
-            )}
+            <div className="tiles cons">
+              {consBands.filter((b) => clsOn[b.cat]).flatMap((b) => b.items.map((c) => (
+                <TrayTile key={c.ch} free={free} color={CLS_COLOR[b.cat]} glyph={c.ch} name={t.showNames ? c.name : ""}
+                  selected={initial === c.ch} onTap={() => pickInitial(c.ch)} onSpawn={startSpawn} />
+              )))}
+              {showClusters && clsOn.clus && THAI.clusters.map((c) => (
+                <TrayTile key={c.ch} free={free} color="c-clus" glyph={c.ch}
+                  selected={initial === c.ch} onTap={() => pickInitial(c.ch)} onSpawn={startSpawn} />
+              ))}
+            </div>
           </div>
+          )}
 
           {/* vowels */}
-          <div className="panel">
-            <div className="panel-head">
-              <span className="p-num">2</span>
-              <span className="p-en">Vowels</span>
-              <span className="p-th">สระ</span>
-              <span className="p-hint">{vowList.length} รูป</span>
+          {secOn.vow && (
+          <div className="kp-sec">
+            <div className="kp-head">
+              <span className="kp-en">Vowels</span>
+              <span className="kp-th">สระ</span>
+              <span className="kp-hint">{vowList.length} รูป</span>
             </div>
-            <div className="band">
-              <div className="band-label c-vlong">
-                <span className="bl-en">Vowels<span className="bl-dot" /></span>
-                <span className="bl-th">สระ · {vowList.length}</span>
-              </div>
-              <div className="tiles vow">
-                {vowList.map((v) => (
-                  <TrayTile key={v.id} free={free} color={vowColor(v.cat)} glyph={THAI.vowelBare(v)}
-                    selected={vowId === v.id} onTap={() => pickVowel(v.id)} onSpawn={startSpawn} />
-                ))}
-              </div>
+            <div className="tiles vow">
+              {vowList.map((v) => (
+                <TrayTile key={v.id} free={free} color={vowColor(v.cat)} glyph={THAI.vowelBare(v)}
+                  selected={vowId === v.id} onTap={() => pickVowel(v.id)} onSpawn={startSpawn} />
+              ))}
             </div>
           </div>
+          )}
 
           {/* finals */}
-          {finList && (
-            <div className="panel">
-              <div className="panel-head">
-                <span className="p-num">3</span>
-                <span className="p-en">Final consonants</span>
+          {finList && secOn.final && (
+            <div className="kp-sec">
+              <div className="kp-head">
+                <span className="kp-en">Final consonants</span>
                 <span className="p-th">ตัวสะกด</span>
                 <span className="p-hint">{m.finals.length <= 3 ? "แม่ที่ออกเสียงง่าย · ง น ม" : m.finals.length + " มาตราตัวสะกด"}</span>
               </div>
               <div className="band">
-                <div className="band-label c-final">
-                  <span className="bl-en">Endings<span className="bl-dot" /></span>
-                  <span className="bl-th">มาตรา · {m.finals.length}</span>
-                </div>
                 <div className="tiles final">
                   {finList.map((f) => (
                     <TrayTile key={f.id} free={free} color="c-final" glyph={f.ch || " "}
@@ -392,19 +396,14 @@
           )}
 
           {/* tones */}
-          {toneList && (
-            <div className="panel">
-              <div className="panel-head">
-                <span className="p-num">4</span>
-                <span className="p-en">Tone marks</span>
+          {toneList && secOn.tone && (
+            <div className="kp-sec">
+              <div className="kp-head">
+                <span className="kp-en">Tone marks</span>
                 <span className="p-th">วรรณยุกต์</span>
                 <span className="p-hint">{free ? "ลากวางทับพยัญชนะต้น" : "ผันเสียงในแม่สะกดต่าง ๆ"}</span>
               </div>
               <div className="band">
-                <div className="band-label c-tone">
-                  <span className="bl-en">Tones<span className="bl-dot" /></span>
-                  <span className="bl-th">รูป · {toneList.length}</span>
-                </div>
                 <div className="tiles tone">
                   {toneList.map((tn) => (
                     <TrayTile key={tn.id} free={free} color="c-tone" glyph={THAI.toneBare(tn) || " "}

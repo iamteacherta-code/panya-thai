@@ -1,5 +1,6 @@
 /* global React, THAI */
 const { useState, useMemo, useCallback, useEffect } = React;
+const KeypadFilters = window.KeypadFilters;
 
 /* ---- set filters ---- */
 function consItemsBySet(setKey) {
@@ -15,6 +16,14 @@ const VOW_CATS = [
   { cat: "special", en: "Special",      th: "สระพิเศษ",    cls: "c-spec" },
 ];
 const CLS_COLOR = { mid: "c-mid", high: "c-high", low: "c-low" };
+
+/* finals that are NOT the direct representative of their แม่ (ตัวสะกดไม่ตรงมาตรา),
+   derived from each มาตรา's `also` list (e.g. แม่กด → จ ต ถ ท ธ ส). */
+const EXTRA_FINALS = THAI.finals.flatMap((f) =>
+  (f.also || "").split(" ").filter((ch) => ch && ch !== f.ch)
+    .map((ch) => ({ id: f.id + "_" + ch, ch, rom: f.rom, maatra: f.maatra, base: f.id, live: f.live }))
+);
+const ALL_FINALS = THAI.finals.concat(EXTRA_FINALS);
 
 /* ===================== generic tile ===================== */
 function Tile({ color, glyph, name, selected, onClick, title }) {
@@ -58,6 +67,10 @@ function BlendingBoard({ t }) {
   const toneList = THAI.tones;
   const finals = THAI.finals;
 
+  // word-chain drill: nothing shown until the teacher taps a chain (keeps it tidy)
+  const [chainId, setChainId] = useState(null);
+  const activeChain = THAI.WORD_CHAINS.find((c) => c.id === chainId) || null;
+
   // ordered lists each slot can "slide" through
   const initialList = useMemo(
     () => consItems.map((c) => c.ch).concat(level.clusters ? THAI.clusters.map((c) => c.ch) : []),
@@ -73,6 +86,36 @@ function BlendingBoard({ t }) {
   const [reveal, setReveal] = useState(false);
   const [feedback, setFeedback] = useState(null); // {ok, msg}
   const [otr, setOtr] = useState(0); // Opportunities to Respond (words practised)
+
+  // which categories the right keypad shows (teacher control)
+  const [secOn, setSecOn] = useState({ cons: true, vow: true, final: true, tone: true });
+  const [clsOn, setClsOn] = useState({ mid: true, high: true, low: true, clus: true });
+  const toggleSec = (k) => setSecOn((s) => ({ ...s, [k]: !s[k] }));
+  const toggleCls = (k) => setClsOn((s) => ({ ...s, [k]: !s[k] }));
+  const sectionDefs = [{ key: "cons", label: "พยัญชนะ" }, { key: "vow", label: "สระ" }]
+    .concat(level.finals ? [{ key: "final", label: "ตัวสะกด" }] : [])
+    .concat(level.tones ? [{ key: "tone", label: "วรรณยุกต์" }] : []);
+  const classDefs = [
+    { key: "mid", label: "กลาง", color: "c-mid" },
+    { key: "high", label: "สูง", color: "c-high" },
+    { key: "low", label: "ต่ำ", color: "c-low" },
+  ].concat(level.clusters ? [{ key: "clus", label: "ควบกล้ำ", color: "c-clus" }] : []);
+  // ตัวสะกด: ตรงมาตรา (ตัวแทน) / ไม่ตรงมาตรา (ตัวอื่นในแม่เดียวกัน)
+  const [finCat, setFinCat] = useState({ direct: true, extra: false });
+  const toggleFin = (k) => setFinCat((s) => ({ ...s, [k]: !s[k] }));
+  const finCatDefs = [{ key: "direct", label: "ตรงมาตรา" }, { key: "extra", label: "ไม่ตรงมาตรา" }];
+  // finals offered (and slid through), grouped by แม่: representative then its extras
+  const availFinals = useMemo(() => {
+    const out = [THAI.finals[0]]; // ไม่มีตัวสะกด always first
+    THAI.finals.slice(1).forEach((f) => {
+      if (finCat.direct) out.push(f);
+      if (finCat.extra) {
+        (f.also || "").split(" ").filter((ch) => ch && ch !== f.ch)
+          .forEach((ch) => out.push({ id: f.id + "_" + ch, ch, rom: f.rom, maatra: f.maatra, base: f.id, live: f.live }));
+      }
+    });
+    return out;
+  }, [finCat.direct, finCat.extra]);
 
   // build a display word from a chain spec
   const specWord = (w) => {
@@ -107,7 +150,7 @@ function BlendingBoard({ t }) {
 
   const initObj = useMemo(() => THAI.getInitial(initial), [initial]);
   const vowObj = useMemo(() => THAI.vowels.find((v) => v.id === vowId) || null, [vowId]);
-  const finObj = useMemo(() => THAI.finals.find((f) => f.id === finId) || null, [finId]);
+  const finObj = useMemo(() => ALL_FINALS.find((f) => f.id === finId) || null, [finId]);
   const toneObj = useMemo(() => THAI.tones.find((x) => x.id === toneId) || null, [toneId]);
 
   const finChar = finObj && finObj.ch ? finObj.ch : "";
@@ -133,9 +176,9 @@ function BlendingBoard({ t }) {
     };
     if (type === "initial") step(initialList, initial, setInitial);
     else if (type === "vowel") step(vowList.map((v) => v.id), vowId, setVowId);
-    else if (type === "final") step(finals.map((f) => f.id), finId, setFinId);
+    else if (type === "final") step(availFinals.map((f) => f.id), finId, setFinId);
     else if (type === "tone") step(toneList.map((x) => x.id), toneId, setToneId);
-  }, [initialList, initial, vowList, vowId, finals, finId, toneList, toneId]);
+  }, [initialList, initial, vowList, vowId, availFinals, finId, toneList, toneId]);
 
   const clearAll = useCallback(() => {
     setInitial(""); setVowId(""); setFinId("none"); setToneId("none"); setActive("initial"); setFeedback(null);
@@ -179,7 +222,7 @@ function BlendingBoard({ t }) {
         </button>
 
         <div className="bb-display">
-          <div className="bb-word" style={{ fontSize: t.letterSize + "px" }}>
+          <div className="bb-word" style={{ fontSize: Math.round(t.letterSize * THAI.displayScale(initial, vowObj)) + "px", transform: hasContent ? "translateY(" + THAI.displayOffset(word) + "em)" : undefined }}>
             {hasContent ? word : <span className="slot-dot">{"\u00A0"}</span>}
           </div>
           {reveal && (
@@ -247,119 +290,89 @@ function BlendingBoard({ t }) {
         <div className="chains-head">
           <span className="ch-en">Word Chains</span>
           <span className="ch-th">ชุดคำฝึก · เปลี่ยนทีละตำแหน่ง</span>
-          <span className="ch-hint">แตะคำเพื่อโหลดขึ้นกระดาน — ฝึกอ่านไล่ทีละคำ</span>
+          <span className="ch-hint">เลือกชุดฝึก แล้วแตะคำเพื่อโหลดขึ้นกระดาน</span>
         </div>
-        <div className="chain-rows">
+        {/* pick a drill — its words appear below only when tapped (tap again to hide) */}
+        <div className="chain-picker">
           {THAI.WORD_CHAINS.map((c) => (
-            <div className="chain-row" key={c.id}>
-              <div className="chain-label">
-                <b>{c.th}</b>
-                <span className="en">{c.en}</span>
-              </div>
-              <div className="chain-words">
-                {c.words.map((w, j) => (
-                  <React.Fragment key={j}>
-                    {j > 0 && <span className="chain-arrow">→</span>}
-                    <button className="chain-word" onClick={() => loadWord(w, c.level)}>
-                      {specWord(w)}
-                    </button>
-                  </React.Fragment>
-                ))}
-              </div>
-            </div>
+            <button key={c.id} className={"chain-pick" + (chainId === c.id ? " on" : "")}
+              onClick={() => setChainId((id) => (id === c.id ? null : c.id))}>
+              <b>{c.th}</b><span className="en">{c.en}</span>
+            </button>
           ))}
         </div>
+        {activeChain && (
+          <div className="chain-words chain-active">
+            {activeChain.words.map((w, j) => (
+              <React.Fragment key={j}>
+                {j > 0 && <span className="chain-arrow">→</span>}
+                <button className="chain-word" onClick={() => loadWord(w, activeChain.level)}>
+                  {specWord(w)}
+                </button>
+              </React.Fragment>
+            ))}
+          </div>
+        )}
       </div>
 
       </div>{/* /board-stage */}
       <div className="board-keys">
       {/* panels */}
-      <div className="panels">
-        {/* 1 — initial consonants */}
-        <div className="panel">
-          <div className="panel-head">
-            <span className="p-num">1</span>
-            <span className="p-en">Initial consonants</span>
+      <div className="keypad">
+        <KeypadFilters sections={sectionDefs} sec={secOn} onSec={toggleSec} classes={classDefs} cls={clsOn} onCls={toggleCls}
+          finals={level.finals ? finCatDefs : null} fin={finCat} onFin={toggleFin} />
+        {/* 1 — initial consonants (one grid; colour = class) */}
+        {secOn.cons && (
+        <div className="kp-sec">
+          <div className="kp-head">
+            <span className="kp-en">Initial consonants</span>
             <span className="p-th">พยัญชนะต้น</span>
             <span className="p-hint">เรียงตามหมู่อักษร · กลาง → สูง → ต่ำ</span>
           </div>
-          {consBands.map((b) => (
-            <div className="band" key={b.cls}>
-              <div className={"band-label " + CLS_COLOR[b.cat]}>
-                <span className="bl-en">{b.en}<span className="bl-dot" /></span>
-                <span className="bl-th">{b.th} · {b.items.length}</span>
-              </div>
-              <div className="tiles cons">
-                {b.items.map((c) => (
-                  <Tile key={c.ch} color={CLS_COLOR[b.cat]} glyph={c.ch} name={t.showNames ? c.name : ""}
-                    selected={initial === c.ch} onClick={() => pickInitial(c.ch)}
-                    title={c.ch + " " + c.name + " · " + b.th} />
-                ))}
-              </div>
-            </div>
-          ))}
-          {level.clusters && (
-            <div className="band">
-              <div className="band-label c-clus">
-                <span className="bl-en">Clusters<span className="bl-dot" /></span>
-                <span className="bl-th">ควบกล้ำ · {THAI.clusters.length}</span>
-              </div>
-              <div className="tiles cons">
-                {THAI.clusters.map((c) => (
-                  <Tile key={c.ch} color="c-clus" glyph={c.ch} selected={initial === c.ch}
-                    onClick={() => pickInitial(c.ch)} title={"ควบกล้ำ " + c.ch} />
-                ))}
-              </div>
-            </div>
-          )}
+          <div className="tiles cons">
+            {consBands.filter((b) => clsOn[b.cat]).flatMap((b) => b.items.map((c) => (
+              <Tile key={c.ch} color={CLS_COLOR[b.cat]} glyph={c.ch} name={t.showNames ? c.name : ""}
+                selected={initial === c.ch} onClick={() => pickInitial(c.ch)}
+                title={c.ch + " " + c.name + " · " + b.th} />
+            )))}
+            {level.clusters && clsOn.clus && THAI.clusters.map((c) => (
+              <Tile key={c.ch} color="c-clus" glyph={c.ch} selected={initial === c.ch}
+                onClick={() => pickInitial(c.ch)} title={"ควบกล้ำ " + c.ch} />
+            ))}
+          </div>
         </div>
+        )}
 
-        {/* 2 — vowels */}
-        <div className="panel">
-          <div className="panel-head">
-            <span className="p-num">2</span>
-            <span className="p-en">Vowels</span>
+        {/* 2 — vowels (one grid; colour = category) */}
+        {secOn.vow && (
+        <div className="kp-sec">
+          <div className="kp-head">
+            <span className="kp-en">Vowels</span>
             <span className="p-th">สระ</span>
             <span className="p-hint">{level.id === "beginner" ? "ระดับเริ่มต้น · เฉพาะสระเสียงยาว" : "เสียงยาว → สั้น → ประสม → พิเศษ"}</span>
           </div>
-          {VOW_CATS.map((vc) => {
-            const items = vowList.filter((v) => v.cat === vc.cat);
-            if (!items.length) return null;
-            return (
-              <div className="band" key={vc.cat}>
-                <div className={"band-label " + vc.cls}>
-                  <span className="bl-en">{vc.en}<span className="bl-dot" /></span>
-                  <span className="bl-th">{vc.th} · {items.length}</span>
-                </div>
-                <div className="tiles vow">
-                  {items.map((v) => (
-                    <Tile key={v.id} color={vc.cls} glyph={THAI.vowelBare(v)}
-                      selected={vowId === v.id} onClick={() => pickVowel(v.id)} title={"สระ " + vc.th} />
-                  ))}
-                </div>
-              </div>
-            );
-          })}
+          <div className="tiles vow">
+            {VOW_CATS.flatMap((vc) => vowList.filter((v) => v.cat === vc.cat).map((v) => (
+              <Tile key={v.id} color={vc.cls} glyph={THAI.vowelBare(v)}
+                selected={vowId === v.id} onClick={() => pickVowel(v.id)} title={"สระ " + vc.th} />
+            )))}
+          </div>
         </div>
+        )}
 
         {/* 3 — finals (intermediate+) */}
-        {level.finals && (
-          <div className="panel">
-            <div className="panel-head">
-              <span className="p-num">3</span>
-              <span className="p-en">Final consonants</span>
+        {level.finals && secOn.final && (
+          <div className="kp-sec">
+            <div className="kp-head">
+              <span className="kp-en">Final consonants</span>
               <span className="p-th">ตัวสะกด · มาตราตัวสะกด</span>
-              <span className="p-hint">8 มาตรา · ตัวแทนของแต่ละแม่</span>
+              <span className="p-hint">{finCat.extra ? "รวมตัวสะกดไม่ตรงมาตรา" : "8 มาตรา · ตัวแทนของแต่ละแม่"}</span>
             </div>
             <div className="band">
-              <div className="band-label c-final">
-                <span className="bl-en">Endings<span className="bl-dot" /></span>
-                <span className="bl-th">มาตรา · {finals.length}</span>
-              </div>
               <div className="tiles final">
-                {finals.map((f) => (
+                {availFinals.map((f) => (
                   <button key={f.id} className={"tile c-final" + (finId === f.id ? " sel" : "")}
-                    onClick={() => pickFinal(f.id)} title={f.maatra + (f.also ? " · " + f.also : "")}>
+                    onClick={() => pickFinal(f.id)} title={f.maatra + (f.base ? " · ไม่ตรงมาตรา" : "")}>
                     <span className="g">{f.ch || "\u00A0"}</span>
                     <span className="nm">{f.id === "none" ? "ไม่มีตัวสะกด" : f.maatra}</span>
                   </button>
@@ -370,19 +383,14 @@ function BlendingBoard({ t }) {
         )}
 
         {/* 4 — tones (advanced) */}
-        {level.tones && (
-          <div className="panel">
-            <div className="panel-head">
-              <span className="p-num">4</span>
-              <span className="p-en">Tone marks</span>
+        {level.tones && secOn.tone && (
+          <div className="kp-sec">
+            <div className="kp-head">
+              <span className="kp-en">Tone marks</span>
               <span className="p-th">วรรณยุกต์</span>
               <span className="p-hint">วางบนพยัญชนะต้น</span>
             </div>
             <div className="band">
-              <div className="band-label c-tone">
-                <span className="bl-en">Tones<span className="bl-dot" /></span>
-                <span className="bl-th">รูปวรรณยุกต์ · {toneList.length}</span>
-              </div>
               <div className="tiles tone">
                 {toneList.map((tn) => (
                   <button key={tn.id} className={"tile c-tone" + (toneId === tn.id ? " sel" : "")}
