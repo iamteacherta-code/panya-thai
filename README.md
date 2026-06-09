@@ -23,7 +23,7 @@ Then open http://localhost:8080/ — `serve.js` serves `Panyaden Thai Literacy.h
 | --- | --- |
 | **Blending Board** (`board.jsx`) | The core UFLI blending drill — pick initial / vowel / final / tone, slide each slot ◀▶, Check, Word Chains, OTR counter, three teaching levels (Foundation → Blending → Advanced). |
 | **Word Work Mat · Beginner** (`wordmat.jsx`) | C+V and C+V+C mats for อ.3 — 18 initials + 4 long vowels; CVC adds easy finals (ง น ม), tones locked. |
-| **Word Work Mat · Intermediate** (`wordmat.jsx`) | All 44 initials + clusters, every vowel, 8 finals, tone marks (ป.1–2). |
+| **Word Work Mat · Intermediate** (`wordmat.jsx`) | All 44 initials + clusters, every vowel, 8 finals, tone marks (Y1–2). |
 | **Lessons / Reading / Activity / Worksheets** (`pages.jsx`) | Framework pages with sample content, ready to wire to real curriculum. |
 
 ### Files

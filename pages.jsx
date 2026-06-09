@@ -3,7 +3,7 @@ const Icons = window.Icons;
 const Placeholder = window.Placeholder;
 
 const DIGITAL_APPS = [
-  { id: "mat", en: "Word Work Mat", th: "แผ่นฝึกคำ", icon: "activity", color: "var(--earth)", desc: "Build C+V and C+V+C words at the Beginner level (อ.2–ป.2) — consonants, vowels, finals and tones." },
+  { id: "mat", en: "Word Work Mat", th: "แผ่นฝึกคำ", icon: "activity", color: "var(--earth)", desc: "Build C+V and C+V+C words at the Beginner level (K2–Y2) — consonants, vowels, finals and tones." },
   { id: "board", en: "Blending Board", th: "กระดานประสมคำ", icon: "board", color: "var(--leaf)", desc: "Slide consonants, vowels and tones to blend syllables live — the UFLI blending drill." },
 ];
 const RESOURCES = [
@@ -102,12 +102,12 @@ function HomePage({ go }) {
 
 /* ---------------- ACTIVITY SHEETS ---------------- */
 /* shared 3-level selector — Beginner / Intermediate / Advanced (optional "All") */
-function LevelBar({ value, onChange, withAll }) {
+function LevelBar({ value, onChange, withAll, extra }) {
   const opts = (withAll ? [{ key: "all", n: "•", en: "All", th: "ทั้งหมด" }] : []).concat([
     { key: "beginner", n: "1", en: "Beginner", th: "พื้นฐาน" },
     { key: "intermediate", n: "2", en: "Intermediate", th: "ปานกลาง" },
     { key: "advanced", n: "3", en: "Advanced", th: "ขั้นสูง" },
-  ]);
+  ]).concat(extra || []);
   return (
     <div className="level-bar">
       <span className="lvl-lead">ระดับ <span className="en">· Level</span></span>
@@ -314,6 +314,13 @@ const LESSON_ITEMS = THAI.GRADE_ORDER.map((id) => ({
 
 const LESSON_LEVELS = { beginner: ["k2", "k3", "y1"], intermediate: ["y2"], advanced: ["y3"] };
 const lessonGradeLevel = (gg) => Object.keys(LESSON_LEVELS).find((L) => LESSON_LEVELS[L].includes(gg)) || "beginner";
+// Comprehension (Y4–6) "read-to-learn" phases — link to the Reading & Writing pack + full curriculum.
+const COMP_PHASES = [
+  { en: "Fluency", th: "อ่านคล่อง", range: "C1–C8", page: 1 },
+  { en: "Vocabulary", th: "คลังคำและคำศัพท์", range: "C9–C18", page: 6 },
+  { en: "Comprehension", th: "อ่านจับใจความ", range: "C19–C28", page: 12 },
+  { en: "Writing", th: "การเขียนและนำเสนอ", range: "C29–C36", page: 18 },
+];
 function LessonsPage({ grade }) {
   const [lvl, setLvl] = React.useState(() => lessonGradeLevel(grade));
   const grades = (LESSON_LEVELS[lvl] || []).filter((id) => LESSONS_BY_GRADE[id]);
@@ -323,13 +330,32 @@ function LessonsPage({ grade }) {
         sub="ลำดับการสอนแบบเป็นระบบ (UFLI-style) — เลือกระดับเพื่อดูหน่วยและบทเรียน" />
       <div className="lessons-cta">
         <span className="lc-txt">
-          ดูหลักสูตรเต็มทุกบท ทุกช่วงชั้น <b>K2–ป.6</b> (174 บท · 4 ระดับ) พร้อมจุดประสงค์ คำตัวอย่าง และกิจกรรม
-          <span className="th"> · รวมสาย “อ่านเพื่อเรียนรู้” ป.4–6</span>
+          ดูหลักสูตรเต็มทุกบท ทุกช่วงชั้น <b>K2–Y6</b> (174 บท · 4 ระดับ) พร้อมจุดประสงค์ คำตัวอย่าง และกิจกรรม
+          <span className="th"> · รวมสาย “อ่านเพื่อเรียนรู้” Y4–6</span>
         </span>
         <a className="btn btn-sm btn-leaf" href="curriculum.html">📚 Full Scope &amp; Sequence →</a>
       </div>
-      <LevelBar value={lvl} onChange={setLvl} />
-      {grades.map((gid) => {
+      <LevelBar value={lvl} onChange={setLvl} extra={[{ key: "comprehension", n: "4", en: "Comprehension", th: "Y4–6" }]} />
+      {lvl === "comprehension" ? (
+        <div>
+          <h3 className="page-title" style={{ fontSize: 18, marginTop: 20, marginBottom: 2 }}>Comprehension<span className="th"> · อ่านเพื่อเรียนรู้ (Y4–6)</span></h3>
+          <p className="lv-goal" style={{ fontSize: 14, color: "var(--ink-3)", margin: "4px 0 14px" }}>
+            เมื่อถอดรหัสได้คล่องแล้ว เน้นความเข้าใจ คลังคำ และการเขียน · ดูบทเรียนเต็ม (C1–C36) ได้ในหลักสูตร แล้วฝึกด้วยใบงาน
+          </p>
+          <div className="grid-3">
+            {COMP_PHASES.map((ph) => (
+              <div className="item-card" key={ph.page}>
+                <h3>{ph.en}<span className="th">{ph.th}</span></h3>
+                <div className="item-meta"><span className="tag">Y4–6</span><span className="tag earth">{ph.range}</span></div>
+                <div className="item-actions">
+                  <a className="btn btn-sm btn-leaf" href={"activity-reading-comprehension.html#s" + ph.page}><Ico name="worksheet" style={{ width: 15, height: 15 }} /> ใบงาน · Worksheet</a>
+                  <a className="btn btn-sm btn-ghost" href="curriculum.html">บทเรียน</a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : grades.map((gid) => {
         const g = THAI.GRADES[gid];
         const units = LESSONS_BY_GRADE[gid] || [];
         return (
@@ -500,6 +526,13 @@ function ReadingPage() {
       <PageHead eyebrow="Decodable Texts" en="Reading Passages" th="บทอ่าน"
         sub="Short passages built only from sounds students have already learned — so they can read every word with success." />
       <FwNote />
+      <div className="lessons-cta">
+        <span className="lc-txt">
+          ระดับ <b>Y4–6</b> เน้นอ่านจับใจความและเขียน — ดูบทอ่านยาวขึ้นและกิจกรรมในชุด “อ่านเพื่อเรียนรู้”
+          <span className="th"> · Reading &amp; Writing pack</span>
+        </span>
+        <a className="btn btn-sm btn-leaf" href="activity-reading-comprehension.html#s12">📖 Y4–6 Reading &amp; Writing →</a>
+      </div>
       <LevelBar value={lvl} onChange={setLvl} />
       <div className="grid-2">
         {shown.map((p, i) => (
@@ -618,11 +651,11 @@ function WorksheetsPage() {
     { en: "Sound Dictation", th: "เขียนตามคำบอก", type: "Dictation", level: "intermediate", file: "activity-sound-dictation.html", page: 1, preview: ["1", "2", "3"] },
     { en: "Tone Mark Tracing", th: "คัดวรรณยุกต์", type: "Tracing", level: "advanced", file: "activity-tone-mark-tracing.html", page: 1, preview: ["◌่", "◌้", "◌๊"] },
     { en: "Unit Check", th: "ทดสอบท้ายหน่วย", type: "Assessment", level: "advanced", file: "activity-unit-check.html", page: 1, preview: ["A", "B", "C"] },
-    // Comprehension · ป.4–6 (read-to-learn) — Reading & Writing pack
-    { en: "Reading · Fluency", th: "อ่านคล่อง (ป.4–6)", type: "Reading", level: "comprehension", file: "activity-reading-comprehension.html", page: 1, preview: ["อ่าน", "ซ้ำ"] },
-    { en: "Reading · Vocabulary", th: "คลังคำ (ป.4–6)", type: "Reading", level: "comprehension", file: "activity-reading-comprehension.html", page: 6, preview: ["คำ", "พ้อง"] },
-    { en: "Reading · Comprehension", th: "จับใจความ (ป.4–6)", type: "Reading", level: "comprehension", file: "activity-reading-comprehension.html", page: 12, preview: ["จับ", "ใจความ"] },
-    { en: "Reading · Writing", th: "การเขียน (ป.4–6)", type: "Reading", level: "comprehension", file: "activity-reading-comprehension.html", page: 18, preview: ["เขียน", "เรียงความ"] },
+    // Comprehension · Y4–6 (read-to-learn) — Reading & Writing pack
+    { en: "Reading · Fluency", th: "อ่านคล่อง (Y4–6)", type: "Reading", level: "comprehension", file: "activity-reading-comprehension.html", page: 1, preview: ["อ่าน", "ซ้ำ"] },
+    { en: "Reading · Vocabulary", th: "คลังคำ (Y4–6)", type: "Reading", level: "comprehension", file: "activity-reading-comprehension.html", page: 6, preview: ["คำ", "พ้อง"] },
+    { en: "Reading · Comprehension", th: "จับใจความ (Y4–6)", type: "Reading", level: "comprehension", file: "activity-reading-comprehension.html", page: 12, preview: ["จับ", "ใจความ"] },
+    { en: "Reading · Writing", th: "การเขียน (Y4–6)", type: "Reading", level: "comprehension", file: "activity-reading-comprehension.html", page: 18, preview: ["เขียน", "เรียงความ"] },
   ];
   const sheetFile = (s) => s.file || WS_FILE;
   const sheetHref = (s) => s.page ? sheetFile(s) + "#s" + s.page : null;
@@ -648,7 +681,7 @@ function WorksheetsPage() {
               : <Placeholder label="worksheet preview" h={150} />}
             <h3>{s.en}<span className="th">{s.th}</span></h3>
             <div className="item-meta">
-              {s.level && <span className="tag">{s.level === "beginner" ? "Beginner" : s.level === "intermediate" ? "Intermediate" : s.level === "comprehension" ? "ป.4–6" : "Advanced"}</span>}
+              {s.level && <span className="tag">{s.level === "beginner" ? "Beginner" : s.level === "intermediate" ? "Intermediate" : s.level === "comprehension" ? "Y4–6" : "Advanced"}</span>}
               <span className="tag earth">{s.type}</span>
             </div>
             <div className="item-actions">
