@@ -100,7 +100,7 @@ function NavBar({ page, go }) {
           <NavDropdown label="Lessons" icon="lesson" items={LESSON_MENU} page={page} go={go} />
           <a className="nav-btn" href="curriculum.html" title="หลักสูตร 138 บทเรียน · Scope &amp; Sequence">
             <Ico name="reading" />
-            <span>หลักสูตร</span>
+            <span>Curriculum</span>
           </a>
         </nav>
       </div>
