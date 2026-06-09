@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · Worksheets — Tone Mark Tracing (Advanced)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="activity-base.css" />
+</head>
+<body>
+<div class="toolbar">
+  <a class="btn btn-home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก · Home</a>
+  <div class="tb-title">PANYA · Worksheets <small>Tone Mark Tracing · คัดวรรณยุกต์ — Advanced</small></div>
+  <span class="spacer"></span>
+  <span class="hint">20 หน้า · พิมพ์ลงกระดาษ A4</span>
+  <button class="btn btn-primary" onclick="window.print()">🖨️ พิมพ์ / Print</button>
+</div>
+<div class="sheets" id="sheets"></div>
+
+<script src="activity-art.js"></script>
+<script src="activity-ws.js"></script>
+<script>
+window.WSMETA = { eyebrow:'Tone Mark Tracing', level:'Advanced · ขั้นสูง', levelClass:'clay',
+  footTh:'PANYA Thai Foundation · คัดวรรณยุกต์ — Tone Mark Tracing (ขั้นสูง)' };
+const W = window.WS, mg = W.mg;
+const S = [];
+const MARKS = [
+  { m:'่', th:'ไม้เอก', en:'mai ek', tone:'เอก' },
+  { m:'้', th:'ไม้โท', en:'mai tho', tone:'โท' },
+  { m:'๊', th:'ไม้ตรี', en:'mai tri', tone:'ตรี' },
+  { m:'๋', th:'ไม้จัตวา', en:'mai chattawa', tone:'จัตวา' },
+];
+function introSheet(no, en, th, intrTh){
+  const cards = MARKS.map(k =>
+    '<div class="tcard"><span class="mk">' + mg(k.m) + '</span><div class="info">'
+    + '<div class="nm">' + k.th + ' <span style="color:var(--clay)">' + mg(k.m) + '</span></div>'
+    + '<div class="en">' + k.en + ' · เสียง' + k.tone + '</div>'
+    + '<div class="trace"><span class="tbox">' + mg(k.m) + '</span>'
+    + '<span class="tbox"><span class="g">' + mg(k.m) + '</span></span>'
+    + '<span class="tbox"><span class="g">' + mg(k.m) + '</span></span>'
+    + '<span class="tbox"></span></div></div></div>').join('');
+  return W.custom(no,'Trace the marks', en, th,
+    W.instruct(1,'Name and trace each tone mark', intrTh)
+    + '<div class="note-th">รูปวรรณยุกต์วางไว้เหนือพยัญชนะต้นเสมอ ( ◌ = พยัญชนะ )</div>'
+    + '<div class="tone-intro">' + cards + '</div>' + W.extra('คัดรูปวรรณยุกต์ที่ชอบ แล้วเขียนคำที่มีรูปนั้น'));
+}
+
+/* 1 · meet & trace */
+S.push(introSheet(1,'The four tone marks','รูปวรรณยุกต์ทั้ง 4','ลากตามรอยรูปวรรณยุกต์ทั้งสี่ แล้วอ่านชื่อ'));
+
+/* trace words by mark */
+function traceWords(no, kind, en, th, rows, opts){
+  return W.traceSheet(no, kind, en, th, 'Trace, then say', 'คัดตามรอยคำ แล้วอ่านออกเสียง', rows, opts);
+}
+/* 2 · ไม้เอก */
+S.push(traceWords(2,'ไม้เอก ◌่','Words with mai ek','คำมีไม้เอก',[
+  {lead:'ป่า',ghost:'ป่า',n:4,fs:40,tailWord:'forest'},
+  {lead:'พ่อ',ghost:'พ่อ',n:4,fs:40,tailPic:'👨',tailWord:'father'},
+  {lead:'ไก่',ghost:'ไก่',n:4,fs:40,tailPic:'🐔',tailWord:'chicken'},
+  {lead:'ปู่',ghost:'ปู่',n:4,fs:40,tailPic:'👴',tailWord:'grandpa'},
+  {lead:'สี่',ghost:'สี่',n:4,fs:40,tailWord:'four'},
+  {lead:'อ่าน',ghost:'อ่าน',n:4,fs:40,tailWord:'read'},
+]));
+/* 3 · ไม้โท */
+S.push(traceWords(3,'ไม้โท ◌้','Words with mai tho','คำมีไม้โท',[
+  {lead:'ม้า',ghost:'ม้า',n:4,fs:40,tailPic:'🐴',tailWord:'horse'},
+  {lead:'น้ำ',ghost:'น้ำ',n:4,fs:40,tailWord:'water'},
+  {lead:'บ้าน',ghost:'บ้าน',n:4,fs:40,tailWord:'house'},
+  {lead:'ป้า',ghost:'ป้า',n:4,fs:40,tailPic:'👩‍🦰',tailWord:'aunt'},
+  {lead:'ฟ้า',ghost:'ฟ้า',n:4,fs:40,tailPic:'🌤️',tailWord:'sky'},
+  {lead:'ห้า',ghost:'ห้า',n:4,fs:40,tailWord:'five'},
+]));
+/* 4 · ไม้ตรี */
+S.push(traceWords(4,'ไม้ตรี ◌๊','Words with mai tri','คำมีไม้ตรี',[
+  {lead:'โต๊ะ',ghost:'โต๊ะ',n:4,fs:36,tailWord:'table'},
+  {lead:'ก๊อก',ghost:'ก๊อก',n:4,fs:36,tailWord:'tap'},
+  {lead:'ตุ๊กตา',ghost:'ตุ๊กตา',n:3,fs:32,tailWord:'doll'},
+  {lead:'จ๊ะ',ghost:'จ๊ะ',n:4,fs:36,tailWord:'(particle)'},
+  {lead:'ก๊าซ',ghost:'ก๊าซ',n:4,fs:36,tailWord:'gas'},
+  {lead:'ป๊า',ghost:'ป๊า',n:4,fs:36,tailWord:'dad'},
+]));
+/* 5 · ไม้จัตวา */
+S.push(traceWords(5,'ไม้จัตวา ◌๋','Words with mai chattawa','คำมีไม้จัตวา',[
+  {lead:'จ๋า',ghost:'จ๋า',n:4,fs:36,tailWord:'(particle)'},
+  {lead:'ก๋ง',ghost:'ก๋ง',n:4,fs:36,tailWord:'grandpa'},
+  {lead:'ตุ๋น',ghost:'ตุ๋น',n:4,fs:36,tailWord:'stew'},
+  {lead:'เดี๋ยว',ghost:'เดี๋ยว',n:3,fs:32,tailWord:'a moment'},
+  {lead:'ป๋า',ghost:'ป๋า',n:4,fs:36,tailWord:'dad'},
+  {lead:'เก๋',ghost:'เก๋',n:4,fs:36,tailWord:'chic'},
+]));
+/* 6 · placement on carrier */
+S.push(W.traceSheet(6,'Placement','Mark on the consonant','รูปวางบนพยัญชนะ','Trace the mark over the letter','คัดรูปวรรณยุกต์ให้วางเหนือพยัญชนะ',[
+  {lead:'◌่',kw:'ไม้เอก',ghost:'ก่',n:5,fs:44},
+  {lead:'◌้',kw:'ไม้โท',ghost:'ก้',n:5,fs:44},
+  {lead:'◌๊',kw:'ไม้ตรี',ghost:'ก๊',n:5,fs:44},
+  {lead:'◌๋',kw:'ไม้จัตวา',ghost:'ก๋',n:5,fs:44},
+],{note:'รูปวรรณยุกต์อยู่เหนือพยัญชนะต้น (ถ้ามีสระบน ให้วางไว้เหนือสระ)'}));
+
+/* ผัน tracing */
+function paanSheet(no, en, th, classTh, note, rows){
+  return W.traceSheet(no,'ผัน · '+classTh, en, th, 'Trace each tone form','คัดตามรอยทุกเสียงวรรณยุกต์', rows, {note});
+}
+/* 7 · mid */
+S.push(paanSheet(7,'Mid-class ladder','ผันอักษรกลาง','อักษรกลาง',
+  'อักษรกลางผันครบ 5 เสียง',[
+  {lead:'—',kw:'สามัญ',ghost:'กา',n:5,fs:42},
+  {lead:'◌่',kw:'เอก',ghost:'ก่า',n:5,fs:42},
+  {lead:'◌้',kw:'โท',ghost:'ก้า',n:5,fs:42},
+  {lead:'◌๊',kw:'ตรี',ghost:'ก๊า',n:5,fs:42},
+  {lead:'◌๋',kw:'จัตวา',ghost:'ก๋า',n:5,fs:42},
+]));
+/* 8 · high */
+S.push(paanSheet(8,'High-class ladder','ผันอักษรสูง','อักษรสูง',
+  'อักษรสูง (ข) คำเป็นพื้นเสียงจัตวา เติมได้ ไม้เอก และ ไม้โท',[
+  {lead:'—',kw:'จัตวา',ghost:'ขา',n:5,fs:42},
+  {lead:'◌่',kw:'เอก',ghost:'ข่า',n:5,fs:42},
+  {lead:'◌้',kw:'โท',ghost:'ข้า',n:5,fs:42},
+]));
+/* 9 · low */
+S.push(paanSheet(9,'Low-class ladder','ผันอักษรต่ำ','อักษรต่ำ',
+  'อักษรต่ำ (ค) คำเป็นพื้นเสียงสามัญ — รูปกับเสียงต่างกัน',[
+  {lead:'—',kw:'สามัญ',ghost:'คา',n:5,fs:42},
+  {lead:'◌่',kw:'โท',ghost:'ค่า',n:5,fs:42},
+  {lead:'◌้',kw:'ตรี',ghost:'ค้า',n:5,fs:42},
+]));
+/* 10 · tone on words with finals */
+S.push(traceWords(10,'With finals','Tone on words with finals','คำมีตัวสะกด + วรรณยุกต์',[
+  {lead:'ต้น',ghost:'ต้น',n:4,fs:40,tailWord:'tree'},
+  {lead:'น้อง',ghost:'น้อง',n:4,fs:40,tailWord:'younger'},
+  {lead:'ร้อน',ghost:'ร้อน',n:4,fs:40,tailWord:'hot'},
+  {lead:'ห้อง',ghost:'ห้อง',n:4,fs:40,tailWord:'room'},
+  {lead:'เก้า',ghost:'เก้า',n:4,fs:40,tailWord:'nine'},
+  {lead:'ช้าง',ghost:'ช้าง',n:4,fs:40,tailWord:'elephant'},
+]));
+/* 11 · tone on clusters / diphthongs */
+S.push(traceWords(11,'Harder','Clusters &amp; diphthongs','คำควบกล้ำ/สระประสม',[
+  {lead:'เสื้อ',ghost:'เสื้อ',n:3,fs:34,tailWord:'shirt'},
+  {lead:'เปลี่ยน',ghost:'เปลี่ยน',n:3,fs:30,tailWord:'change'},
+  {lead:'เกี๊ยว',ghost:'เกี๊ยว',n:3,fs:32,tailWord:'dumpling'},
+  {lead:'กล้า',ghost:'กล้า',n:4,fs:36,tailWord:'brave'},
+  {lead:'พร้อม',ghost:'พร้อม',n:3,fs:32,tailWord:'ready'},
+  {lead:'เลี้ยง',ghost:'เลี้ยง',n:3,fs:32,tailWord:'raise'},
+]));
+/* 12 · family tone words */
+S.push(traceWords(12,'Family','Family tone words','คำครอบครัว',[
+  {lead:'ป้า',ghost:'ป้า',n:4,fs:40,tailPic:'👩‍🦰',tailWord:'aunt'},
+  {lead:'พ่อ',ghost:'พ่อ',n:4,fs:40,tailPic:'👨',tailWord:'father'},
+  {lead:'แม่',ghost:'แม่',n:4,fs:40,tailPic:'👩',tailWord:'mother'},
+  {lead:'ปู่',ghost:'ปู่',n:4,fs:40,tailPic:'👴',tailWord:'grandpa'},
+  {lead:'ย่า',ghost:'ย่า',n:4,fs:40,tailPic:'👵',tailWord:'grandma'},
+  {lead:'พี่',ghost:'พี่',n:4,fs:40,tailPic:'🧒',tailWord:'big sibling'},
+]));
+/* 13 · high-frequency tone words */
+S.push(traceWords(13,'Common','High-frequency tone words','คำที่ใช้บ่อย',[
+  {lead:'ได้',ghost:'ได้',n:4,fs:40,tailWord:'can'},
+  {lead:'ใช้',ghost:'ใช้',n:4,fs:40,tailWord:'use'},
+  {lead:'ไม้',ghost:'ไม้',n:4,fs:40,tailWord:'wood'},
+  {lead:'รู้',ghost:'รู้',n:4,fs:40,tailWord:'know'},
+  {lead:'ขึ้น',ghost:'ขึ้น',n:4,fs:38,tailWord:'go up'},
+  {lead:'แล้ว',ghost:'แล้ว',n:4,fs:38,tailWord:'already'},
+]));
+/* 14 · more ไม้เอก */
+S.push(traceWords(14,'ไม้เอก ◌่','More mai ek words','คำไม้เอก (ต่อ)',[
+  {lead:'ก่อน',ghost:'ก่อน',n:4,fs:38,tailWord:'before'},
+  {lead:'ต่อ',ghost:'ต่อ',n:4,fs:40,tailWord:'continue'},
+  {lead:'ผ่าน',ghost:'ผ่าน',n:4,fs:38,tailWord:'pass'},
+  {lead:'ใส่',ghost:'ใส่',n:4,fs:40,tailWord:'put in'},
+  {lead:'ส่ง',ghost:'ส่ง',n:4,fs:40,tailWord:'send'},
+  {lead:'เก่ง',ghost:'เก่ง',n:4,fs:40,tailWord:'clever'},
+]));
+/* 15 · more ไม้โท */
+S.push(traceWords(15,'ไม้โท ◌้','More mai tho words','คำไม้โท (ต่อ)',[
+  {lead:'ข้าว',ghost:'ข้าว',n:4,fs:38,tailWord:'rice'},
+  {lead:'เท้า',ghost:'เท้า',n:4,fs:40,tailWord:'foot'},
+  {lead:'น้อง',ghost:'น้อง',n:4,fs:40,tailWord:'younger'},
+  {lead:'ถ้า',ghost:'ถ้า',n:4,fs:40,tailWord:'if'},
+  {lead:'ใช้',ghost:'ใช้',n:4,fs:40,tailWord:'use'},
+  {lead:'ร้อน',ghost:'ร้อน',n:4,fs:40,tailWord:'hot'},
+]));
+/* 16 · write the mark */
+S.push(W.chooseSheet(16,'Write the mark','Add the tone mark','เติมวรรณยุกต์ที่ถูก','Circle the mark, then write the word','ดูภาพ/ความหมาย วงกลมรูปวรรณยุกต์ที่ถูก แล้วเขียนคำเต็มในกรอบ',[
+  {e:'🐴',base:'มา',meaning:'ม้า · horse',opts:[mg('่'),mg('้'),mg('๊')]},
+  {e:'👩‍🦰',base:'ปา',meaning:'ป้า · aunt',opts:[mg('่'),mg('้'),mg('๋')]},
+  {e:'👨',base:'พอ',meaning:'พ่อ · father',opts:[mg('่'),mg('้'),mg('๊')]},
+  {base:'หา',meaning:'ห้า · five',opts:[mg('่'),mg('้'),mg('๊')]},
+  {base:'สี',meaning:'สี่ · four',opts:[mg('่'),mg('้'),mg('๋')]},
+  {base:'โตะ',meaning:'โต๊ะ · table',opts:[mg('่'),mg('้'),mg('๊')]},
+],{round:true,wbox:true}));
+/* 17 · mixed marks trace */
+S.push(traceWords(17,'Mixed','Trace mixed marks','คัดวรรณยุกต์รวม',[
+  {lead:'ป่า',ghost:'ป่า',n:4,fs:40,tailWord:'forest'},
+  {lead:'ม้า',ghost:'ม้า',n:4,fs:40,tailPic:'🐴',tailWord:'horse'},
+  {lead:'โต๊ะ',ghost:'โต๊ะ',n:4,fs:36,tailWord:'table'},
+  {lead:'จ๋า',ghost:'จ๋า',n:4,fs:36,tailWord:'(particle)'},
+  {lead:'ไก่',ghost:'ไก่',n:4,fs:40,tailPic:'🐔',tailWord:'chicken'},
+  {lead:'น้ำ',ghost:'น้ำ',n:4,fs:40,tailWord:'water'},
+]));
+/* 18 · trace sentences */
+(function(){
+  const sents=['พ่อพาน้องไปบ้านปู่','ม้าสีขาววิ่งเร็ว','ป้าซื้อก๋วยเตี๋ยว'];
+  const body = sents.map((s,i) =>
+    '<div class="q"><div class="qh"><span class="qn">' + (i+1) + '</span>'
+    + '<span class="thai" style="font-size:26px;color:transparent;-webkit-text-stroke:1.3px var(--ghost)">' + s + '</span></div>'
+    + '<div class="qbody"><span class="qline" style="height:30px"></span></div></div>').join('');
+  S.push(W.custom(18,'Trace sentences','Trace the sentence','คัดประโยค',
+    W.instruct(1,'Trace, then write it again','คัดตามรอยประโยค แล้วเขียนเองอีกครั้ง วงกลมรูปวรรณยุกต์ทุกตัว')
+    + '<div class="qlist">' + body + '</div>' + W.extra()));
+})();
+/* 19 · trace then write on your own */
+S.push(traceWords(19,'Trace &amp; write','Trace, then write your own','คัดแล้วเขียนเอง',[
+  {lead:'ป่า',ghost:'ป่า',n:3,fs:40,tailWord:'เอก'},
+  {lead:'ม้า',ghost:'ม้า',n:3,fs:40,tailWord:'โท'},
+  {lead:'โต๊ะ',ghost:'โต๊ะ',n:3,fs:36,tailWord:'ตรี'},
+  {lead:'จ๋า',ghost:'จ๋า',n:3,fs:36,tailWord:'จัตวา'},
+],{note:'คัด 3 ช่อง แล้วเขียนคำที่มีรูปเดียวกันเองในช่องว่างด้านล่าง',extra:'เขียนคำที่มีรูปวรรณยุกต์แต่ละรูป รูปละ 1 คำ'}));
+/* 20 · review */
+S.push(introSheet(20,'Review the four marks','ทบทวนรูปวรรณยุกต์','คัดทบทวนรูปวรรณยุกต์ทั้งสี่ให้คล่อง — หนูเขียนได้ทุกรูปแล้ว!'));
+
+W.render(S);
+W.autoprint();
+</script>
+</body>
+</html>

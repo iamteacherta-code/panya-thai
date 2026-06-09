@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · Activity Sheets — Read &amp; Color (Advanced)</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+<style>
+/* ============================================================
+   PANYA · Read & Color Activity Sheets (Advanced)
+   Printable A4 — read decodable Thai words & sentences, then
+   colour. Colour-by-code reinforces consonant class, vowel
+   length, tone marks and clusters; read-and-do builds reading
+   comprehension. Same earth-wood-leaf design system.
+   ============================================================ */
+:root{
+  --bg:#f4efe4; --surface:#fbf8f1; --line:#e3d9c4; --line-2:#d6c8ab;
+  --ink:#2f2a20; --ink-2:#5c5341; --ink-3:#8a7e66;
+  --leaf:#5b7a4b; --leaf-d:#45603a; --leaf-l:#e6eddf;
+  --earth:#c98a3b; --earth-d:#a86d24; --earth-l:#f6e8d2;
+  --clay:#b05c3c; --clay-l:#f3ddd2; --sky:#6f9bb0; --sky-l:#e2ecf1;
+  --ghost:#d8cdb4;
+  --font-ui:"Sarabun",system-ui,-apple-system,sans-serif;
+  --font-thai:"TH Sarabun","Sarabun",sans-serif;
+  --font-hand:"Mali","Sarabun",sans-serif;
+}
+@font-face{font-family:"TH Sarabun";src:url("fonts/Sarabun-Regular.ttf") format("truetype");font-weight:100 500;font-style:normal;font-display:swap;}
+@font-face{font-family:"TH Sarabun";src:url("fonts/Sarabun-Bold.ttf") format("truetype");font-weight:501 900;font-style:normal;font-display:swap;}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{font-family:var(--font-ui);color:var(--ink);background:var(--bg);
+  background-image:radial-gradient(circle at 1px 1px, rgba(120,100,60,.07) 1px, transparent 0);
+  background-size:22px 22px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+
+/* ---------- Toolbar ---------- */
+.toolbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:12px 22px;background:rgba(251,248,241,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);}
+.toolbar .tb-title{font-weight:800;letter-spacing:.04em;}
+.toolbar .tb-title small{display:block;font-weight:600;color:var(--ink-3);font-size:12px;letter-spacing:.02em;}
+.toolbar .spacer{margin-left:auto;}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink);
+  font-family:inherit;font-weight:700;font-size:14px;padding:10px 16px;border-radius:999px;cursor:pointer;}
+.btn-primary{background:var(--earth);color:#fff;border-color:var(--earth-d);box-shadow:inset 0 -3px 0 rgba(0,0,0,.12);}
+.btn-primary:hover{background:var(--earth-d);}
+.btn-home{text-decoration:none;background:var(--leaf);color:#fff;border-color:var(--leaf-d);box-shadow:inset 0 -3px 0 rgba(0,0,0,.12);margin-right:4px;}
+.btn-home:hover{background:var(--leaf-d);}
+.hint{color:var(--ink-3);font-size:13px;}
+
+/* ---------- Sheet (A4) ---------- */
+.sheets{padding:26px 14px 60px;display:flex;flex-direction:column;align-items:center;gap:26px;}
+.sheet{width:210mm;min-height:297mm;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:10px;
+  box-shadow:0 2px 6px rgba(60,48,28,.08),0 22px 50px -22px rgba(60,48,28,.30);
+  padding:15mm 14mm 13mm;position:relative;overflow:hidden;display:flex;flex-direction:column;}
+.extra{flex:1;min-height:60px;margin-top:14px;border:1.8px dashed var(--line-2);border-radius:16px;
+  background:repeating-linear-gradient(45deg,transparent 0 12px,rgba(170,140,90,.045) 12px 24px);
+  padding:12px 18px 16px;display:flex;flex-direction:column;}
+.extra .ex-head{font-size:13px;color:var(--earth-d);font-weight:800;font-family:var(--font-thai);}
+.extra .ex-head .th{color:var(--ink-3);font-weight:600;}
+.extra .ex-space{flex:1;min-height:18px;}
+.extra .ex-lines{display:flex;flex-direction:column;gap:24px;padding-bottom:2px;}
+.extra .ex-lines .l{border-bottom:1.9px dotted var(--line-2);}
+
+/* ---------- Header ---------- */
+.sh-head{display:flex;align-items:flex-start;gap:16px;padding-bottom:12px;border-bottom:2px solid var(--leaf-l);}
+.sh-brand{display:flex;align-items:center;gap:11px;flex:none;}
+.sh-mark{width:46px;height:46px;flex:none;display:grid;place-items:center;}
+.sh-mark img{width:100%;height:100%;object-fit:contain;}
+.sh-mark .fallback{width:42px;height:42px;border-radius:11px;background:var(--leaf);color:#fff;display:grid;place-items:center;font-weight:800;font-size:20px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.15);}
+.sh-brand .bn{font-weight:800;font-size:18px;letter-spacing:.26em;line-height:1;}
+.sh-brand .bs{font-size:10.5px;color:var(--ink-3);letter-spacing:.04em;margin-top:2px;}
+.sh-meta{flex:1;}
+.sh-tag-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.eyebrow{font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--earth-d);}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px;background:var(--leaf-l);color:var(--leaf-d);}
+.badge.earth{background:var(--earth-l);color:var(--earth-d);}
+.badge.clay{background:var(--clay-l);color:var(--clay);}
+.sh-title{font-size:21px;font-weight:800;margin:5px 0 1px;letter-spacing:-.01em;}
+.sh-title .th{font-family:var(--font-thai);font-weight:500;color:var(--ink-2);font-size:17px;}
+.sh-fields{flex:none;display:flex;flex-direction:column;gap:7px;min-width:188px;}
+.fld{display:flex;align-items:flex-end;gap:7px;font-size:12px;font-weight:700;color:var(--ink-2);}
+.fld .th{font-family:var(--font-thai);font-weight:500;color:var(--ink-3);font-size:11px;}
+.fld .ln{flex:1;border-bottom:1.6px dotted var(--line-2);height:17px;}
+.fld.small{min-width:0;}
+
+/* ---------- Instructions ---------- */
+.instruct{display:flex;align-items:center;gap:10px;margin:13px 0 10px;font-size:13.5px;color:var(--ink-2);}
+.instruct .n{flex:none;width:24px;height:24px;border-radius:8px;background:var(--earth);color:#fff;font-weight:800;display:grid;place-items:center;font-size:13px;box-shadow:inset 0 -2px 0 rgba(0,0,0,.14);}
+.instruct b{color:var(--ink);}
+.instruct .th{font-family:var(--font-thai);font-weight:500;color:var(--ink-3);}
+.thai{font-family:var(--font-thai);}
+.note-th{font-family:var(--font-thai);font-size:12.5px;color:var(--ink-3);margin:-2px 0 8px;}
+.emoji svg{width:1em;height:1em;display:block;fill:none;stroke:var(--ink);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ---------- Picture cards to colour ---------- */
+.rc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:6px;}
+.rc-card{border:1.7px solid var(--line);border-radius:16px;background:var(--surface);padding:14px 10px 12px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.rc-card .pic{font-size:92px;line-height:1;color:var(--ink);}
+.rc-card .w{font-family:var(--font-thai);font-size:30px;font-weight:600;color:var(--ink);}
+.rc-card .ins{font-family:var(--font-thai);font-size:13px;color:var(--clay);font-weight:700;}
+
+/* ---------- Read-and-do rows ---------- */
+.rd-list{display:flex;flex-direction:column;gap:12px;margin-top:6px;}
+.rd-row{display:flex;align-items:center;gap:16px;border:1.7px solid var(--line);border-radius:16px;background:var(--surface);padding:12px 18px;}
+.rd-row .num{flex:none;width:26px;height:26px;border-radius:8px;background:var(--leaf);color:#fff;font-weight:800;display:grid;place-items:center;font-size:13px;}
+.rd-row .sent{font-family:var(--font-thai);font-size:25px;color:var(--ink);flex:1;}
+.rd-row .pic{font-size:66px;flex:none;}
+
+/* ---------- Colour-by-code ---------- */
+.clegend{display:flex;flex-wrap:wrap;gap:10px 18px;padding:12px 16px;border:1.8px dashed var(--line-2);border-radius:14px;background:var(--earth-l);margin-bottom:12px;font-family:var(--font-thai);font-size:14.5px;}
+.clegend .ci{display:inline-flex;align-items:center;gap:8px;}
+.clegend .sw{width:22px;height:22px;border-radius:6px;border:1.6px solid var(--ink-3);}
+.wordwall{border:1.8px solid var(--line);border-radius:16px;background:var(--surface);padding:18px 18px;display:flex;flex-wrap:wrap;gap:16px 28px;justify-content:center;font-family:var(--font-thai);font-size:34px;color:var(--ink);line-height:1.5;}
+
+/* ---------- Clue → colour the right picture ---------- */
+.clue-rows{display:flex;flex-direction:column;gap:12px;margin-top:6px;}
+.cr{display:flex;align-items:center;gap:16px;border:1.7px solid var(--line);border-radius:16px;background:var(--surface);padding:12px 18px;}
+.cr .clue{font-family:var(--font-thai);font-size:32px;color:var(--leaf-d);font-weight:600;min-width:120px;}
+.cr .opts{display:flex;gap:24px;margin-left:auto;}
+.cr .opt{font-size:58px;}
+
+/* ---------- Number colour ---------- */
+.num-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:6px;}
+.num-cell{border:1.6px solid var(--line);border-radius:14px;background:var(--surface);padding:12px 6px 10px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.num-cell .pic{font-size:56px;line-height:1;}
+.num-cell .nlab{font-family:var(--font-thai);font-size:24px;color:var(--clay);font-weight:700;}
+
+/* ---------- Match (line) ---------- */
+.match{display:grid;grid-template-columns:1fr 1fr;gap:46px;margin-top:6px;}
+.mcol{display:flex;flex-direction:column;gap:12px;justify-content:center;}
+.mitem{position:relative;border:1.7px solid var(--line);border-radius:14px;background:var(--surface);min-height:70px;display:flex;align-items:center;padding:10px 16px;}
+.mcol.left .mitem{justify-content:flex-start;font-family:var(--font-thai);font-size:32px;}
+.mcol.right .mitem{justify-content:flex-end;}
+.mcol.right .mitem .pic{font-size:50px;}
+.node{width:15px;height:15px;border-radius:50%;border:2.5px solid var(--earth-d);background:#fff;position:absolute;top:50%;transform:translateY(-50%);}
+.node.nR{right:-9px;} .node.nL{left:-9px;}
+
+/* ---------- Footer ---------- */
+.sh-foot{position:absolute;left:14mm;right:14mm;bottom:8mm;display:flex;align-items:center;justify-content:space-between;font-size:10.5px;color:var(--ink-3);border-top:1.4px solid var(--line);padding-top:7px;}
+.sh-foot .th{font-family:var(--font-thai);}
+.star-row{display:flex;align-items:center;gap:6px;}
+.star{width:15px;height:15px;border:1.6px solid var(--line-2);border-radius:4px;}
+
+/* ---------- Print ---------- */
+@media print{
+  @page{size:A4;margin:0;}
+  body{background:#fff;background-image:none;}
+  .toolbar{display:none !important;}
+  .sheets{padding:0;gap:0;}
+  .sheet{width:210mm;min-height:297mm;box-shadow:none;border:none;border-radius:0;page-break-after:always;break-after:page;}
+  .sheet:last-child{page-break-after:auto;break-after:auto;}
+}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <a class="btn btn-home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก · Home</a>
+  <div class="tb-title">PANYA · Activity Sheets
+    <small>Read &amp; Color · อ่านแล้วระบายสี — Advanced</small>
+  </div>
+  <span class="spacer"></span>
+  <span class="hint">20 แผ่น · พิมพ์ลงกระดาษ A4</span>
+  <button class="btn btn-primary" onclick="window.print()">🖨️ พิมพ์ / Print</button>
+</div>
+
+<div class="sheets" id="sheets"></div>
+
+<script src="activity-art.js"></script>
+<script>
+const art = window.artIcon;
+
+/* ---------- shared scaffold ---------- */
+const LOGO = '<div class="sh-mark"><img src="images/panya-logo.png" alt="PANYA" '
+  + 'onerror="this.style.display=\'none\';this.parentNode.innerHTML=\'<div class=&quot;fallback&quot;>P</div>\'"></div>';
+function head(no, kind, en, th){
+  return '<header class="sh-head"><div class="sh-brand">' + LOGO
+    + '<div><div class="bn">PANYA</div><div class="bs">Thai Foundation</div></div></div>'
+    + '<div class="sh-meta"><div class="sh-tag-row">'
+    + '<span class="eyebrow">Read &amp; Color</span>'
+    + '<span class="badge clay">Advanced · ขั้นสูง</span>'
+    + '<span class="badge earth">แบบที่ ' + no + ' · ' + kind + '</span></div>'
+    + '<div class="sh-title">' + en + (th ? ' <span class="th">· ' + th + '</span>' : '') + '</div></div>'
+    + '<div class="sh-fields">'
+    + '<div class="fld">ชื่อ <span class="th">Name</span> <span class="ln"></span></div>'
+    + '<div class="fld small">วันที่ <span class="th">Date</span> <span class="ln"></span>'
+    + '&nbsp;ห้อง <span class="th">Class</span> <span class="ln"></span></div></div></header>';
+}
+function instruct(n, en, th){
+  return '<div class="instruct"><span class="n">' + n + '</span><span><b>' + en + '</b> '
+    + '<span class="th">' + th + '</span></span></div>';
+}
+function foot(){
+  return '<footer class="sh-foot"><span class="th">PANYA Thai Foundation · อ่านแล้วระบายสี — Read &amp; Color (ขั้นสูง)</span>'
+    + '<span class="star-row">ระบายดาวเมื่อทำเสร็จ <span class="star"></span><span class="star"></span><span class="star"></span></span></footer>';
+}
+function sheet(inner){ return '<section class="sheet">' + inner + '</section>'; }
+const EXTRA = '<div class="extra"><div class="ex-head">✏️ วาดต่อ · Draw &amp; colour more '
+  + '<span class="th">— วาดและระบายภาพที่หนูชอบจากใบงานนี้ พร้อมเขียนคำกำกับ</span></div>'
+  + '<div class="ex-space"></div>'
+  + '<div class="ex-lines"><span class="l"></span><span class="l"></span></div></div>';
+const wall = (words) => '<div class="wordwall">' + words.map(w => '<span class="w">' + w + '</span>').join('') + '</div>';
+const legendBar = (items) => '<div class="clegend">' + items.map(l =>
+  '<span class="ci"><span class="sw" style="background:' + l.c + '"></span>' + l.t + '</span>').join('') + '</div>';
+
+const SHEETS = [];
+
+/* picture-cards-to-colour sheet */
+function colorPicSheet(no, kind, en, th, intrTh, items){
+  const cards = items.map(it =>
+    '<div class="rc-card"><span class="pic emoji">' + art(it.e) + '</span>'
+    + '<span class="w">' + it.w + '</span>'
+    + (it.ins ? '<span class="ins">' + it.ins + '</span>' : '<span class="ins">ระบายสีให้สวย</span>') + '</div>').join('');
+  return sheet(head(no, kind, en, th)
+    + instruct(1, 'Read &amp; colour', intrTh)
+    + '<div class="rc-grid">' + cards + '</div>' + EXTRA + foot());
+}
+/* colour-by-code sheet */
+function codeSheet(no, kind, en, th, intrTh, legend, words, note){
+  return sheet(head(no, kind, en, th)
+    + instruct(1, 'Colour by the code', intrTh)
+    + (note ? '<div class="note-th">' + note + '</div>' : '')
+    + legendBar(legend) + wall(words) + EXTRA + foot());
+}
+/* read-and-do sheet */
+function readDoSheet(no, kind, en, th, intrTh, rows, lead){
+  const list = rows.map((r,i) =>
+    '<div class="rd-row"><span class="num">' + (i+1) + '</span>'
+    + '<span class="sent">' + r.s + '</span><span class="pic emoji">' + art(r.e) + '</span></div>').join('');
+  return sheet(head(no, kind, en, th)
+    + instruct(1, 'Read, then colour', intrTh)
+    + (lead ? '<div class="note-th">' + lead + '</div>' : '')
+    + '<div class="rd-list">' + list + '</div>' + EXTRA + foot());
+}
+/* clue → colour the matching picture */
+function clueSheet(no, kind, en, th, intrTh, rows){
+  const list = rows.map(r =>
+    '<div class="cr"><span class="clue">' + r.clue + '</span><div class="opts">'
+    + r.opts.map(e => '<span class="opt emoji">' + art(e) + '</span>').join('') + '</div></div>').join('');
+  return sheet(head(no, kind, en, th)
+    + instruct(1, 'Read &amp; colour the right one', intrTh)
+    + '<div class="clue-rows">' + list + '</div>' + EXTRA + foot());
+}
+
+/* === 1 · read & colour — animals === */
+SHEETS.push(colorPicSheet(1,'Colour the picture','Animals','สัตว์',
+  'อ่านคำใต้ภาพ แล้วระบายสีภาพให้สวยงาม',[
+  {e:'🐟',w:'ปลา'},{e:'🐍',w:'งู'},{e:'🐢',w:'เต่า'},
+  {e:'🐔',w:'ไก่'},{e:'🐴',w:'ม้า'},{e:'🦀',w:'ปู'},
+]));
+/* === 2 · read & colour — body & family === */
+SHEETS.push(colorPicSheet(2,'Colour the picture','Body &amp; family','ร่างกายและครอบครัว',
+  'อ่านคำใต้ภาพ แล้วระบายสีภาพ',[
+  {e:'👁️',w:'ตา'},{e:'👂',w:'หู'},{e:'✋',w:'มือ'},
+  {e:'👩',w:'แม่'},{e:'👨',w:'พ่อ'},{e:'🧒',w:'พี่'},
+]));
+/* === 3 · colour by consonant class === */
+SHEETS.push(codeSheet(3,'Colour by class','Consonant class','ระบายตามหมู่อักษร',
+  'อ่านคำ ดูพยัญชนะต้น แล้วระบายตามหมู่อักษร',
+  [{c:'#cfe0c4',t:'อักษรกลาง (ก จ ด ต บ ป อ)'},{c:'#f6d8b0',t:'อักษรสูง (ข ฉ ถ ผ ฝ ส ห)'},{c:'#cfe0ea',t:'อักษรต่ำ (ค ง ช ท น ม ย ร ล ว พ ฟ)'}],
+  ['กา','ขา','คา','จาน','สี','งู','ตา','ถุง','นก','ปลา','ผม','ม้า','ดาว','หู','ลิง','อ่าง','เสือ','ฟ้า'],
+  'หมู่อักษรเป็นกุญแจสำคัญในการผันวรรณยุกต์'));
+/* === 4 · colour by vowel length === */
+SHEETS.push(codeSheet(4,'Colour by vowel','Vowel length','ระบายตามความสั้น–ยาวของสระ',
+  'อ่านคำ ฟังเสียงสระ แล้วระบายตามความสั้น–ยาว',
+  [{c:'#f4d06a',t:'สระเสียงสั้น · short'},{c:'#9ec089',t:'สระเสียงยาว · long'}],
+  ['จะ','กา','ติ','ดี','ปุ','ปู','มะ','นา','กิน','โต','บัด','เก','สุ','แล','ละ','ตี','นก','มี']));
+/* === 5 · colour by tone mark === */
+SHEETS.push(codeSheet(5,'Colour by tone','Tone marks','ระบายตามรูปวรรณยุกต์',
+  'อ่านคำ ดูรูปวรรณยุกต์ แล้วระบายตามสี',
+  [{c:'#f2d24b',t:'ไม่มีรูป'},{c:'#d96b54',t:'ไม้เอก ◌่'},{c:'#5b7a4b',t:'ไม้โท ◌้'},{c:'#6f9bb0',t:'ไม้ตรี ◌๊'},{c:'#b08bd0',t:'ไม้จัตวา ◌๋'}],
+  ['กา','ป่า','ม้า','โต๊ะ','จ๋า','ไก่','น้ำ','ปลา','ข้าว','ก๊อก','ก๋ง','สี่','ดาว','ห้า','พ่อ','เดี๋ยว','ชา','บ้าน']));
+/* === 6 · read the sentence, colour what it says === */
+SHEETS.push(readDoSheet(6,'Read &amp; do','Colour what it says','ระบายตามคำสั่ง',
+  'อ่านประโยค แล้วระบายสีภาพตามที่บอก',[
+  {s:'ระบายปลาสีฟ้า',    e:'🐟'},
+  {s:'ระบายไก่สีแดง',     e:'🐔'},
+  {s:'ระบายดาวสีเหลือง',  e:'⭐'},
+  {s:'ระบายม้าสีน้ำตาล',  e:'🐴'},
+  {s:'ระบายดอกไม้สีชมพู', e:'🌸'},
+]));
+/* === 7 · colour by number (เลขไทย) === */
+(function(){
+  const legend = [{c:'#d96b54',t:'๑ · แดง'},{c:'#e0913f',t:'๒ · ส้ม'},{c:'#f2d24b',t:'๓ · เหลือง'},{c:'#5b7a4b',t:'๔ · เขียว'},{c:'#6f9bb0',t:'๕ · ฟ้า'}];
+  const cells = [['🐟','๑'],['⭐','๓'],['🐔','๒'],['🐢','๕'],['🦀','๔'],['🐴','๒'],['🌸','๑'],['🍵','๓'],['🐍','๔'],['🥚','๕']];
+  const grid = '<div class="num-grid">' + cells.map(c =>
+    '<div class="num-cell"><span class="pic emoji">' + art(c[0]) + '</span><span class="nlab">' + c[1] + '</span></div>').join('') + '</div>';
+  SHEETS.push(sheet(head(7,'Colour by number','Thai numerals','ระบายตามเลขไทย')
+    + instruct(1,'Read the number, colour the picture','อ่านเลขไทยใต้ภาพ แล้วระบายตามสีในตาราง')
+    + legendBar(legend) + grid + EXTRA + foot()));
+})();
+/* === 8 · find & colour words with สระ –า === */
+SHEETS.push(codeSheet(8,'Find &amp; colour','Words with สระ –า','คำที่มีสระ –า',
+  'อ่านทุกคำ ระบายเฉพาะคำที่มีสระ –า เท่านั้น',
+  [{c:'#9ec089',t:'มีสระ –า → ระบายสีเขียว'},{c:'#ffffff',t:'ไม่มี → ปล่อยว่าง'}],
+  ['กา','ดี','ตา','ปู','มา','นก','ปลา','หู','จาน','กิน','ดาว','ดิน','บ้าน','มี','นา','งู']));
+/* === 9 · read the word, colour the right picture === */
+SHEETS.push(clueSheet(9,'Read &amp; colour','Find the picture','หาภาพให้ตรงกับคำ',
+  'อ่านคำ แล้วระบายเฉพาะภาพที่ตรงกับคำ',[
+  {clue:'ม้า',  opts:['🐴','🐢','🐟']},
+  {clue:'ดาว',  opts:['🔥','⭐','🌧️']},
+  {clue:'หู',   opts:['👁️','👂','👄']},
+  {clue:'ปลา',  opts:['🐍','🐔','🐟']},
+  {clue:'แม่',  opts:['👨','👩','👴']},
+]));
+/* === 10 · colour by cluster (คำควบกล้ำ) === */
+SHEETS.push(codeSheet(10,'Find &amp; colour','Consonant clusters','คำควบกล้ำ',
+  'อ่านทุกคำ ระบายเฉพาะคำที่มีอักษรควบกล้ำ (กร กล กว ปร ปล คร ...)',
+  [{c:'#b08bd0',t:'มีคำควบกล้ำ → ระบายสีม่วง'},{c:'#ffffff',t:'ไม่มี → ปล่อยว่าง'}],
+  ['ปลา','กา','ครู','นก','กลอง','มา','ขวด','ดิน','ปราบ','ตา','กว่าง','หู','พระ','ปู','ตรง','คลอง'],
+  'คำควบกล้ำ = พยัญชนะต้น 2 ตัวออกเสียงควบกัน'));
+/* === 11 · read the passage, colour the scene === */
+(function(){
+  const passage = 'วันนี้ฟ้าใส มีดาวบนท้องฟ้า พ่อพาน้องไปดูม้ากับไก่ที่ฟาร์ม น้องชอบดอกไม้สีชมพูมาก';
+  const pics = [['⭐','ดาว'],['🐴','ม้า'],['🐔','ไก่'],['🌸','ดอกไม้']];
+  const cards = '<div class="rc-grid" style="grid-template-columns:repeat(4,1fr)">' + pics.map(p =>
+    '<div class="rc-card"><span class="pic emoji" style="font-size:78px">' + art(p[0]) + '</span><span class="w">' + p[1] + '</span></div>').join('') + '</div>';
+  SHEETS.push(sheet(head(11,'Read &amp; colour','Colour the scene','ระบายภาพตามเรื่อง')
+    + instruct(1,'Read the passage','อ่านเรื่องสั้น แล้วระบายสีภาพสิ่งที่พบในเรื่อง')
+    + '<div class="wordwall" style="font-size:26px;line-height:1.8;text-align:left;justify-content:flex-start">' + passage + '</div>'
+    + cards + EXTRA + foot()));
+})();
+/* === 12 · colour the pictures whose name has ไม้โท === */
+SHEETS.push(codeSheet(12,'Find &amp; colour','Words with ไม้โท','คำที่มีไม้โท ◌้',
+  'อ่านทุกคำ ระบายเฉพาะคำที่มีไม้โท ( ◌้ )',
+  [{c:'#6f9bb0',t:'มีไม้โท ◌้ → ระบายสีฟ้า'},{c:'#ffffff',t:'ไม่มี → ปล่อยว่าง'}],
+  ['ม้า','ป่า','น้ำ','ไก่','บ้าน','กา','ฟ้า','ดู','ห้า','พ่อ','ข้าว','ปลา','น้อง','สี่','เท้า','มา']));
+/* === 13 · match the word to the picture, then colour === */
+(function(){
+  const pairs = [
+    {w:'เต่า', e:'🐢'},{w:'ผีเสื้อ', e:'🦋'},{w:'ดอกไม้', e:'🌸'},
+    {w:'แมว?', e:'🐔'},{w:'ไก่', e:'🐔'},
+  ];
+  // use a clean 4-pair match
+  const data = [{w:'เต่า',e:'🐢'},{w:'ผีเสื้อ',e:'🦋'},{w:'ดอกไม้',e:'🌸'},{w:'ปู',e:'🦀'}];
+  const order = data.map((_,i,a)=>a[(i+2)%a.length]);
+  const left = data.map(p => '<div class="mitem"><span>' + p.w + '</span><span class="node nR"></span></div>').join('');
+  const right = order.map(p => '<div class="mitem"><span class="node nL"></span><span class="pic emoji">' + art(p.e) + '</span></div>').join('');
+  SHEETS.push(sheet(head(13,'Match &amp; colour','Word to picture','จับคู่คำกับภาพ')
+    + instruct(1,'Match, then colour','ลากเส้นจับคู่คำกับภาพ แล้วระบายสีภาพ')
+    + '<div class="match"><div class="mcol left">' + left + '</div><div class="mcol right">' + right + '</div></div>'
+    + EXTRA + foot()));
+})();
+/* === 14 · read & colour — nature === */
+SHEETS.push(colorPicSheet(14,'Colour the picture','Nature','ธรรมชาติ',
+  'อ่านคำใต้ภาพ แล้วระบายสีภาพ',[
+  {e:'⭐',w:'ดาว'},{e:'🔥',w:'ไฟ'},{e:'🌤️',w:'ฟ้า'},
+  {e:'🌧️',w:'ฝน'},{e:'🌸',w:'ดอกไม้'},{e:'💨',w:'ลม'},
+]));
+/* === 15 · read & colour — food & things === */
+SHEETS.push(colorPicSheet(15,'Colour the picture','Food &amp; things','อาหารและสิ่งของ',
+  'อ่านคำใต้ภาพ แล้วระบายสีภาพ',[
+  {e:'🍵',w:'ชา'},{e:'🍽️',w:'จาน'},{e:'🥚',w:'ไข่'},
+  {e:'🥛',w:'นม'},{e:'🎨',w:'สี'},{e:'🛏️',w:'เตียง'},
+]));
+/* === 16 · read & colour — action words === */
+SHEETS.push(colorPicSheet(16,'Colour the picture','Action words','คำกริยา',
+  'อ่านคำกริยาใต้ภาพ แล้วระบายสีภาพ',[
+  {e:'😋',w:'กิน'},{e:'👀',w:'ดู'},{e:'🦋',w:'บิน'},
+  {e:'🧗',w:'ปีน'},{e:'🚶',w:'เดิน'},{e:'🛏️',w:'นอน'},
+]));
+/* === 17 · read & do — more sentences === */
+SHEETS.push(readDoSheet(17,'Read &amp; do','Colour what it says','ระบายตามคำสั่ง (ต่อ)',
+  'อ่านประโยค แล้วระบายสีภาพตามที่บอก',[
+  {s:'ระบายเต่าสีเขียว',   e:'🐢'},
+  {s:'ระบายปูสีส้ม',       e:'🦀'},
+  {s:'ระบายไข่สีเหลือง',   e:'🥚'},
+  {s:'ระบายผีเสื้อสีม่วง', e:'🦋'},
+  {s:'ระบายแก้วนมสีฟ้า',   e:'🥛'},
+]));
+/* === 18 · read & colour the right picture (set 2) === */
+SHEETS.push(clueSheet(18,'Read &amp; colour','Find the picture','หาภาพให้ตรงกับคำ',
+  'อ่านคำ แล้วระบายเฉพาะภาพที่ตรงกับคำ',[
+  {clue:'ไก่',     opts:['🐴','🐔','🐟']},
+  {clue:'ดอกไม้',  opts:['🌸','🔥','⭐']},
+  {clue:'กิน',     opts:['👀','😋','🧗']},
+  {clue:'ฝน',      opts:['🌤️','🌧️','💨']},
+  {clue:'จาน',     opts:['🥚','🍽️','🥛']},
+]));
+/* === 19 · read & colour — things around me === */
+SHEETS.push(colorPicSheet(19,'Colour the picture','My world','สิ่งรอบตัว',
+  'อ่านคำใต้ภาพ แล้วระบายสีภาพ',[
+  {e:'⭐',w:'ดาว'},{e:'🐢',w:'เต่า'},{e:'🌸',w:'ดอกไม้'},
+  {e:'🦋',w:'ผีเสื้อ'},{e:'🍵',w:'ชา'},{e:'🐴',w:'ม้า'},
+]));
+/* === 20 · review — read & do challenge === */
+SHEETS.push(readDoSheet(20,'Review','Read &amp; colour challenge','ทบทวน — อ่านแล้วระบาย',
+  'อ่านประโยคให้ชัด แล้วระบายสีตามคำสั่งทั้งหมด',[
+  {s:'ระบายดาวสีเหลือง 3 ดวง', e:'⭐'},
+  {s:'ระบายม้าสีน้ำตาล',        e:'🐴'},
+  {s:'ระบายปลาในน้ำสีฟ้า',      e:'🐟'},
+  {s:'ระบายดอกไม้สีแดงและชมพู', e:'🌸'},
+  {s:'วาดและระบายสิ่งที่หนูชอบ', e:'🎨'},
+]));
+
+document.getElementById('sheets').innerHTML = SHEETS.join('');
+if (new URLSearchParams(location.search).has('print')){ window.addEventListener('load', () => window.print()); }
+</script>
+</body>
+</html>

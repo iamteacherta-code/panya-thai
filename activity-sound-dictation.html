@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · Worksheets — Sound Dictation (Intermediate)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="activity-base.css" />
+</head>
+<body>
+<div class="toolbar">
+  <a class="btn btn-home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก · Home</a>
+  <div class="tb-title">PANYA · Worksheets <small>Sound Dictation · เขียนตามคำบอก — Intermediate</small></div>
+  <span class="spacer"></span>
+  <span class="hint">20 หน้า · พิมพ์ลงกระดาษ A4</span>
+  <button class="btn btn-primary" onclick="window.print()">🖨️ พิมพ์ / Print</button>
+</div>
+<div class="sheets" id="sheets"></div>
+
+<script src="activity-art.js"></script>
+<script src="activity-ws.js"></script>
+<script>
+window.WSMETA = { eyebrow:'Sound Dictation', level:'Intermediate · ปานกลาง', levelClass:'',
+  footTh:'PANYA Thai Foundation · เขียนตามคำบอก — Sound Dictation (ปานกลาง)' };
+const W = window.WS;
+const S = [];
+const INTR_EN = 'Listen, then write';
+const INTR_TH = 'ครูอ่านคำ — ฟังให้ดี แล้วเขียนลงในช่อง';
+
+/* word-dictation pages */
+function dpage(no, kind, en, th, teacher, count){
+  return W.dictSheet(no, kind, en, th, INTR_EN, INTR_TH, { teacher, count: count || 10 });
+}
+S.push(dpage(1,'Letters','Letters','พยัญชนะ','ก  จ  ด  ต  บ  ป  ม  น  ส  ห',10));
+S.push(dpage(2,'Vowels','Syllables · vowels','สระ','กา  กี  กู  เก  แก  โก  ไก  ดำ',8));
+S.push(dpage(3,'Words','CV words','คำสระเสียงยาว','มา  ตา  ดี  ปู  งู  สี  หู  ชา  นา  ขา',10));
+S.push(dpage(4,'Words','Finals -ง -น -ม','มาตรา กง กน กม','กาง  ลิง  จาน  ปีน  ตาม  ยาม  นาน  คาง',8));
+S.push(dpage(5,'Words','Finals -ก -ด -บ','มาตรา กก กด กบ','ปาก  มาก  มด  ปิด  กบ  จับ  รับ  ดิบ',8));
+S.push(dpage(6,'Words','Short vowels','สระเสียงสั้น','จะ  มะ  กิน  ดิน  สุข  นัด  ปะ  ทุน',8));
+S.push(dpage(7,'Words','Words with ◌ั','ไม้หันอากาศ','กัน  มัน  ฟัน  รัก  หัก  กับ  วัด  ขัง',8));
+S.push(dpage(8,'Tone','Tone words','คำมีวรรณยุกต์','ป้า  น้า  พ่อ  แม่  พี่  สี่  ไก่  ห้า',8));
+S.push(dpage(9,'Clusters','Cluster words','คำควบกล้ำ','ปลา  ครู  กลอง  ขวด  ตรง  พริก  กวาง  เพลง',8));
+
+/* picture dictation */
+S.push(W.dictSheet(10,'Picture','Picture dictation 1','เขียนคำจากภาพ','Write the word for each picture','ดูภาพ แล้วเขียนคำให้ถูกต้อง',{ pics:['🐟','🍽️','⭐','🐴','😋','👄'] }));
+S.push(W.dictSheet(11,'Picture','Picture dictation 2','เขียนคำจากภาพ','Write the word for each picture','ดูภาพ แล้วเขียนคำให้ถูกต้อง',{ pics:['🐍','🦀','👁️','👂','🎨','🐢'] }));
+
+S.push(dpage(12,'Words','Mixed words 1','คำผสม','ดาว  บ้าน  กิน  ปลา  จาน  ม้า  สี่  รัก  นก  ตาม',10));
+S.push(dpage(13,'Words','Mixed words 2','คำผสม','หู  งู  ปาก  มด  กบ  ครู  ป้า  ลิง  ฝน  ดิน',10));
+S.push(dpage(14,'Numbers','Number words','คำเลข','หนึ่ง  สอง  สาม  สี่  ห้า  หก  เจ็ด  แปด  เก้า  สิบ',10));
+S.push(dpage(15,'Colours','Colour words','คำสี','แดง  เขียว  ฟ้า  ขาว  ดำ  ส้ม',6));
+
+/* sentence dictation */
+function sentSheet(no, en, th, sents){
+  const lines = '<div class="qlist">' + sents.map((_,i) =>
+    '<div class="q"><div class="qh"><span class="qn">' + (i+1) + '</span></div>'
+    + '<div class="qbody"><span class="qline" style="height:30px"></span></div></div>').join('') + '</div>';
+  const teacher = '<div class="teacher"><b>สำหรับครู · teacher:</b> ' + sents.join('  /  ') + '</div>';
+  return W.custom(no,'Sentence', en, th, W.instruct(1,'Listen, then write the sentence','ครูอ่านประโยค — ฟังให้จบ แล้วเขียนทั้งประโยค')
+    + teacher + lines + W.extra('วาดภาพประโยคที่ชอบ 1 ภาพ'));
+}
+S.push(sentSheet(16,'Sentence dictation 1','เขียนประโยคตามคำบอก',
+  ['พ่อ ไป นา','แม่ เลี้ยง ไก่','น้อง กิน ข้าว','ปลา อยู่ ใน น้ำ','ม้า วิ่ง เร็ว']));
+S.push(sentSheet(17,'Sentence dictation 2','เขียนประโยคตามคำบอก',
+  ['ครู สอน เด็ก','ปู่ ปลูก ผัก','ดาว อยู่ บน ฟ้า','พี่ อ่าน หนังสือ','เพื่อน เล่น กัน']));
+
+S.push(dpage(18,'Challenge','Mixed challenge','รวมทุกแบบ','ปลาก? — ปาก  ครู  ป้า  กัน  ดาว  มด  จาน  ลิง  พ่อ  ขวด',10));
+S.push(W.dictSheet(19,'Self-check','Check with a friend','ตรวจกับเพื่อน','Write, then check with a friend','เขียนตามคำบอก แล้วแลกกันตรวจกับเพื่อน',{ teacher:'กา  ตา  จาน  ปาก  รัก  ป้า  ครู  ดาว', count:8 }));
+S.push(dpage(20,'Review','Review dictation','ทบทวนรวม','มา  กิน  จาน  ปาก  รัก  ป้า  ปลา  ดาว  ม้า  ครู',10));
+
+W.render(S);
+W.autoprint();
+</script>
+</body>
+</html>

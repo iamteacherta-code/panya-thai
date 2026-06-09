@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · Worksheets — Beginner (20 pages)</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+<style>
+/* ============================================================
+   PANYA · Beginner Worksheets (ใบงานพื้นฐาน) — 20 printable A4
+   Trace & Say letters and vowels, build words, match and read.
+   Same earth-wood-leaf design as the Thai Literacy Studio.
+   ============================================================ */
+:root{
+  --bg:#f4efe4; --surface:#fbf8f1; --line:#e3d9c4; --line-2:#d6c8ab;
+  --ink:#2f2a20; --ink-2:#5c5341; --ink-3:#8a7e66;
+  --leaf:#5b7a4b; --leaf-d:#45603a; --leaf-l:#e6eddf;
+  --earth:#c98a3b; --earth-d:#a86d24; --earth-l:#f6e8d2;
+  --clay:#b05c3c; --clay-l:#f3ddd2; --sky:#6f9bb0; --sky-l:#e2ecf1;
+  --ghost:#d8cdb4;
+  --font-ui:"Sarabun",system-ui,-apple-system,sans-serif;
+  --font-thai:"TH Sarabun","Sarabun",sans-serif;
+  --font-hand:"Mali","Sarabun",sans-serif;
+}
+@font-face{font-family:"TH Sarabun";src:url("fonts/Sarabun-Regular.ttf") format("truetype");font-weight:100 500;font-style:normal;font-display:swap;}
+@font-face{font-family:"TH Sarabun";src:url("fonts/Sarabun-Bold.ttf") format("truetype");font-weight:501 900;font-style:normal;font-display:swap;}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{font-family:var(--font-ui);color:var(--ink);background:var(--bg);
+  background-image:radial-gradient(circle at 1px 1px, rgba(120,100,60,.07) 1px, transparent 0);
+  background-size:22px 22px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+
+/* ---------- Toolbar ---------- */
+.toolbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:12px 22px;background:rgba(251,248,241,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);}
+.toolbar .tb-title{font-weight:800;letter-spacing:.04em;}
+.toolbar .tb-title small{display:block;font-weight:600;color:var(--ink-3);font-size:12px;letter-spacing:.02em;}
+.toolbar .spacer{margin-left:auto;}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink);
+  font-family:inherit;font-weight:700;font-size:14px;padding:10px 16px;border-radius:999px;cursor:pointer;}
+.btn-primary{background:var(--earth);color:#fff;border-color:var(--earth-d);box-shadow:inset 0 -3px 0 rgba(0,0,0,.12);}
+.btn-primary:hover{background:var(--earth-d);}
+.btn-home{text-decoration:none;background:var(--leaf);color:#fff;border-color:var(--leaf-d);box-shadow:inset 0 -3px 0 rgba(0,0,0,.12);margin-right:4px;}
+.btn-home:hover{background:var(--leaf-d);}
+.hint{color:var(--ink-3);font-size:13px;}
+
+/* ---------- Sheet (A4) ---------- */
+.sheets{padding:26px 14px 60px;display:flex;flex-direction:column;align-items:center;gap:26px;}
+.sheet{width:210mm;min-height:297mm;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:10px;
+  box-shadow:0 2px 6px rgba(60,48,28,.08),0 22px 50px -22px rgba(60,48,28,.30);
+  padding:15mm 14mm 13mm;position:relative;overflow:hidden;display:flex;flex-direction:column;scroll-margin-top:80px;}
+.extra{flex:1;min-height:56px;margin-top:14px;border:1.8px dashed var(--line-2);border-radius:16px;
+  background:repeating-linear-gradient(45deg,transparent 0 12px,rgba(170,140,90,.045) 12px 24px);
+  padding:12px 18px 16px;display:flex;flex-direction:column;}
+.extra .ex-head{font-size:13px;color:var(--earth-d);font-weight:800;font-family:var(--font-thai);}
+.extra .ex-head .th{color:var(--ink-3);font-weight:600;}
+.extra .ex-space{flex:1;min-height:16px;}
+.extra .ex-lines{display:flex;flex-direction:column;gap:22px;padding-bottom:2px;}
+.extra .ex-lines .l{border-bottom:1.9px dotted var(--line-2);}
+
+/* ---------- Header ---------- */
+.sh-head{display:flex;align-items:flex-start;gap:16px;padding-bottom:12px;border-bottom:2px solid var(--leaf-l);}
+.sh-brand{display:flex;align-items:center;gap:11px;flex:none;}
+.sh-mark{width:46px;height:46px;flex:none;display:grid;place-items:center;}
+.sh-mark img{width:100%;height:100%;object-fit:contain;}
+.sh-mark .fallback{width:42px;height:42px;border-radius:11px;background:var(--leaf);color:#fff;display:grid;place-items:center;font-weight:800;font-size:20px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.15);}
+.sh-brand .bn{font-weight:800;font-size:18px;letter-spacing:.26em;line-height:1;}
+.sh-brand .bs{font-size:10.5px;color:var(--ink-3);letter-spacing:.04em;margin-top:2px;}
+.sh-meta{flex:1;}
+.sh-tag-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.eyebrow{font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--earth-d);}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px;background:var(--leaf-l);color:var(--leaf-d);}
+.badge.earth{background:var(--earth-l);color:var(--earth-d);}
+.sh-title{font-size:21px;font-weight:800;margin:5px 0 1px;letter-spacing:-.01em;}
+.sh-title .th{font-family:var(--font-thai);font-weight:500;color:var(--ink-2);font-size:17px;}
+.sh-fields{flex:none;display:flex;flex-direction:column;gap:7px;min-width:188px;}
+.fld{display:flex;align-items:flex-end;gap:7px;font-size:12px;font-weight:700;color:var(--ink-2);}
+.fld .th{font-family:var(--font-thai);font-weight:500;color:var(--ink-3);font-size:11px;}
+.fld .ln{flex:1;border-bottom:1.6px dotted var(--line-2);height:17px;}
+.fld.small{min-width:0;}
+
+/* ---------- Instructions ---------- */
+.instruct{display:flex;align-items:center;gap:10px;margin:13px 0 10px;font-size:13.5px;color:var(--ink-2);}
+.instruct .n{flex:none;width:24px;height:24px;border-radius:8px;background:var(--earth);color:#fff;font-weight:800;display:grid;place-items:center;font-size:13px;box-shadow:inset 0 -2px 0 rgba(0,0,0,.14);}
+.instruct b{color:var(--ink);}
+.instruct .th{font-family:var(--font-thai);font-weight:500;color:var(--ink-3);}
+.thai{font-family:var(--font-thai);}
+.note-th{font-family:var(--font-thai);font-size:12.5px;color:var(--ink-3);margin:-2px 0 8px;}
+.emoji svg{width:1em;height:1em;display:block;fill:none;stroke:var(--ink);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ---------- Trace rows ---------- */
+.trow{display:flex;border:1.6px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;margin-bottom:10px;}
+.trow .lead{flex:none;width:96px;background:var(--leaf-l);border-right:1.6px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px;}
+.trow .lead .m{font-family:var(--font-thai);font-size:46px;color:var(--leaf-d);line-height:1.05;}
+.trow .lead .kw{font-family:var(--font-thai);font-size:12px;color:var(--ink-2);}
+.trow .cells{flex:1;display:grid;}
+.tcell{--fs:46px;--pb:16px;display:flex;align-items:flex-end;justify-content:center;padding:8px 0 var(--pb);border-right:1.4px dashed #ece2cc;position:relative;min-height:82px;}
+.tcell:last-child{border-right:none;}
+.tcell::after{content:"";position:absolute;left:12%;right:12%;bottom:calc(var(--pb) + 0.078 * var(--fs));border-bottom:1.4px solid #e7ddc6;}
+.tcell .g{font-family:var(--font-thai);font-size:var(--fs);color:transparent;-webkit-text-stroke:1.4px var(--ghost);line-height:1;}
+.trow .tail{flex:none;width:112px;border-left:1.6px solid var(--line);background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px;text-align:center;}
+.trow .tail .pic{font-size:38px;line-height:1;}
+.trow .tail .tw{font-family:var(--font-thai);font-size:14px;color:var(--ink-2);font-weight:600;}
+.trow .tail .tr{font-size:11px;color:var(--ink-3);}
+
+/* ---------- Baseline write box ---------- */
+.wbox{--fs:40px;--pb:13px;border:1.6px solid var(--line);border-radius:9px;background:#fff;position:relative;display:flex;align-items:flex-end;justify-content:center;padding-bottom:var(--pb);height:62px;}
+.wbox::after{content:"";position:absolute;left:10%;right:10%;bottom:calc(var(--pb) + 0.078 * var(--fs));border-bottom:1.4px solid #e7ddc6;}
+.wbox .m{font-family:var(--font-thai);font-size:var(--fs);color:var(--ghost);line-height:1;}
+
+/* ---------- Blend (eq) ---------- */
+.eqlist{display:flex;flex-direction:column;gap:10px;margin-top:4px;}
+.eq{display:flex;align-items:center;gap:10px;border:1.6px solid var(--line);border-radius:14px;background:var(--surface);padding:10px 14px;}
+.eq .emoji{font-size:38px;width:46px;text-align:center;flex:none;}
+.tile{flex:none;min-width:54px;height:60px;padding:0 8px;border:1.7px solid var(--line-2);border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--font-thai);font-size:36px;font-weight:600;color:var(--leaf-d);}
+.tile.v{background:var(--earth-l);color:var(--earth-d);}
+.tile.f{background:var(--clay-l);color:var(--clay);}
+.op{flex:none;font-size:24px;font-weight:800;color:var(--ink-3);width:18px;text-align:center;}
+.eqbox{--fs:38px;--pb:12px;flex:1;min-width:120px;height:60px;border:1.8px solid var(--line);border-radius:10px;background:#fff;position:relative;display:flex;align-items:flex-end;justify-content:center;padding-bottom:var(--pb);}
+.eqbox::after{content:"";position:absolute;left:8%;right:8%;bottom:calc(var(--pb) + 0.078 * var(--fs));border-bottom:1.5px solid #e7ddc6;}
+.eqbox .ans{font-family:var(--font-thai);font-size:38px;font-weight:600;color:var(--leaf-d);line-height:1;}
+.eq .gloss{flex:none;width:120px;font-family:var(--font-thai);font-size:13px;color:var(--ink-3);text-align:right;}
+
+/* ---------- Choose vowel / read & circle ---------- */
+.choose{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px;}
+.ch-item{display:flex;align-items:center;gap:12px;border:1.6px solid var(--line);border-radius:14px;background:var(--surface);padding:11px 14px;min-height:78px;}
+.ch-item .emoji{font-size:44px;flex:none;}
+.ch-item .base{font-family:var(--font-thai);font-size:30px;color:var(--ink);}
+.ch-opts{display:flex;gap:8px;margin-left:auto;}
+.opt{font-family:var(--font-thai);font-size:24px;font-weight:600;border:1.8px solid var(--line-2);border-radius:999px;padding:5px 16px;background:#fff;color:var(--ink);}
+.opt.round{border-radius:50%;width:46px;height:46px;padding:0;display:flex;align-items:center;justify-content:center;color:var(--earth-d);}
+
+/* ---------- Match ---------- */
+.match{display:grid;grid-template-columns:1fr 1fr;gap:46px;margin-top:6px;}
+.mcol{display:flex;flex-direction:column;gap:12px;justify-content:center;}
+.mitem{position:relative;border:1.7px solid var(--line);border-radius:14px;background:var(--surface);min-height:70px;display:flex;align-items:center;padding:10px 16px;font-family:var(--font-thai);}
+.mcol.left .mitem{justify-content:flex-start;font-size:42px;color:var(--leaf-d);}
+.mcol.right .mitem{justify-content:flex-end;}
+.mcol.right .mitem .pic{font-size:50px;}
+.node{width:15px;height:15px;border-radius:50%;border:2.5px solid var(--earth-d);background:#fff;position:absolute;top:50%;transform:translateY(-50%);}
+.node.nR{right:-9px;} .node.nL{left:-9px;}
+
+/* ---------- Picture trace ---------- */
+.pt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:6px;}
+.pt-card{border:1.7px solid var(--line);border-radius:16px;background:var(--surface);padding:12px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.pt-card .pic{font-size:74px;line-height:1;}
+.pt-card .gw{font-family:var(--font-thai);font-size:40px;color:transparent;-webkit-text-stroke:1.5px var(--ghost);line-height:1.3;}
+
+/* ---------- Dictation ---------- */
+.dict-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 16px;margin-top:6px;}
+.dict{display:flex;align-items:center;gap:12px;}
+.dict .num{flex:none;width:26px;height:26px;border-radius:8px;background:var(--leaf);color:#fff;font-weight:800;display:grid;place-items:center;font-size:13px;}
+.dict .wbox{flex:1;height:58px;}
+
+/* ---------- Checklist ---------- */
+.checklist{display:grid;grid-template-columns:repeat(3,1fr);gap:9px 14px;margin-top:6px;}
+.ck{display:flex;align-items:center;gap:10px;border:1.6px solid var(--line);border-radius:10px;background:var(--surface);padding:8px 12px;}
+.ck .box{width:22px;height:22px;border:1.8px solid var(--line-2);border-radius:6px;flex:none;}
+.ck .w{font-family:var(--font-thai);font-size:26px;color:var(--ink);}
+
+/* ---------- Footer ---------- */
+.sh-foot{position:absolute;left:14mm;right:14mm;bottom:8mm;display:flex;align-items:center;justify-content:space-between;font-size:10.5px;color:var(--ink-3);border-top:1.4px solid var(--line);padding-top:7px;}
+.sh-foot .th{font-family:var(--font-thai);}
+.star-row{display:flex;align-items:center;gap:6px;}
+.star{width:15px;height:15px;border:1.6px solid var(--line-2);border-radius:4px;}
+
+/* ---------- Print ---------- */
+@media print{
+  @page{size:A4;margin:0;}
+  body{background:#fff;background-image:none;}
+  .toolbar{display:none !important;}
+  .sheets{padding:0;gap:0;}
+  .sheet{width:210mm;min-height:297mm;box-shadow:none;border:none;border-radius:0;page-break-after:always;break-after:page;}
+  .sheet:last-child{page-break-after:auto;break-after:auto;}
+}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <a class="btn btn-home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก · Home</a>
+  <div class="tb-title">PANYA · Worksheets
+    <small>Beginner · พื้นฐาน — Trace, build &amp; read</small>
+  </div>
+  <span class="spacer"></span>
+  <span class="hint">20 หน้า · พิมพ์ลงกระดาษ A4</span>
+  <button class="btn btn-primary" onclick="window.print()">🖨️ พิมพ์ / Print</button>
+</div>
+
+<div class="sheets" id="sheets"></div>
+
+<script src="activity-art.js"></script>
+<script>
+const art = window.artIcon;
+
+/* ---------- shared scaffold ---------- */
+const LOGO = '<div class="sh-mark"><img src="images/panya-logo.png" alt="PANYA" '
+  + 'onerror="this.style.display=\'none\';this.parentNode.innerHTML=\'<div class=&quot;fallback&quot;>P</div>\'"></div>';
+function head(no, kind, en, th){
+  return '<header class="sh-head"><div class="sh-brand">' + LOGO
+    + '<div><div class="bn">PANYA</div><div class="bs">Thai Foundation</div></div></div>'
+    + '<div class="sh-meta"><div class="sh-tag-row">'
+    + '<span class="eyebrow">Worksheet</span>'
+    + '<span class="badge">Beginner · พื้นฐาน</span>'
+    + '<span class="badge earth">หน้า ' + no + ' · ' + kind + '</span></div>'
+    + '<div class="sh-title">' + en + (th ? ' <span class="th">· ' + th + '</span>' : '') + '</div></div>'
+    + '<div class="sh-fields">'
+    + '<div class="fld">ชื่อ <span class="th">Name</span> <span class="ln"></span></div>'
+    + '<div class="fld small">วันที่ <span class="th">Date</span> <span class="ln"></span>'
+    + '&nbsp;ห้อง <span class="th">Class</span> <span class="ln"></span></div></div></header>';
+}
+function instruct(n, en, th){
+  return '<div class="instruct"><span class="n">' + n + '</span><span><b>' + en + '</b> '
+    + '<span class="th">' + th + '</span></span></div>';
+}
+function foot(th){
+  return '<footer class="sh-foot"><span class="th">' + (th || 'PANYA Thai Foundation · ใบงานพื้นฐาน — Beginner Worksheet') + '</span>'
+    + '<span class="star-row">ระบายดาวเมื่อทำเสร็จ <span class="star"></span><span class="star"></span><span class="star"></span></span></footer>';
+}
+function sheet(no, inner){ return '<section class="sheet" id="s' + no + '">' + inner + '</section>'; }
+function extra(th){
+  return '<div class="extra"><div class="ex-head">✏️ ฝึกต่อ · Practice more '
+    + '<span class="th">— ' + (th || 'เขียนคำที่หนูชอบ 2 คำ แล้ววาดภาพประกอบ') + '</span></div>'
+    + '<div class="ex-space"></div>'
+    + '<div class="ex-lines"><span class="l"></span><span class="l"></span></div></div>';
+}
+
+/* trace row: lead (model + keyword) · ghost cells · tail (picture/word) */
+function trow(o){
+  const n = o.n || 5, fs = o.fs || 46;
+  let cells = '';
+  for (let i = 0; i < n; i++) cells += '<div class="tcell" style="--fs:' + fs + 'px"><span class="g">' + o.ghost + '</span></div>';
+  const tail = (o.tailPic || o.tailWord || o.tailRom)
+    ? '<div class="tail">' + (o.tailPic ? '<span class="pic emoji">' + art(o.tailPic) + '</span>' : '')
+      + (o.tailWord ? '<span class="tw">' + o.tailWord + '</span>' : '')
+      + (o.tailRom ? '<span class="tr">' + o.tailRom + '</span>' : '') + '</div>'
+    : '';
+  return '<div class="trow"><div class="lead"><span class="m">' + o.lead + '</span>'
+    + (o.kw ? '<span class="kw">' + o.kw + '</span>' : '') + '</div>'
+    + '<div class="cells" style="grid-template-columns:repeat(' + n + ',1fr)">' + cells + '</div>' + tail + '</div>';
+}
+function traceSheet(no, kind, en, th, intrEn, intrTh, rows, opts){
+  opts = opts || {};
+  return sheet(no, head(no, kind, en, th) + instruct(1, intrEn, intrTh)
+    + (opts.note ? '<div class="note-th">' + opts.note + '</div>' : '')
+    + rows.map(r => trow(Object.assign({n:opts.n, fs:opts.fs}, r))).join('') + extra(opts.extra) + foot());
+}
+
+/* eq blend row */
+function eqRow(r){
+  const tiles = r.parts.map((p,i) => (i ? '<span class="op">+</span>' : '')
+    + '<span class="tile' + (p.k === 'c' ? '' : ' ' + p.k) + '">' + p.s + '</span>').join('');
+  const box = r.ex ? '<div class="eqbox"><span class="ans">' + r.ans + '</span></div>' : '<div class="eqbox"></div>';
+  return '<div class="eq">' + (r.e ? '<span class="emoji">' + art(r.e) + '</span>' : '<span class="emoji"></span>')
+    + tiles + '<span class="op">=</span>' + box + '<span class="gloss">' + r.g + '</span></div>';
+}
+function eqSheet(no, kind, en, th, intrEn, intrTh, rows){
+  return sheet(no, head(no, kind, en, th) + instruct(1, intrEn, intrTh)
+    + '<div class="eqlist">' + rows.map(eqRow).join('') + '</div>' + extra() + foot());
+}
+
+/* choose (circle the option) */
+function chooseSheet(no, kind, en, th, intrEn, intrTh, items, round){
+  const body = items.map(it =>
+    '<div class="ch-item">' + (it.e ? '<span class="emoji">' + art(it.e) + '</span>' : '')
+    + (it.base ? '<span class="base">' + it.base + '</span>' : '')
+    + '<div class="ch-opts">' + it.opts.map(o => '<span class="opt' + (round ? ' round' : '') + '">' + o + '</span>').join('') + '</div></div>').join('');
+  return sheet(no, head(no, kind, en, th) + instruct(1, intrEn, intrTh)
+    + '<div class="choose">' + body + '</div>' + extra() + foot());
+}
+
+const SHEETS = [];
+
+/* === 1 · Trace & Say · Mid-class letters === */
+SHEETS.push(traceSheet(1,'Trace &amp; Say','Mid-class letters','คัดอักษรกลาง',
+  'Trace each letter, then say the word','คัดตามรอยพยัญชนะ แล้วอ่านออกเสียงคำตัวอย่าง',[
+  {lead:'ก',kw:'ก ไก่',ghost:'ก',tailPic:'🐔',tailWord:'กา'},
+  {lead:'จ',kw:'จ จาน',ghost:'จ',tailPic:'🍽️',tailWord:'จาน'},
+  {lead:'ด',kw:'ด เด็ก',ghost:'ด',tailPic:'⭐',tailWord:'ดาว'},
+  {lead:'ต',kw:'ต เต่า',ghost:'ต',tailPic:'🐢',tailWord:'ตา'},
+  {lead:'บ',kw:'บ ใบไม้',ghost:'บ',tailWord:'ใบ'},
+  {lead:'ป',kw:'ป ปลา',ghost:'ป',tailPic:'🐟',tailWord:'ปู'},
+  {lead:'อ',kw:'อ อ่าง',ghost:'อ',tailWord:'อา'},
+],{note:'อักษรกลางมี 9 ตัว: ก จ ฎ ฏ ด ต บ ป อ — หน้านี้คัดตัวที่พบบ่อย'}));
+
+/* === 2 · Trace & Say · ก จ ด ต === */
+SHEETS.push(traceSheet(2,'Trace &amp; Say','Letters ก จ ด ต','คัด ก จ ด ต',
+  'Trace the four letters, then say each word','คัดพยัญชนะหลักทั้งสี่ แล้วอ่านคำให้ดัง',[
+  {lead:'ก',kw:'ก ไก่',ghost:'ก',fs:50,tailPic:'🐔',tailWord:'ไก่',tailRom:'gài'},
+  {lead:'จ',kw:'จ จาน',ghost:'จ',fs:50,tailPic:'🍽️',tailWord:'จาน',tailRom:'jaan'},
+  {lead:'ด',kw:'ด ดาว',ghost:'ด',fs:50,tailPic:'⭐',tailWord:'ดาว',tailRom:'daao'},
+  {lead:'ต',kw:'ต เต่า',ghost:'ต',fs:50,tailPic:'🐢',tailWord:'เต่า',tailRom:'tào'},
+],{n:5}));
+
+/* === 3 · Trace & Say · more letters === */
+SHEETS.push(traceSheet(3,'Trace &amp; Say','More letters ม น ส ห ค','คัด ม น ส ห ค',
+  'Trace each letter, then say the word','คัดตามรอยพยัญชนะ แล้วอ่านคำ',[
+  {lead:'ม',kw:'ม ม้า',ghost:'ม',tailPic:'🐴',tailWord:'มา'},
+  {lead:'น',kw:'น หนู',ghost:'น',tailWord:'นา'},
+  {lead:'ส',kw:'ส เสือ',ghost:'ส',tailPic:'🎨',tailWord:'สี'},
+  {lead:'ห',kw:'ห หีบ',ghost:'ห',tailPic:'👂',tailWord:'หู'},
+  {lead:'ค',kw:'ค ควาย',ghost:'ค',tailWord:'คา'},
+]));
+
+/* === 4 · Trace & Say · letters บ ป ผ พ ฟ === */
+SHEETS.push(traceSheet(4,'Trace &amp; Say','Letters บ ป ผ พ ฟ','คัด บ ป ผ พ ฟ',
+  'Trace each letter carefully','คัดตามรอยพยัญชนะให้สวยงาม',[
+  {lead:'บ',kw:'บ ใบไม้',ghost:'บ',tailWord:'ใบ'},
+  {lead:'ป',kw:'ป ปลา',ghost:'ป',tailPic:'🐟',tailWord:'ปลา'},
+  {lead:'ผ',kw:'ผ ผึ้ง',ghost:'ผ',tailWord:'ผา'},
+  {lead:'พ',kw:'พ พาน',ghost:'พ',tailWord:'พา'},
+  {lead:'ฟ',kw:'ฟ ฟัน',ghost:'ฟ',tailWord:'ฟา'},
+]));
+
+/* === 5 · Trace & Say · long vowels -า -ี -ู === */
+SHEETS.push(traceSheet(5,'Trace &amp; Say','Long vowels -า -ี -ู','คัดสระเสียงยาว',
+  'Trace the syllable, notice the vowel','คัดตามรอยพยางค์ สังเกตรูปสระ แล้วอ่านออกเสียง',[
+  {lead:'-า',kw:'สระอา',ghost:'กา',tailWord:'กา'},
+  {lead:'-ี',kw:'สระอี',ghost:'ดี',tailWord:'ดี'},
+  {lead:'-ู',kw:'สระอู',ghost:'ปู',tailPic:'🦀',tailWord:'ปู'},
+  {lead:'-า',kw:'สระอา',ghost:'มา',tailPic:'🐴',tailWord:'มา'},
+  {lead:'-ี',kw:'สระอี',ghost:'สี',tailPic:'🎨',tailWord:'สี'},
+  {lead:'-ู',kw:'สระอู',ghost:'งู',tailPic:'🐍',tailWord:'งู'},
+],{fs:44}));
+
+/* === 6 · Trace & Say · vowels เ แ โ === */
+SHEETS.push(traceSheet(6,'Trace &amp; Say','Vowels เ แ โ','คัดสระ เ แ โ',
+  'Trace, notice the vowel, then say it','คัดตามรอยพยางค์ สังเกตรูปสระ แล้วอ่านออกเสียง',[
+  {lead:'เ-',kw:'สระเอ',ghost:'เก',tailWord:'เก'},
+  {lead:'แ-',kw:'สระแอ',ghost:'แก',tailWord:'แก'},
+  {lead:'โ-',kw:'สระโอ',ghost:'โก',tailWord:'โต'},
+  {lead:'เ-',kw:'สระเอ',ghost:'เต',tailWord:'เท'},
+  {lead:'แ-',kw:'สระแอ',ghost:'แม',tailWord:'แม'},
+  {lead:'โ-',kw:'สระโอ',ghost:'โด',tailWord:'โด'},
+],{fs:44}));
+
+/* === 7 · Trace & Say · vowels ไ ใ -ำ === */
+SHEETS.push(traceSheet(7,'Trace &amp; Say','Vowels ไ ใ -ำ','คัดสระ ไ ใ ำ',
+  'Trace the syllable, then say it','คัดตามรอยพยางค์ แล้วอ่านออกเสียง',[
+  {lead:'ไ-',kw:'สระไอ',ghost:'ไป',tailWord:'ไป'},
+  {lead:'ใ-',kw:'สระใอ',ghost:'ใจ',tailWord:'ใจ'},
+  {lead:'-ำ',kw:'สระอำ',ghost:'ทำ',tailWord:'ทำ'},
+  {lead:'ไ-',kw:'สระไอ',ghost:'ไม',tailWord:'ไม'},
+  {lead:'ใ-',kw:'สระใอ',ghost:'ใส',tailWord:'ใส'},
+  {lead:'-ำ',kw:'สระอำ',ghost:'นำ',tailWord:'นำ'},
+],{fs:44}));
+
+/* === 8 · Vowel match -า -ี -ู === */
+SHEETS.push(chooseSheet(8,'Vowel match','Choose the vowel -า -ี -ู','จับคู่สระ',
+  'Say the word, then circle the right vowel','อ่านคำตามภาพ แล้ววงกลมสระที่ถูกต้อง',[
+  {e:'🦀', base:'ป_', opts:['า','◌ี','◌ู']},
+  {e:'👁️', base:'ต_', opts:['า','◌ี','◌ู']},
+  {e:'👂', base:'ห_', opts:['า','◌ี','◌ู']},
+  {e:'🐍', base:'ง_', opts:['า','◌ี','◌ู']},
+  {e:'🎨', base:'ส_', opts:['า','◌ี','◌ู']},
+  {e:'🚶', base:'ม_', opts:['า','◌ี','◌ู']},
+]));
+
+/* === 9 · Trace & Say · long-vowel words === */
+SHEETS.push(traceSheet(9,'Trace &amp; Say','Long-vowel words','คัดคำ สระเสียงยาว',
+  'Trace each word, then say it aloud','คัดตามรอยคำ แล้วอ่านออกเสียง',[
+  {lead:'ตา',ghost:'ตา',fs:40,n:4,tailPic:'👁️',tailWord:'eye'},
+  {lead:'กา',ghost:'กา',fs:40,n:4,tailWord:'crow'},
+  {lead:'ดี',ghost:'ดี',fs:40,n:4,tailWord:'good'},
+  {lead:'ปู',ghost:'ปู',fs:40,n:4,tailPic:'🦀',tailWord:'crab'},
+  {lead:'งู',ghost:'งู',fs:40,n:4,tailPic:'🐍',tailWord:'snake'},
+  {lead:'มา',ghost:'มา',fs:40,n:4,tailPic:'🚶',tailWord:'come'},
+]));
+
+/* === 10 · Trace & Say · words set 2 === */
+SHEETS.push(traceSheet(10,'Trace &amp; Say','More words','คัดคำ (ต่อ)',
+  'Trace each word, then say it','คัดตามรอยคำ แล้วอ่านออกเสียง',[
+  {lead:'หู',ghost:'หู',fs:40,n:4,tailPic:'👂',tailWord:'ear'},
+  {lead:'นา',ghost:'นา',fs:40,n:4,tailWord:'field'},
+  {lead:'ขา',ghost:'ขา',fs:40,n:4,tailPic:'🦵',tailWord:'leg'},
+  {lead:'ชา',ghost:'ชา',fs:40,n:4,tailPic:'🍵',tailWord:'tea'},
+  {lead:'ปี',ghost:'ปี',fs:40,n:4,tailWord:'year'},
+  {lead:'มี',ghost:'มี',fs:40,n:4,tailWord:'have'},
+]));
+
+/* === 11 · Picture + word trace === */
+(function(){
+  const items = [
+    {e:'🐟',w:'ปลา'},{e:'⭐',w:'ดาว'},{e:'🍽️',w:'จาน'},
+    {e:'🐴',w:'ม้า'},{e:'🐍',w:'งู'},{e:'🐢',w:'เต่า'},
+  ];
+  const cards = items.map(it =>
+    '<div class="pt-card"><span class="pic emoji">' + art(it.e) + '</span><span class="gw">' + it.w + '</span></div>').join('');
+  SHEETS.push(sheet(11, head(11,'Look · Trace · Say','Picture words','ดูภาพ–คัดคำ')
+    + instruct(1,'Colour, trace the word, say it','ระบายภาพ คัดตามรอยคำ แล้วอ่านออกเสียง')
+    + '<div class="pt-grid">' + cards + '</div>' + extra('วาดและระบายภาพที่หนูชอบ พร้อมเขียนคำ') + foot()));
+})();
+
+/* === 12 · CVC words (voiced finals -ง -น -ม) === */
+SHEETS.push(traceSheet(12,'Trace &amp; Say','Words with finals -ง -น -ม','คัดคำมีตัวสะกด',
+  'Trace each word, hear the final sound','คัดตามรอยคำ ฟังเสียงตัวสะกดท้ายคำ',[
+  {lead:'กาง',ghost:'กาง',fs:38,n:4,tailWord:'spread'},
+  {lead:'จาน',ghost:'จาน',fs:38,n:4,tailPic:'🍽️',tailWord:'plate'},
+  {lead:'ตาม',ghost:'ตาม',fs:38,n:4,tailWord:'follow'},
+  {lead:'นาน',ghost:'นาน',fs:38,n:4,tailWord:'long'},
+  {lead:'ยาม',ghost:'ยาม',fs:38,n:4,tailWord:'guard'},
+  {lead:'คาง',ghost:'คาง',fs:38,n:4,tailWord:'chin'},
+]));
+
+/* === 13 · CVC words set 2 === */
+SHEETS.push(traceSheet(13,'Trace &amp; Say','More words with finals','คัดคำมีตัวสะกด (ต่อ)',
+  'Trace each word, then say it','คัดตามรอยคำ แล้วอ่านออกเสียง',[
+  {lead:'กิน',ghost:'กิน',fs:38,n:4,tailPic:'😋',tailWord:'eat'},
+  {lead:'ดิน',ghost:'ดิน',fs:38,n:4,tailWord:'soil'},
+  {lead:'บิน',ghost:'บิน',fs:38,n:4,tailPic:'🦋',tailWord:'fly'},
+  {lead:'ปีน',ghost:'ปีน',fs:38,n:4,tailPic:'🧗',tailWord:'climb'},
+  {lead:'บาน',ghost:'บาน',fs:38,n:4,tailPic:'🌸',tailWord:'bloom'},
+  {lead:'งาม',ghost:'งาม',fs:38,n:4,tailWord:'pretty'},
+]));
+
+/* === 14 · Blend the syllable (C + V) === */
+SHEETS.push(eqSheet(14,'Blend','Blend the syllable','ประสมพยางค์',
+  'Blend the consonant and vowel','นำพยัญชนะประสมกับสระ แล้วเขียนเป็นคำ (แถวแรกคือตัวอย่าง)',[
+  {e:'🐴', parts:[{k:'c',s:'ม'},{k:'v',s:'า'}], ans:'มา', ex:true, g:'มา · come'},
+  {e:'👁️', parts:[{k:'c',s:'ต'},{k:'v',s:'า'}], g:'ตา · eye'},
+  {e:'🦀', parts:[{k:'c',s:'ป'},{k:'v',s:'◌ู'}], g:'ปู · crab'},
+  {e:'🎨', parts:[{k:'c',s:'ส'},{k:'v',s:'◌ี'}], g:'สี · colour'},
+  {e:'🐍', parts:[{k:'c',s:'ง'},{k:'v',s:'◌ู'}], g:'งู · snake'},
+  {e:'👂', parts:[{k:'c',s:'ห'},{k:'v',s:'◌ู'}], g:'หู · ear'},
+]));
+
+/* === 15 · Build a word (C + V + C) === */
+SHEETS.push(eqSheet(15,'Build','Build a word','ต่อคำมีตัวสะกด',
+  'Blend consonant, vowel and final','ประสมพยัญชนะ สระ และตัวสะกด แล้วเขียนเป็นคำ',[
+  {e:'🍽️', parts:[{k:'c',s:'จ'},{k:'v',s:'า'},{k:'f',s:'น'}], ans:'จาน', ex:true, g:'จาน · plate'},
+  {e:'😋', parts:[{k:'c',s:'ก'},{k:'v',s:'◌ิ'},{k:'f',s:'น'}], g:'กิน · eat'},
+  {e:'🌸', parts:[{k:'c',s:'บ'},{k:'v',s:'า'},{k:'f',s:'น'}], g:'บาน · bloom'},
+  {e:'🧗', parts:[{k:'c',s:'ป'},{k:'v',s:'◌ี'},{k:'f',s:'น'}], g:'ปีน · climb'},
+  {e:'🦋', parts:[{k:'c',s:'บ'},{k:'v',s:'◌ิ'},{k:'f',s:'น'}], g:'บิน · fly'},
+]));
+
+/* === 16 · Vowel swap (read & write) === */
+SHEETS.push(eqSheet(16,'Vowel swap','Change the vowel','เปลี่ยนสระ',
+  'Keep the consonant, change the vowel','พยัญชนะเดิม เปลี่ยนสระเป็น า / ◌ี / ◌ู แล้วเขียนคำ',[
+  {parts:[{k:'c',s:'ก'},{k:'v',s:'า / ◌ี / ◌ู'}], g:'กา · กี · กู'},
+  {parts:[{k:'c',s:'ด'},{k:'v',s:'า / ◌ี / ◌ู'}], g:'ดา · ดี · ดู'},
+  {parts:[{k:'c',s:'ป'},{k:'v',s:'า / ◌ี / ◌ู'}], g:'ปา · ปี · ปู'},
+  {parts:[{k:'c',s:'ต'},{k:'v',s:'า / ◌ี / ◌ู'}], g:'ตา · ตี · ตู'},
+]));
+
+/* === 17 · Match letter ↔ picture === */
+(function(){
+  const data = [{l:'ก',e:'🐔'},{l:'จ',e:'🍽️'},{l:'ต',e:'🐢'},{l:'ป',e:'🐟'},{l:'ง',e:'🐍'}];
+  const order = data.map((_,i,a)=>a[(i+2)%a.length]);
+  const left = data.map(p => '<div class="mitem"><span>' + p.l + '</span><span class="node nR"></span></div>').join('');
+  const right = order.map(p => '<div class="mitem"><span class="node nL"></span><span class="pic emoji">' + art(p.e) + '</span></div>').join('');
+  SHEETS.push(sheet(17, head(17,'Match','Letter to picture','จับคู่พยัญชนะกับภาพ')
+    + instruct(1,'Draw a line to its picture','ลากเส้นจับคู่พยัญชนะกับภาพชื่อตัวอักษร (ก ไก่, จ จาน, ต เต่า, ป ปลา, ง งู)')
+    + '<div class="match"><div class="mcol left">' + left + '</div><div class="mcol right">' + right + '</div></div>'
+    + extra() + foot()));
+})();
+
+/* === 18 · Read & circle the word === */
+SHEETS.push(chooseSheet(18,'Read &amp; circle','Which word?','อ่านแล้ววงกลมคำ',
+  'Say the picture, circle its word','ดูภาพ อ่านออกเสียง แล้ววงกลมคำที่ถูก',[
+  {e:'🦀', opts:['ปู','ปา','ปี']},
+  {e:'👁️', opts:['ตา','มา','นา']},
+  {e:'🐍', opts:['งู','ดู','หู']},
+  {e:'🐟', opts:['ปลา','ปา','ปู']},
+  {e:'🍽️', opts:['จาน','จา','นา']},
+  {e:'🎨', opts:['สี','ดี','มี']},
+]));
+
+/* === 19 · Dictation === */
+(function(){
+  let cells = '';
+  for (let i = 1; i <= 8; i++) cells += '<div class="dict"><span class="num">' + i + '</span><div class="wbox"></div></div>';
+  SHEETS.push(sheet(19, head(19,'Dictation','Write what you hear','เขียนตามคำบอก')
+    + instruct(1,'Listen, then write the word','ครูอ่านคำ — ฟังให้ดี แล้วเขียนคำลงในช่อง')
+    + '<div class="note-th">คำแนะนำครู: ใช้คำพื้นฐาน เช่น กา ตา ดี ปู งู มา จาน กิน</div>'
+    + '<div class="dict-grid">' + cells + '</div>' + extra('วาดภาพของคำที่หนูเขียนได้ 1 ภาพ') + foot()));
+})();
+
+/* === 20 · Review checklist === */
+(function(){
+  const words = ['กา','ตา','ดี','ปู','งู','มา','หู','สี','จาน','กิน','ดิน','บิน','ปลา','ดาว','ม้า','เต่า','นา','ใบ'];
+  const ck = words.map(w => '<div class="ck"><span class="box"></span><span class="w">' + w + '</span></div>').join('');
+  SHEETS.push(sheet(20, head(20,'Review','I can read these!','ทบทวน — หนูอ่านได้!')
+    + instruct(1,'Read each word, tick the box','อ่านคำให้ครูฟัง อ่านได้แล้วทำเครื่องหมายในช่อง ✓')
+    + '<div class="checklist">' + ck + '</div>' + extra('เลือกคำที่ชอบที่สุด 2 คำ เขียนแล้ววาดภาพ') + foot()));
+})();
+
+document.getElementById('sheets').innerHTML = SHEETS.join('');
+if (new URLSearchParams(location.search).has('print')){ window.addEventListener('load', () => window.print()); }
+</script>
+</body>
+</html>

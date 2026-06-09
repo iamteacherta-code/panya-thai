@@ -701,5 +701,12 @@ body{
   </section>
 
 </div>
+
+<script>
+  // Auto-open the print dialog when opened with ?print=1 (from the app's Print button)
+  if (new URLSearchParams(location.search).has("print")) {
+    window.addEventListener("load", () => window.print());
+  }
+</script>
 </body>
 </html>

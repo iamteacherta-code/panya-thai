@@ -124,12 +124,12 @@ function LevelBar({ value, onChange, withAll }) {
 
 function ActivityPage() {
   const items = [
-    { en: "Letter Formation", th: "คัดลายมือพยัญชนะ", tag: "Tracing", tagc: "earth", level: "Beginner" },
+    { en: "Letter Formation", th: "คัดลายมือพยัญชนะ", tag: "Tracing", tagc: "earth", level: "Beginner", href: "activity-letter-formation.html" },
     { en: "Sound Sort", th: "แยกเสียงสระสั้น–ยาว", tag: "Phonemic", tagc: "", level: "Beginner" },
-    { en: "Picture & Word Match", th: "จับคู่ภาพกับคำ", tag: "Vocabulary", tagc: "sky", level: "Intermediate" },
-    { en: "Tone Mark Hunt", th: "ตามหาวรรณยุกต์", tag: "Tones", tagc: "earth", level: "Advanced" },
-    { en: "Build-a-Word", th: "ต่อคำจากพยางค์", tag: "Blending", tagc: "", level: "Intermediate" },
-    { en: "Read & Color", th: "อ่านแล้วระบายสี", tag: "Fluency", tagc: "sky", level: "Advanced" },
+    { en: "Picture & Word Match", th: "จับคู่ภาพกับคำ", tag: "Vocabulary", tagc: "sky", level: "Intermediate", href: "activity-picture-word-match.html" },
+    { en: "Tone Mark Hunt", th: "ตามหาวรรณยุกต์", tag: "Tones", tagc: "earth", level: "Advanced", href: "activity-tone-mark-hunt.html" },
+    { en: "Build-a-Word", th: "ต่อคำจากพยางค์", tag: "Blending", tagc: "", level: "Intermediate", href: "activity-build-a-word.html" },
+    { en: "Read & Color", th: "อ่านแล้วระบายสี", tag: "Fluency", tagc: "sky", level: "Advanced", href: "activity-read-and-color.html" },
   ];
   const [lvl, setLvl] = React.useState("all");
   const shown = lvl === "all" ? items : items.filter((it) => it.level.toLowerCase() === lvl);
@@ -149,8 +149,14 @@ function ActivityPage() {
               <span className="tag sky">{it.level}</span>
             </div>
             <div className="item-actions">
-              <button className="btn btn-sm btn-leaf"><Ico name="play" style={{ width: 15, height: 15 }} /> Open</button>
-              <button className="btn btn-sm btn-ghost"><Ico name="print" style={{ width: 15, height: 15 }} /> Print</button>
+              <button className="btn btn-sm btn-leaf" disabled={!it.href}
+                onClick={() => it.href && (window.location.href = it.href)}>
+                <Ico name="play" style={{ width: 15, height: 15 }} /> Open
+              </button>
+              <button className="btn btn-sm btn-ghost" disabled={!it.href}
+                onClick={() => it.href && window.open(it.href + "?print=1", "_blank")}>
+                <Ico name="print" style={{ width: 15, height: 15 }} /> Print
+              </button>
             </div>
           </div>
         ))}
@@ -585,17 +591,31 @@ function WorksheetsPage() {
   const [lvl, setLvl] = React.useState("all");
   const [sheet, setSheet] = React.useState(null);
   const filters = ["All", "Tracing", "Blending", "Dictation", "Assessment"];
-  const sheetLevels = ["beginner", "intermediate", "intermediate", "advanced", "beginner", "advanced"];
+  // The Beginner worksheets live in a single printable 20-page file; each card
+  // jumps to its page (#sN) and Print opens the whole pack (?print=1).
+  const WS_FILE = "activity-worksheet-beginner.html";
   const sheets = [
-    { en: "Trace & Say: ก จ ด ต", th: "คัด ก จ ด ต", type: "Tracing" },
-    { en: "Blend the syllable", th: "ประสมพยางค์", type: "Blending" },
-    { en: "Sound dictation #1", th: "เขียนตามคำบอก", type: "Dictation" },
-    { en: "Unit 1 check", th: "ทดสอบหน่วยที่ 1", type: "Assessment" },
-    { en: "Vowel match -า -ี -ู", th: "จับคู่สระ", type: "Blending" },
-    { en: "Trace tone marks", th: "คัดวรรณยุกต์", type: "Tracing" },
+    { en: "Beginner Worksheet Pack", th: "ชุดใบงานพื้นฐาน 20 หน้า", type: "Tracing", level: "beginner", page: 1, preview: ["20", "หน้า"] },
+    { en: "Trace & Say · Mid-class letters", th: "คัดอักษรกลาง", type: "Tracing", level: "beginner", page: 1, preview: ["ก", "จ", "ด", "ต"] },
+    { en: "Trace & Say · ก จ ด ต", th: "คัด ก จ ด ต", type: "Tracing", level: "beginner", page: 2, preview: ["ก", "จ", "ด", "ต"] },
+    { en: "Trace & Say · Long-vowel words", th: "คัดคำ สระเสียงยาว", type: "Tracing", level: "beginner", page: 9, preview: ["ตา", "กา", "ดี", "ปู"] },
+    { en: "Trace & Say · Vowels เ แ โ", th: "คัดสระ เ แ โ", type: "Tracing", level: "beginner", page: 6, preview: ["เก", "แก", "โก"] },
+    { en: "Vowel match -า -ี -ู", th: "จับคู่สระ", type: "Blending", level: "beginner", page: 8, preview: ["-า", "-ี", "-ู"] },
+    { en: "Blend the syllable", th: "ประสมพยางค์", type: "Blending", level: "beginner", page: 14, preview: ["ก+า", "ม+า"] },
+    { en: "Build a word (finals)", th: "ต่อคำมีตัวสะกด", type: "Blending", level: "beginner", page: 15, preview: ["จาน", "กิน"] },
+    { en: "Write what you hear", th: "เขียนตามคำบอก", type: "Dictation", level: "beginner", page: 19, preview: ["1", "2", "3"] },
+    { en: "Review · I can read!", th: "ทบทวน หนูอ่านได้", type: "Assessment", level: "beginner", page: 20, preview: ["กา", "ตา", "ดี"] },
+    // Intermediate & Advanced worksheets — own 20-page printable files
+    { en: "Blend & Build", th: "ประสมและต่อคำ", type: "Blending", level: "intermediate", file: "activity-blend-and-build.html", page: 1, preview: ["ก+า", "จาน"] },
+    { en: "Sound Dictation", th: "เขียนตามคำบอก", type: "Dictation", level: "intermediate", file: "activity-sound-dictation.html", page: 1, preview: ["1", "2", "3"] },
+    { en: "Tone Mark Tracing", th: "คัดวรรณยุกต์", type: "Tracing", level: "advanced", file: "activity-tone-mark-tracing.html", page: 1, preview: ["◌่", "◌้", "◌๊"] },
+    { en: "Unit Check", th: "ทดสอบท้ายหน่วย", type: "Assessment", level: "advanced", file: "activity-unit-check.html", page: 1, preview: ["A", "B", "C"] },
   ];
-  const withLvl = TRACE_SHEETS.concat(sheets.map((s, i) => ({ ...s, level: sheetLevels[i] })));
-  const shown = withLvl.filter((s) => (lvl === "all" || s.level === lvl) && (filter === "All" || s.type === filter));
+  const sheetFile = (s) => s.file || WS_FILE;
+  const sheetHref = (s) => s.page ? sheetFile(s) + "#s" + s.page : null;
+  const openWs = (s) => { if (s.page) window.location.href = sheetHref(s); };
+  const printWs = (s) => { if (s.page) window.open(sheetFile(s) + "?print=1", "_blank"); };
+  const shown = sheets.filter((s) => (lvl === "all" || s.level === lvl) && (filter === "All" || s.type === filter));
   return (
     <div>
       <PageHead eyebrow="Print & Assess" en="Worksheets" th="ใบงาน"
@@ -610,8 +630,8 @@ function WorksheetsPage() {
       <div className="grid-3">
         {shown.map((s, i) => (
           <div className="item-card" key={i}>
-            {s.rows
-              ? <div className="ws-card-preview" onClick={() => setSheet(s)}>{s.rows.slice(0, 4).map((r, k) => <span key={k}>{r.t}</span>)}</div>
+            {s.preview
+              ? <div className="ws-card-preview" onClick={() => openWs(s)}>{s.preview.map((g, k) => <span key={k}>{g}</span>)}</div>
               : <Placeholder label="worksheet preview" h={150} />}
             <h3>{s.en}<span className="th">{s.th}</span></h3>
             <div className="item-meta">
@@ -619,8 +639,8 @@ function WorksheetsPage() {
               <span className="tag earth">{s.type}</span>
             </div>
             <div className="item-actions">
-              <button className="btn btn-sm btn-primary" onClick={() => s.rows && setSheet(s)} disabled={!s.rows}><Ico name="print" style={{ width: 15, height: 15 }} /> Print PDF</button>
-              <button className="btn btn-sm btn-ghost" onClick={() => s.rows && setSheet(s)} disabled={!s.rows}>Preview</button>
+              <button className="btn btn-sm btn-primary" onClick={() => printWs(s)} disabled={!s.page}><Ico name="print" style={{ width: 15, height: 15 }} /> Print PDF</button>
+              <button className="btn btn-sm btn-ghost" onClick={() => openWs(s)} disabled={!s.page}>Preview</button>
             </div>
           </div>
         ))}

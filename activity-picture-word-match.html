@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · Activity Sheets — Picture &amp; Word Match (Intermediate)</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+<style>
+/* ============================================================
+   PANYA · Picture & Word Match Activity Sheets (Intermediate)
+   Printable A4 worksheets — warm earth-wood-leaf design system,
+   matching the Thai Literacy Studio app and the Letter Formation
+   activity sheets.
+   ============================================================ */
+:root{
+  --bg:#f4efe4; --surface:#fbf8f1; --line:#e3d9c4; --line-2:#d6c8ab;
+  --ink:#2f2a20; --ink-2:#5c5341; --ink-3:#8a7e66;
+  --leaf:#5b7a4b; --leaf-d:#45603a; --leaf-l:#e6eddf;
+  --earth:#c98a3b; --earth-d:#a86d24; --earth-l:#f6e8d2;
+  --clay:#b05c3c; --sky:#6f9bb0;
+  --ghost:#d8cdb4;
+  --font-ui:"Sarabun",system-ui,-apple-system,sans-serif;
+  --font-thai:"TH Sarabun","Sarabun",sans-serif;
+  --font-hand:"Mali","Sarabun",sans-serif;
+}
+@font-face{
+  font-family:"TH Sarabun";
+  src:url("fonts/Sarabun-Regular.ttf") format("truetype");
+  font-weight:100 500; font-style:normal; font-display:swap;
+}
+@font-face{
+  font-family:"TH Sarabun";
+  src:url("fonts/Sarabun-Bold.ttf") format("truetype");
+  font-weight:501 900; font-style:normal; font-display:swap;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--font-ui); color:var(--ink); background:var(--bg);
+  background-image:radial-gradient(circle at 1px 1px, rgba(120,100,60,.07) 1px, transparent 0);
+  background-size:22px 22px;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+
+/* ---------- Toolbar (screen only) ---------- */
+.toolbar{
+  position:sticky; top:0; z-index:50;
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  padding:12px 22px; background:rgba(251,248,241,.92); backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.toolbar .tb-title{font-weight:800; letter-spacing:.04em;}
+.toolbar .tb-title small{display:block; font-weight:600; color:var(--ink-3); font-size:12px; letter-spacing:.02em;}
+.toolbar .spacer{margin-left:auto;}
+.btn{
+  display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line-2);
+  background:var(--surface); color:var(--ink); font-family:inherit; font-weight:700; font-size:14px;
+  padding:10px 16px; border-radius:999px; cursor:pointer;
+}
+.btn-primary{background:var(--earth); color:#fff; border-color:var(--earth-d); box-shadow:inset 0 -3px 0 rgba(0,0,0,.12);}
+.btn-primary:hover{background:var(--earth-d);}
+.btn-home{text-decoration:none; background:var(--leaf); color:#fff; border-color:var(--leaf-d); box-shadow:inset 0 -3px 0 rgba(0,0,0,.12); margin-right:4px;}
+.btn-home:hover{background:var(--leaf-d);}
+.hint{color:var(--ink-3); font-size:13px;}
+
+/* ---------- Sheet (A4) ---------- */
+.sheets{padding:26px 14px 60px; display:flex; flex-direction:column; align-items:center; gap:26px;}
+.sheet{
+  width:210mm; min-height:297mm; background:#fff; color:var(--ink);
+  border:1px solid var(--line); border-radius:10px;
+  box-shadow:0 2px 6px rgba(60,48,28,.08), 0 22px 50px -22px rgba(60,48,28,.30);
+  padding:15mm 14mm 13mm; position:relative; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+
+/* ---------- Fill-the-page practice panel (grows to fill leftover height) ---------- */
+.extra{flex:1; min-height:84px; margin-top:15px; border:1.8px dashed var(--line-2); border-radius:16px;
+  background:repeating-linear-gradient(45deg, transparent 0 12px, rgba(170,140,90,.045) 12px 24px);
+  padding:12px 18px 16px; display:flex; flex-direction:column;}
+.extra .ex-head{font-size:13px; color:var(--earth-d); font-weight:800; font-family:var(--font-thai);}
+.extra .ex-head .th{color:var(--ink-3); font-weight:600;}
+.extra .ex-space{flex:1; min-height:24px;}
+.extra .ex-lines{display:flex; flex-direction:column; gap:24px; padding-bottom:2px;}
+.extra .ex-lines .l{border-bottom:1.9px dotted var(--line-2);}
+
+/* ---------- Sheet header ---------- */
+.sh-head{display:flex; align-items:flex-start; gap:16px; padding-bottom:12px; border-bottom:2px solid var(--leaf-l);}
+.sh-brand{display:flex; align-items:center; gap:11px; flex:none;}
+.sh-mark{width:46px; height:46px; flex:none; display:grid; place-items:center;}
+.sh-mark img{width:100%; height:100%; object-fit:contain;}
+.sh-mark .fallback{
+  width:42px; height:42px; border-radius:11px; background:var(--leaf);
+  color:#fff; display:grid; place-items:center; font-weight:800; font-size:20px;
+  box-shadow:inset 0 -3px 0 rgba(0,0,0,.15);
+}
+.sh-brand .bn{font-weight:800; font-size:18px; letter-spacing:.26em; line-height:1;}
+.sh-brand .bs{font-size:10.5px; color:var(--ink-3); letter-spacing:.04em; margin-top:2px;}
+.sh-meta{flex:1;}
+.sh-tag-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+.eyebrow{font-size:10.5px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:var(--earth-d);}
+.badge{display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:800; padding:3px 10px; border-radius:999px; background:var(--leaf-l); color:var(--leaf-d);}
+.badge.earth{background:var(--earth-l); color:var(--earth-d);}
+.sh-title{font-size:21px; font-weight:800; margin:5px 0 1px; letter-spacing:-.01em;}
+.sh-title .th{font-family:var(--font-thai); font-weight:500; color:var(--ink-2); font-size:17px;}
+.sh-fields{flex:none; display:flex; flex-direction:column; gap:7px; min-width:188px;}
+.fld{display:flex; align-items:flex-end; gap:7px; font-size:12px; font-weight:700; color:var(--ink-2);}
+.fld .th{font-family:var(--font-thai); font-weight:500; color:var(--ink-3); font-size:11px;}
+.fld .ln{flex:1; border-bottom:1.6px dotted var(--line-2); height:17px;}
+.fld.small{min-width:0;}
+
+/* ---------- Instructions ---------- */
+.instruct{display:flex; align-items:center; gap:10px; margin:14px 0 11px; font-size:13.5px; color:var(--ink-2);}
+.instruct .n{flex:none; width:24px; height:24px; border-radius:8px; background:var(--earth); color:#fff; font-weight:800; display:grid; place-items:center; font-size:13px; box-shadow:inset 0 -2px 0 rgba(0,0,0,.14);}
+.instruct b{color:var(--ink);}
+.instruct .th{font-family:var(--font-thai); font-weight:500; color:var(--ink-3);}
+.thai{font-family:var(--font-thai);}
+
+/* line-art pictures — outline only, white inside, for children to colour */
+.emoji svg{width:1em; height:1em; display:block; fill:none; stroke:var(--ink); stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round;}
+
+/* ---------- Match (draw a line) ---------- */
+.match{display:grid; grid-template-columns:1fr 1fr; gap:54px; margin-top:6px;}
+.mcol{display:flex; flex-direction:column; gap:14px; justify-content:center;}
+.pcard,.wcard{position:relative; border:1.8px solid var(--line); border-radius:15px; background:var(--surface); min-height:84px; display:flex; align-items:center; gap:13px; padding:11px 18px;}
+.pcard{justify-content:flex-start;}
+.wcard{justify-content:flex-end; text-align:right;}
+.pcard .emoji{font-size:50px; line-height:1;}
+.pcap{font-family:var(--font-thai); color:var(--ink-3); font-size:12px;}
+.wword{font-family:var(--font-thai); font-size:36px; color:var(--ink); font-weight:600; line-height:1.2;}
+.wrom{font-size:12px; color:var(--ink-3); display:block; margin-top:2px;}
+.node{width:16px; height:16px; border-radius:50%; border:2.5px solid var(--earth-d); background:#fff; position:absolute; top:50%; transform:translateY(-50%);}
+.node.nR{right:-9px;} .node.nL{left:-9px;}
+
+/* ---------- Choose / circle the word ---------- */
+.choose{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:6px;}
+.ch-item{display:flex; align-items:center; gap:14px; border:1.6px solid var(--line); border-radius:15px; background:var(--surface); padding:12px 16px; min-height:84px;}
+.ch-item .emoji{font-size:46px; line-height:1; flex:none;}
+.ch-opts{display:flex; gap:9px; flex-wrap:wrap;}
+.opt{font-family:var(--font-thai); font-size:26px; font-weight:600; border:1.8px solid var(--line-2); border-radius:999px; padding:5px 18px; background:#fff; color:var(--ink); line-height:1.3;}
+
+/* ---------- Write the word (with bank) ---------- */
+.bank{display:flex; flex-wrap:wrap; gap:8px 20px; justify-content:center; align-items:center; padding:11px 16px; border:1.8px dashed var(--line-2); border-radius:14px; background:var(--earth-l); margin-bottom:14px;}
+.bank .bk-lbl{font-family:var(--font-thai); font-size:12px; font-weight:700; color:var(--earth-d); margin-right:4px;}
+.bank .chip{font-family:var(--font-thai); font-size:26px; font-weight:600; color:var(--ink);}
+.wgrid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px;}
+.wcell{border:1.6px solid var(--line); border-radius:15px; background:var(--surface); padding:14px 12px 12px; text-align:center;}
+.wcell .emoji{font-size:58px; line-height:1;}
+.wcell .wline{margin-top:10px; border-bottom:1.8px dotted var(--line-2); height:30px;}
+
+/* ---------- Tick the picture ---------- */
+.tickgrid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:6px;}
+.tick-item{display:flex; align-items:center; gap:12px; border:1.6px solid var(--line); border-radius:15px; background:var(--surface); padding:12px 16px;}
+.tick-item .tw{font-family:var(--font-thai); font-size:32px; font-weight:600; min-width:78px; color:var(--leaf-d);}
+.tick-opts{display:flex; gap:16px; margin-left:auto;}
+.tk{display:flex; flex-direction:column; align-items:center; gap:7px;}
+.tk .emoji{font-size:44px; line-height:1;}
+.tk .box{width:22px; height:22px; border:1.9px solid var(--line-2); border-radius:6px;}
+
+/* ---------- Footer ---------- */
+.sh-foot{position:absolute; left:14mm; right:14mm; bottom:8mm; display:flex; align-items:center; justify-content:space-between; font-size:10.5px; color:var(--ink-3); border-top:1.4px solid var(--line); padding-top:7px;}
+.sh-foot .th{font-family:var(--font-thai);}
+.star-row{display:flex; align-items:center; gap:6px;}
+.star{width:15px; height:15px; border:1.6px solid var(--line-2); border-radius:4px;}
+
+/* ---------- Print ---------- */
+@media print{
+  @page{size:A4; margin:0;}
+  body{background:#fff; background-image:none;}
+  .toolbar{display:none !important;}
+  .sheets{padding:0; gap:0;}
+  .sheet{width:210mm; min-height:297mm; box-shadow:none; border:none; border-radius:0; page-break-after:always; break-after:page;}
+  .sheet:last-child{page-break-after:auto; break-after:auto;}
+}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <a class="btn btn-home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก · Home</a>
+  <div class="tb-title">PANYA · Activity Sheets
+    <small>Picture &amp; Word Match · จับคู่ภาพกับคำ — Intermediate</small>
+  </div>
+  <span class="spacer"></span>
+  <span class="hint">10 แผ่น · พิมพ์ลงกระดาษ A4</span>
+  <button class="btn btn-primary" onclick="window.print()">🖨️ พิมพ์ / Print</button>
+</div>
+
+<div class="sheets" id="sheets"></div>
+
+<script src="activity-art.js"></script>
+<script>
+/* ---------- shared building blocks ---------- */
+const art = window.artIcon;
+const LOGO = '<div class="sh-mark"><img src="images/panya-logo.png" alt="PANYA" '
+  + 'onerror="this.style.display=\'none\';this.parentNode.innerHTML=\'<div class=&quot;fallback&quot;>P</div>\'"></div>';
+function head(no, kind, en, th){
+  return '<header class="sh-head"><div class="sh-brand">' + LOGO
+    + '<div><div class="bn">PANYA</div><div class="bs">Thai Foundation</div></div></div>'
+    + '<div class="sh-meta"><div class="sh-tag-row">'
+    + '<span class="eyebrow">Picture &amp; Word Match</span>'
+    + '<span class="badge">Intermediate · ปานกลาง</span>'
+    + '<span class="badge earth">แบบที่ ' + no + ' · ' + kind + '</span></div>'
+    + '<div class="sh-title">' + en + ' <span class="th">· ' + th + '</span></div></div>'
+    + '<div class="sh-fields">'
+    + '<div class="fld">ชื่อ <span class="th">Name</span> <span class="ln"></span></div>'
+    + '<div class="fld small">วันที่ <span class="th">Date</span> <span class="ln"></span>'
+    + '&nbsp;ห้อง <span class="th">Class</span> <span class="ln"></span></div></div></header>';
+}
+function instruct(n, en, th){
+  return '<div class="instruct"><span class="n">' + n + '</span><span><b>' + en + '</b> '
+    + '<span class="th">' + th + '</span></span></div>';
+}
+function foot(th){
+  return '<footer class="sh-foot"><span class="th">' + th + '</span>'
+    + '<span class="star-row">ระบายดาวเมื่อทำเสร็จ <span class="star"></span><span class="star"></span><span class="star"></span></span></footer>';
+}
+function sheet(inner){ return '<section class="sheet">' + inner + '</section>'; }
+const rot = (a,k) => a.map((_,i) => a[(i+k)%a.length]);
+// flexible "practice" panel that stretches to fill the rest of the A4 page
+const EXTRA = '<div class="extra"><div class="ex-head">✏️ ฝึกต่อ · Practice more '
+  + '<span class="th">— เลือกคำที่หนูชอบจากใบงานนี้ เขียน 2 คำ แล้ววาดภาพประกอบ</span></div>'
+  + '<div class="ex-space"></div>'
+  + '<div class="ex-lines"><span class="l"></span><span class="l"></span></div></div>';
+
+/* ---------- sheet builders ---------- */
+// 1) draw-a-line match: pictures (left) ↔ words (right, rotated so they misalign)
+function matchSheet(no, en, th, footTh, pairs){
+  const words = rot(pairs, 2);
+  const L = pairs.map(p =>
+    '<div class="pcard"><span class="emoji">' + art(p.e) + '</span>'
+    + '<span class="pcap">' + p.en + '</span><span class="node nR"></span></div>').join('');
+  const R = words.map(p =>
+    '<div class="wcard"><span class="node nL"></span><span>'
+    + '<span class="wword">' + p.w + '</span><span class="wrom">' + p.r + '</span></span></div>').join('');
+  return sheet(head(no, 'Match', en, th)
+    + instruct(1, 'Draw a line', 'ลากเส้นจับคู่ภาพกับคำให้ถูกต้อง')
+    + '<div class="match"><div class="mcol">' + L + '</div><div class="mcol">' + R + '</div></div>'
+    + EXTRA + foot(footTh));
+}
+// circle the correct word
+function chooseSheet(no, en, th, footTh, items){
+  const body = items.map(it =>
+    '<div class="ch-item"><span class="emoji">' + art(it.e) + '</span><div class="ch-opts">'
+    + it.opts.map(o => '<span class="opt">' + o + '</span>').join('') + '</div></div>').join('');
+  return sheet(head(no, 'Circle', en, th)
+    + instruct(1, 'Circle the correct word', 'ดูภาพ แล้ววงกลมคำที่ถูกต้อง')
+    + '<div class="choose">' + body + '</div>'
+    + EXTRA + foot(footTh));
+}
+// write the word under each picture, using the word bank
+function writeSheet(no, en, th, footTh, bank, pics){
+  const b = '<div class="bank"><span class="bk-lbl">คำให้เลือก · word bank</span>'
+    + bank.map(w => '<span class="chip">' + w + '</span>').join('') + '</div>';
+  const g = pics.map(p =>
+    '<div class="wcell"><span class="emoji">' + art(p.e) + '</span><div class="wline"></div></div>').join('');
+  return sheet(head(no, 'Write', en, th)
+    + instruct(1, 'Write the word', 'เลือกคำจากกรอบ แล้วเขียนใต้ภาพให้ถูกต้อง')
+    + b + '<div class="wgrid">' + g + '</div>'
+    + EXTRA + foot(footTh));
+}
+// tick the picture that matches the word
+function tickSheet(no, en, th, footTh, items){
+  const body = items.map(it =>
+    '<div class="tick-item"><span class="tw">' + it.w + '</span><div class="tick-opts">'
+    + it.opts.map(e => '<div class="tk"><span class="emoji">' + art(e) + '</span><span class="box"></span></div>').join('')
+    + '</div></div>').join('');
+  return sheet(head(no, 'Tick', en, th)
+    + instruct(1, 'Tick the picture', 'อ่านคำ แล้วทำเครื่องหมาย ✓ ในช่องภาพที่ตรงกับคำ')
+    + '<div class="tickgrid">' + body + '</div>'
+    + EXTRA + foot(footTh));
+}
+
+/* ---------- content ---------- */
+const FOOT = 'PANYA Thai Foundation · จับคู่ภาพกับคำ — Picture &amp; Word Match (ปานกลาง)';
+const SHEETS = [
+  matchSheet(1, 'Animals', 'สัตว์', FOOT, [
+    {e:'🐟',w:'ปลา',r:'plaa',en:'fish'},
+    {e:'🐍',w:'งู',r:'nguu',en:'snake'},
+    {e:'🐢',w:'เต่า',r:'tào',en:'turtle'},
+    {e:'🐔',w:'ไก่',r:'gài',en:'chicken'},
+    {e:'🐴',w:'ม้า',r:'máa',en:'horse'},
+  ]),
+  matchSheet(2, 'My body', 'ร่างกาย', FOOT, [
+    {e:'👁️',w:'ตา',r:'taa',en:'eye'},
+    {e:'👂',w:'หู',r:'hǔu',en:'ear'},
+    {e:'👄',w:'ปาก',r:'pàak',en:'mouth'},
+    {e:'🦵',w:'ขา',r:'khǎa',en:'leg'},
+    {e:'✋',w:'มือ',r:'mue',en:'hand'},
+  ]),
+  matchSheet(3, 'My family', 'ครอบครัว', FOOT, [
+    {e:'👩',w:'แม่',r:'mâe',en:'mother'},
+    {e:'👨',w:'พ่อ',r:'phâo',en:'father'},
+    {e:'👴',w:'ปู่',r:'pùu',en:'grandpa'},
+    {e:'👵',w:'ย่า',r:'yâa',en:'grandma'},
+    {e:'🧒',w:'พี่',r:'phîi',en:'big sibling'},
+  ]),
+  matchSheet(4, 'Nature', 'ธรรมชาติ', FOOT, [
+    {e:'⭐',w:'ดาว',r:'daao',en:'star'},
+    {e:'🔥',w:'ไฟ',r:'fai',en:'fire'},
+    {e:'🌤️',w:'ฟ้า',r:'fáa',en:'sky'},
+    {e:'🌧️',w:'ฝน',r:'fǒn',en:'rain'},
+    {e:'💨',w:'ลม',r:'lom',en:'wind'},
+  ]),
+  matchSheet(5, 'Food &amp; things', 'อาหารและสิ่งของ', FOOT, [
+    {e:'🍵',w:'ชา',r:'chaa',en:'tea'},
+    {e:'🍽️',w:'จาน',r:'jaan',en:'plate'},
+    {e:'🥚',w:'ไข่',r:'khài',en:'egg'},
+    {e:'🥛',w:'นม',r:'nom',en:'milk'},
+    {e:'🎨',w:'สี',r:'sǐi',en:'colour'},
+  ]),
+  matchSheet(6, 'Action words', 'คำกริยา', FOOT, [
+    {e:'😋',w:'กิน',r:'gin',en:'eat'},
+    {e:'👀',w:'ดู',r:'duu',en:'look'},
+    {e:'🦋',w:'บิน',r:'bin',en:'fly'},
+    {e:'⏳',w:'รอ',r:'rɔɔ',en:'wait'},
+    {e:'🧗',w:'ปีน',r:'piin',en:'climb'},
+  ]),
+  chooseSheet(7, 'Which word?', 'เลือกคำให้ตรงกับภาพ', FOOT, [
+    {e:'🐟', opts:['ปู','ปลา','ป้า']},
+    {e:'👂', opts:['ดู','รู','หู']},
+    {e:'🐔', opts:['ไก่','ไข่','ไป']},
+    {e:'👁️', opts:['นา','มา','ตา']},
+    {e:'⭐', opts:['ดาว','ดิน','ดี']},
+    {e:'🐍', opts:['งู','ปู','นก']},
+  ]),
+  chooseSheet(8, 'Which word?', 'เลือกคำให้ตรงกับภาพ', FOOT, [
+    {e:'👩', opts:['แมว','แม่','มือ']},
+    {e:'🥚', opts:['ไก่','ใจ','ไข่']},
+    {e:'🍵', opts:['ขา','ชา','หา']},
+    {e:'🐢', opts:['เท','เต่า','ตา']},
+    {e:'🔥', opts:['ไฟ','ไว','ฟัน']},
+    {e:'🐴', opts:['มา','ม้า','นา']},
+  ]),
+  writeSheet(9, 'Write the word', 'เขียนคำใต้ภาพ', FOOT,
+    ['ตา','ดาว','ชา','ปลา','มือ','ไก่'],
+    [{e:'🐟'},{e:'👁️'},{e:'⭐'},{e:'🐔'},{e:'✋'},{e:'🍵'}]),
+  tickSheet(10, 'Tick the picture', 'ทำเครื่องหมายภาพที่ตรงกับคำ', FOOT, [
+    {w:'ปลา', opts:['🐟','🐍','🐢']},
+    {w:'แม่', opts:['👨','👩','👵']},
+    {w:'ดาว', opts:['🔥','⭐','🌧️']},
+    {w:'กิน', opts:['👀','😋','🧗']},
+    {w:'หู', opts:['👁️','👄','👂']},
+    {w:'ไก่', opts:['🐴','🐔','🐟']},
+  ]),
+];
+document.getElementById('sheets').innerHTML = SHEETS.join('');
+
+/* auto-open the print dialog when launched with ?print=1 (app Print button) */
+if (new URLSearchParams(location.search).has('print')){
+  window.addEventListener('load', () => window.print());
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · Worksheets — Unit Check (Advanced)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="activity-base.css" />
+</head>
+<body>
+<div class="toolbar">
+  <a class="btn btn-home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก · Home</a>
+  <div class="tb-title">PANYA · Worksheets <small>Unit Check · ทดสอบท้ายหน่วย — Advanced</small></div>
+  <span class="spacer"></span>
+  <span class="hint">20 หน้า · พิมพ์ลงกระดาษ A4</span>
+  <button class="btn btn-primary" onclick="window.print()">🖨️ พิมพ์ / Print</button>
+</div>
+<div class="sheets" id="sheets"></div>
+
+<script src="activity-art.js"></script>
+<script src="activity-ws.js"></script>
+<script>
+window.WSMETA = { eyebrow:'Unit Check', level:'Advanced · ขั้นสูง', levelClass:'clay',
+  footTh:'PANYA Thai Foundation · ทดสอบท้ายหน่วย — Unit Check (ขั้นสูง)' };
+const W = window.WS, mg = W.mg, art = W.art;
+const S = [];
+const TONES = ['สามัญ','เอก','โท','ตรี','จัตวา'];
+const big = (w) => '<span class="thai" style="font-size:30px;color:var(--ink)">' + w + '</span>';
+
+/* question sheet */
+function qSheet(no, kind, en, th, intrEn, intrTh, qs, opts){
+  opts = opts || {};
+  const body = qs.map((q,i) =>
+    '<div class="q"><div class="qh"><span class="qn">' + (i+1) + '</span><span>' + q.q + '</span></div>'
+    + (q.opts ? '<div class="qbody">' + q.opts.map(o => '<span class="opt">' + o + '</span>').join('') + '</div>'
+              : '<div class="qbody"><span class="qline"></span></div>')
+    + '</div>').join('');
+  return W.custom(no, kind, en, th, W.instruct(1, intrEn, intrTh)
+    + (opts.note ? '<div class="note-th">' + opts.note + '</div>' : '')
+    + '<div class="qlist">' + body + '</div>'
+    + '<div style="margin-top:12px"><span class="score">คะแนน · Score <span class="box"></span> / ' + qs.length + '</span></div>'
+    + W.extra());
+}
+
+/* 1 · Unit 1 — name the tone */
+S.push(qSheet(1,'Unit 1 · Tones','Name the tone','บอกเสียงวรรณยุกต์','Read &amp; circle the tone','อ่านคำ แล้ววงกลมเสียงวรรณยุกต์ที่ถูกต้อง',[
+  {q:big('กา')+' →', opts:TONES},
+  {q:big('ป่า')+' →', opts:TONES},
+  {q:big('ม้า')+' →', opts:TONES},
+  {q:big('โต๊ะ')+' →', opts:TONES},
+  {q:big('จ๋า')+' →', opts:TONES},
+  {q:big('ไก่')+' →', opts:TONES},
+]));
+/* 2 · Unit 1 — ผัน fill */
+S.push(W.eqSheet(2,'Unit 1 · Tones','Tone ladder check','ผันวรรณยุกต์','Add the tone marks','อักษรกลาง — เติมรูปวรรณยุกต์ให้ครบ',[
+  {parts:[{k:'c',s:'ก'},{k:'v',s:'า'},{k:'t',s:'◌่'}],ans:'ก่า',ex:true,g:'เอก'},
+  {parts:[{k:'c',s:'ก'},{k:'v',s:'า'},{k:'t',s:'◌้'}],g:'โท'},
+  {parts:[{k:'c',s:'ก'},{k:'v',s:'า'},{k:'t',s:'◌๊'}],g:'ตรี'},
+  {parts:[{k:'c',s:'ก'},{k:'v',s:'า'},{k:'t',s:'◌๋'}],g:'จัตวา'},
+  {parts:[{k:'c',s:'ต'},{k:'v',s:'า'},{k:'t',s:'◌่'}],g:'ต่า · เอก'},
+  {parts:[{k:'c',s:'ป'},{k:'v',s:'า'},{k:'t',s:'◌้'}],g:'ป้า · โท'},
+],{key:true}));
+/* 3 · Unit 2 — sort by class */
+S.push(W.bucketSheet(3,'Unit 2 · Class','Sort by consonant class','แยกหมู่อักษร',
+  'เขียนพยัญชนะลงช่องตามหมู่อักษร',
+  ['ก','ข','ค','จ','ส','ง','ต','ถ','ม','ป','ห','น'],
+  [{name:'อักษรกลาง'},{name:'อักษรสูง'},{name:'อักษรต่ำ'}]));
+/* 4 · Unit 2 — choose the class */
+S.push(qSheet(4,'Unit 2 · Class','Which class?','พยัญชนะหมู่ใด','Circle the class','อ่านพยัญชนะ แล้ววงกลมหมู่อักษร',[
+  {q:big('ก')+' →', opts:['กลาง','สูง','ต่ำ']},
+  {q:big('ข')+' →', opts:['กลาง','สูง','ต่ำ']},
+  {q:big('ค')+' →', opts:['กลาง','สูง','ต่ำ']},
+  {q:big('จ')+' →', opts:['กลาง','สูง','ต่ำ']},
+  {q:big('ส')+' →', opts:['กลาง','สูง','ต่ำ']},
+  {q:big('ม')+' →', opts:['กลาง','สูง','ต่ำ']},
+]));
+/* 5 · Unit 3 — sort by final (มาตรา) */
+S.push(W.bucketSheet(5,'Unit 3 · Finals','Sort by final','แยกมาตราตัวสะกด',
+  'เขียนคำลงช่องตามมาตราตัวสะกด',
+  ['กาง','จาน','ตาม','ปาก','มด','กบ'],
+  [{name:'แม่กง'},{name:'แม่กน'},{name:'แม่กม'},{name:'แม่กก'},{name:'แม่กด'},{name:'แม่กบ'}]));
+/* 6 · Unit 3 — live / dead */
+S.push(W.bucketSheet(6,'Unit 3 · Syllables','Live or dead?','คำเป็น–คำตาย',
+  'อ่านคำ แล้วแยกคำเป็น (เสียงลากยาว) กับคำตาย (เสียงห้วน)',
+  ['กา','นก','ยาว','จะ','คาง','ปาก','ดี','มด'],
+  [{name:'คำเป็น · live'},{name:'คำตาย · dead'}]));
+/* 7 · Unit 4 — circle clusters */
+S.push(W.custom(7,'Unit 4 · Clusters','Find the clusters','หาคำควบกล้ำ',
+  W.instruct(1,'Circle the cluster words','อ่านทุกคำ วงกลมเฉพาะคำที่มีอักษรควบกล้ำ')
+  + W.wall(['ปลา','กา','ครู','นก','กลอง','มา','ขวด','ดิน','ปราบ','ตา','กว่าง','ตรง'])
+  + '<div class="tally" style="margin-top:14px"><span class="item">วงกลมได้กี่คำ? <span class="box"></span> คำ</span></div>'
+  + W.extra()));
+/* 8 · Unit 5 — diphthong words match meaning */
+S.push(W.matchSheet(8,'Unit 5 · Diphthongs','Match the meaning','จับคู่ความหมาย',
+  'ลากเส้นจับคู่คำสระประสมกับความหมาย',
+  ['เสือ','เรือ','เมือง','เขียน'],
+  ['สัตว์ดุ · tiger','พาหนะน้ำ · boat','เมือง · city','เขียน · write'],
+  { note:'สระประสม เ–ือ / เ–ีย' }));
+/* 9 · Reading — word for picture */
+S.push(W.chooseSheet(9,'Reading','Read the word','อ่านคำให้ตรงภาพ','Circle the word that matches','ดูภาพ แล้ววงกลมคำที่ถูกต้อง',[
+  {e:'🐟',opts:['ปลา','ป่า','ปู']},
+  {e:'🐴',opts:['ม้า','มา','นา']},
+  {e:'⭐',opts:['ดาว','ดิน','ดี']},
+  {e:'👂',opts:['หู','ดู','รู']},
+  {e:'🍵',opts:['ชา','ขา','หา']},
+  {e:'🐔',opts:['ไก่','ไข่','ไป']},
+]));
+/* 10 · Reading — true / false */
+S.push(W.custom(10,'Reading','True or false','ถูกหรือผิด',
+  W.instruct(1,'Read, then tick ✓','อ่านประโยค ถ้าถูกทำ ✓ ถ้าผิดทำ ✗')
+  + '<div class="qlist">' + [
+    'ปลา อยู่ ใน น้ำ','ม้า บิน ได้','ไก่ มี สอง ขา','ดาว อยู่ บน ฟ้า','เต่า วิ่ง เร็ว มาก'
+  ].map((s,i) => '<div class="q"><div class="qh"><span class="qn">' + (i+1) + '</span>'
+    + '<span class="thai" style="font-size:24px">' + s + '</span></div>'
+    + '<div class="qbody"><span class="opt">✓ ถูก</span><span class="opt">✗ ผิด</span></div></div>').join('')
+  + '</div>'
+  + '<div style="margin-top:12px"><span class="score">คะแนน · Score <span class="box"></span> / 5</span></div>' + W.extra()));
+/* 11 · Dictation check */
+S.push(W.dictSheet(11,'Dictation','Dictation check','เขียนตามคำบอก','Listen, then write','ครูอ่านคำ — ฟังแล้วเขียน',{ teacher:'ปลา  ม้า  ป้า  ครู  ดาว  รัก  จาน  กิน', count:8 }));
+/* 12 · Spelling — circle the correct */
+S.push(qSheet(12,'Spelling','Correct spelling','สะกดถูกต้อง','Circle the correctly spelled word','วงกลมคำที่สะกดถูก',[
+  {q:'horse · ม้า →', opts:['ม้า','ม่า','ม๊า']},
+  {q:'rice · ข้าว →', opts:['ข่าว','ข้าว','ขาว']},
+  {q:'aunt · ป้า →', opts:['ป่า','ป้า','ปา']},
+  {q:'four · สี่ →', opts:['สี','สี่','สี้']},
+  {q:'table · โต๊ะ →', opts:['โตะ','โต่ะ','โต๊ะ']},
+  {q:'fish · ปลา →', opts:['ปลา','ปา','ปรา']},
+]));
+/* 13 · Vocabulary — match word to picture */
+(function(){
+  const data=[{w:'เต่า',e:'🐢'},{w:'ผีเสื้อ',e:'🦋'},{w:'ดอกไม้',e:'🌸'},{w:'ปู',e:'🦀'}];
+  const order=data.map((_,i,a)=>a[(i+2)%a.length]);
+  S.push(W.matchSheet(13,'Vocabulary','Word to picture','จับคู่คำกับภาพ','ลากเส้นจับคู่คำกับภาพ',
+    data.map(p=>p.w), order.map(p=>'<span class="pic emoji">'+art(p.e)+'</span>')));
+})();
+/* 14 · Multiple choice mixed */
+S.push(qSheet(14,'Mixed','Multiple choice','เลือกคำตอบ','Circle the best answer','วงกลมคำตอบที่ถูกต้อง',[
+  {q:'รูป ◌้ เรียกว่า', opts:['ไม้เอก','ไม้โท','ไม้ตรี']},
+  {q:'อักษรกลางผันได้กี่เสียง?', opts:['3','4','5']},
+  {q:'“ปลา” มีพยัญชนะต้นแบบใด?', opts:['เดี่ยว','ควบกล้ำ','สะกด']},
+  {q:'“นก” เป็นคำชนิดใด?', opts:['คำเป็น','คำตาย']},
+  {q:'เสียงสามัญมีรูปวรรณยุกต์หรือไม่?', opts:['มี','ไม่มี']},
+  {q:'“ข” เป็นอักษรหมู่ใด?', opts:['กลาง','สูง','ต่ำ']},
+]));
+/* 15 · Fill the blank */
+S.push(qSheet(15,'Fill','Fill the blank','เติมให้สมบูรณ์','Write the missing part','เติมพยัญชนะ สระ หรือวรรณยุกต์ที่ขาดหาย',[
+  {q:big('ม_า')+' (horse) เติมวรรณยุกต์'},
+  {q:big('จา_')+' (plate) เติมตัวสะกด'},
+  {q:big('ป_')+' (crab) เติมสระ'},
+  {q:big('_าว')+' (star) เติมพยัญชนะ'},
+  {q:big('ก_น')+' (eat) เติมสระ'},
+  {q:big('ป_า')+' (aunt) เติมวรรณยุกต์'},
+]));
+/* 16 · Tone of words (set 2) */
+S.push(qSheet(16,'Tones','Name the tone','บอกเสียงวรรณยุกต์','Read &amp; circle the tone','อ่านคำ แล้ววงกลมเสียงวรรณยุกต์',[
+  {q:big('ข้าว')+' →', opts:TONES},
+  {q:big('พ่อ')+' →', opts:TONES},
+  {q:big('ขาว')+' →', opts:TONES},
+  {q:big('ก๊อก')+' →', opts:TONES},
+  {q:big('เดี๋ยว')+' →', opts:TONES},
+  {q:big('มา')+' →', opts:TONES},
+]));
+/* 17 · Build words */
+S.push(W.eqSheet(17,'Build','Build the word','ต่อคำ','Blend the parts','ประสมส่วนต่าง ๆ เป็นคำ',[
+  {e:'🍽️',parts:[{k:'c',s:'จ'},{k:'v',s:'า'},{k:'f',s:'น'}],ans:'จาน',ex:true,g:'จาน · plate'},
+  {e:'👄',parts:[{k:'c',s:'ป'},{k:'v',s:'า'},{k:'f',s:'ก'}],g:'ปาก · mouth'},
+  {e:'🦀',parts:[{k:'c',s:'ป'},{k:'v',s:'◌ู'}],g:'ปู · crab'},
+  {e:'👩‍🦰',parts:[{k:'c',s:'ป'},{k:'v',s:'า'},{k:'t',s:'◌้'}],g:'ป้า · aunt'},
+  {e:'🐟',parts:[{k:'c',s:'ปล'},{k:'v',s:'า'}],g:'ปลา · fish'},
+],{key:true}));
+/* 18 · Match word ↔ picture (set 2) */
+(function(){
+  const data=[{w:'ปลา',e:'🐟'},{w:'ดาว',e:'⭐'},{w:'ม้า',e:'🐴'},{w:'กิน',e:'😋'}];
+  const order=data.map((_,i,a)=>a[(i+2)%a.length]);
+  S.push(W.matchSheet(18,'Vocabulary','Word to picture','จับคู่คำกับภาพ','ลากเส้นจับคู่คำกับภาพ',
+    data.map(p=>p.w), order.map(p=>'<span class="pic emoji">'+art(p.e)+'</span>')));
+})();
+/* 19 · Comprehensive review */
+S.push(qSheet(19,'Review','Comprehensive review','ทบทวนรวม','Answer each question','ตอบคำถามทบทวนทุกหน่วย',[
+  {q:'เขียนคำที่มีไม้เอก 1 คำ'},
+  {q:'เขียนคำที่มีตัวสะกดแม่กง 1 คำ'},
+  {q:'เขียนคำควบกล้ำ 1 คำ'},
+  {q:'“ค” อยู่หมู่อักษรใด?', opts:['กลาง','สูง','ต่ำ']},
+  {q:'เขียนคำสระประสม เ–ือ 1 คำ'},
+  {q:'“โต๊ะ” มีเสียงวรรณยุกต์ใด?', opts:TONES},
+]));
+/* 20 · Final check + self-rating */
+(function(){
+  const cans = ['อ่านวรรณยุกต์ได้','ผันอักษรกลางได้','บอกหมู่อักษรได้','อ่านคำควบกล้ำได้','อ่านสระประสมได้','เขียนตามคำบอกได้'];
+  const ck = cans.map(c => '<div class="ck"><span class="box"></span><span class="w" style="font-size:18px">' + c + '</span></div>').join('');
+  S.push(W.custom(20,'Final check','I can do this!','หนูทำได้!',
+    W.instruct(1,'Tick what you can do','อ่านแต่ละข้อ ถ้าทำได้ทำเครื่องหมาย ✓')
+    + '<div class="checklist" style="grid-template-columns:repeat(2,1fr)">' + ck + '</div>'
+    + '<div style="margin-top:14px"><span class="score">คะแนนรวมทุกหน่วย · Total <span class="box"></span> / 100</span></div>'
+    + W.extra('วาดภาพสิ่งที่หนูภูมิใจที่อ่านออก')));
+})();
+
+W.render(S);
+W.autoprint();
+</script>
+</body>
+</html>

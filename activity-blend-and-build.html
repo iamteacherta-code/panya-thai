@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · Worksheets — Blend &amp; Build (Intermediate)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="activity-base.css" />
+</head>
+<body>
+<div class="toolbar">
+  <a class="btn btn-home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก · Home</a>
+  <div class="tb-title">PANYA · Worksheets <small>Blend &amp; Build · ประสมและต่อคำ — Intermediate</small></div>
+  <span class="spacer"></span>
+  <span class="hint">20 หน้า · พิมพ์ลงกระดาษ A4</span>
+  <button class="btn btn-primary" onclick="window.print()">🖨️ พิมพ์ / Print</button>
+</div>
+<div class="sheets" id="sheets"></div>
+
+<script src="activity-art.js"></script>
+<script src="activity-ws.js"></script>
+<script>
+window.WSMETA = { eyebrow:'Blend &amp; Build', level:'Intermediate · ปานกลาง', levelClass:'',
+  footTh:'PANYA Thai Foundation · ประสมและต่อคำ — Blend &amp; Build (ปานกลาง)' };
+const W = window.WS;
+const S = [];
+
+/* 1 · C + V */
+S.push(W.eqSheet(1,'C + V','Consonant + vowel','พยัญชนะ + สระ','Blend the sounds','ประสมพยัญชนะกับสระ แล้วเขียนเป็นคำ (แถวแรกคือตัวอย่าง)',[
+  {e:'🚶',parts:[{k:'c',s:'ม'},{k:'v',s:'า'}],ans:'มา',ex:true,g:'มา · come'},
+  {e:'👁️',parts:[{k:'c',s:'ต'},{k:'v',s:'า'}],g:'ตา · eye'},
+  {e:'🦀',parts:[{k:'c',s:'ป'},{k:'v',s:'◌ู'}],g:'ปู · crab'},
+  {e:'🎨',parts:[{k:'c',s:'ส'},{k:'v',s:'◌ี'}],g:'สี · colour'},
+  {e:'🐍',parts:[{k:'c',s:'ง'},{k:'v',s:'◌ู'}],g:'งู · snake'},
+  {e:'👂',parts:[{k:'c',s:'ห'},{k:'v',s:'◌ู'}],g:'หู · ear'},
+],{key:true}));
+
+/* 2 · C + V + C (live finals) */
+S.push(W.eqSheet(2,'C + V + C','Add a sonorant final','เติมตัวสะกดเสียงก้อง','Blend with a final','ประสมพยัญชนะ สระ และตัวสะกดเสียงก้อง (ง น ม ย ว)',[
+  {e:'🟢',parts:[{k:'c',s:'ก'},{k:'v',s:'า'},{k:'f',s:'ง'}],ans:'กาง',ex:true,g:'กาง · spread'},
+  {e:'🍽️',parts:[{k:'c',s:'จ'},{k:'v',s:'า'},{k:'f',s:'น'}],g:'จาน · plate'},
+  {e:'👣',parts:[{k:'c',s:'ต'},{k:'v',s:'า'},{k:'f',s:'ม'}],g:'ตาม · follow'},
+  {e:'👵',parts:[{k:'c',s:'ย'},{k:'v',s:'า'},{k:'f',s:'ย'}],g:'ยาย · granny'},
+  {e:'⭐',parts:[{k:'c',s:'ด'},{k:'v',s:'า'},{k:'f',s:'ว'}],g:'ดาว · star'},
+  {e:'🛏️',parts:[{k:'c',s:'น'},{k:'v',s:'อ'},{k:'f',s:'น'}],g:'นอน · sleep'},
+],{key:true}));
+
+/* 3 · C + V + C (dead finals) */
+S.push(W.eqSheet(3,'C + V + C','Add a stop final','เติมตัวสะกดเสียงตาย','Blend with a final','ประสมพยัญชนะ สระ และตัวสะกดเสียงตาย (ก ด บ)',[
+  {e:'👄',parts:[{k:'c',s:'ป'},{k:'v',s:'า'},{k:'f',s:'ก'}],ans:'ปาก',ex:true,g:'ปาก · mouth'},
+  {e:'➕',parts:[{k:'c',s:'ม'},{k:'v',s:'า'},{k:'f',s:'ก'}],g:'มาก · many'},
+  {parts:[{k:'c',s:'ก'},{k:'v',s:'◌ั'},{k:'f',s:'บ'}],g:'กับ · with'},
+  {parts:[{k:'c',s:'จ'},{k:'v',s:'◌ั'},{k:'f',s:'บ'}],g:'จับ · catch'},
+  {parts:[{k:'c',s:'ม'},{k:'v',s:'◌'},{k:'f',s:'ด'}],g:'มด · ant'},
+  {parts:[{k:'c',s:'ป'},{k:'v',s:'◌ิ'},{k:'f',s:'ด'}],g:'ปิด · close'},
+],{key:true}));
+
+/* 4 · มาตรา -ง -น -ม */
+S.push(W.eqSheet(4,'มาตรา','Finals -ง -น -ม','แม่กง กน กม','Build the words','ประสมคำที่มีตัวสะกด ง น ม',[
+  {parts:[{k:'c',s:'ก'},{k:'v',s:'า'},{k:'f',s:'ง'}],ans:'กาง',ex:true,g:'แม่กง'},
+  {parts:[{k:'c',s:'ล'},{k:'v',s:'◌ิ'},{k:'f',s:'ง'}],g:'ลิง · monkey'},
+  {parts:[{k:'c',s:'จ'},{k:'v',s:'า'},{k:'f',s:'น'}],g:'จาน · plate'},
+  {parts:[{k:'c',s:'ป'},{k:'v',s:'◌ี'},{k:'f',s:'น'}],g:'ปีน · climb'},
+  {parts:[{k:'c',s:'ต'},{k:'v',s:'า'},{k:'f',s:'ม'}],g:'ตาม · follow'},
+  {parts:[{k:'c',s:'ย'},{k:'v',s:'า'},{k:'f',s:'ม'}],g:'ยาม · guard'},
+]));
+
+/* 5 · มาตรา -ย -ว */
+S.push(W.eqSheet(5,'มาตรา','Finals -ย -ว','แม่เกย เกอว','Build the words','ประสมคำที่มีตัวสะกด ย ว',[
+  {parts:[{k:'c',s:'ย'},{k:'v',s:'า'},{k:'f',s:'ย'}],ans:'ยาย',ex:true,g:'ยาย · granny'},
+  {parts:[{k:'c',s:'ล'},{k:'v',s:'อ'},{k:'f',s:'ย'}],g:'ลอย · float'},
+  {parts:[{k:'c',s:'โ'},{k:'v',s:'ด'},{k:'f',s:'ย'}],g:'โดย · by'},
+  {parts:[{k:'c',s:'ด'},{k:'v',s:'า'},{k:'f',s:'ว'}],g:'ดาว · star'},
+  {parts:[{k:'c',s:'แ'},{k:'v',s:'ม'},{k:'f',s:'ว'}],g:'แมว · cat'},
+  {parts:[{k:'c',s:'เ'},{k:'v',s:'ล'},{k:'f',s:'ว'}],g:'เลว · bad'},
+]));
+
+/* 6 · มาตรา -ก */
+S.push(W.eqSheet(6,'มาตรา','Final -ก','แม่กก','Build the words','ประสมคำที่มีตัวสะกด ก',[
+  {parts:[{k:'c',s:'ป'},{k:'v',s:'า'},{k:'f',s:'ก'}],ans:'ปาก',ex:true,g:'ปาก · mouth'},
+  {parts:[{k:'c',s:'ม'},{k:'v',s:'า'},{k:'f',s:'ก'}],g:'มาก · many'},
+  {parts:[{k:'c',s:'จ'},{k:'v',s:'า'},{k:'f',s:'ก'}],g:'จาก · from'},
+  {parts:[{k:'c',s:'ล'},{k:'v',s:'า'},{k:'f',s:'ก'}],g:'ลาก · drag'},
+  {parts:[{k:'c',s:'ร'},{k:'v',s:'◌ั'},{k:'f',s:'ก'}],g:'รัก · love'},
+  {parts:[{k:'c',s:'น'},{k:'v',s:'◌'},{k:'f',s:'ก'}],g:'นก · bird'},
+]));
+
+/* 7 · มาตรา -ด */
+S.push(W.eqSheet(7,'มาตรา','Final -ด','แม่กด','Build the words','ประสมคำที่มีตัวสะกด ด',[
+  {parts:[{k:'c',s:'ม'},{k:'v',s:'◌'},{k:'f',s:'ด'}],ans:'มด',ex:true,g:'มด · ant'},
+  {parts:[{k:'c',s:'ร'},{k:'v',s:'◌'},{k:'f',s:'ด'}],g:'รด · water (v.)'},
+  {parts:[{k:'c',s:'ก'},{k:'v',s:'◌ั'},{k:'f',s:'ด'}],g:'กัด · bite'},
+  {parts:[{k:'c',s:'ป'},{k:'v',s:'◌ิ'},{k:'f',s:'ด'}],g:'ปิด · close'},
+  {parts:[{k:'c',s:'ช'},{k:'v',s:'◌ุ'},{k:'f',s:'ด'}],g:'ชุด · set'},
+  {parts:[{k:'c',s:'ข'},{k:'v',s:'◌ู'},{k:'f',s:'ด'}],g:'ขูด · scrape'},
+]));
+
+/* 8 · มาตรา -บ */
+S.push(W.eqSheet(8,'มาตรา','Final -บ','แม่กบ','Build the words','ประสมคำที่มีตัวสะกด บ',[
+  {parts:[{k:'c',s:'ก'},{k:'v',s:'◌'},{k:'f',s:'บ'}],ans:'กบ',ex:true,g:'กบ · frog'},
+  {parts:[{k:'c',s:'จ'},{k:'v',s:'◌ั'},{k:'f',s:'บ'}],g:'จับ · catch'},
+  {parts:[{k:'c',s:'ร'},{k:'v',s:'◌ั'},{k:'f',s:'บ'}],g:'รับ · receive'},
+  {parts:[{k:'c',s:'ล'},{k:'v',s:'◌ู'},{k:'f',s:'บ'}],g:'ลูบ · stroke'},
+  {parts:[{k:'c',s:'ด'},{k:'v',s:'◌ิ'},{k:'f',s:'บ'}],g:'ดิบ · raw'},
+  {parts:[{k:'c',s:'ค'},{k:'v',s:'◌'},{k:'f',s:'บ'}],g:'คบ · befriend'},
+]));
+
+/* 9 · vowel-shape change ◌ะ → ◌ั */
+S.push(W.eqSheet(9,'Vowel change','สระอะ เปลี่ยนรูป','สระลดรูป','Watch the vowel change','เมื่อมีตัวสะกด สระอะ ( ◌ะ ) เปลี่ยนรูปเป็นไม้หันอากาศ ( ◌ั )',[
+  {parts:[{k:'c',s:'ก'},{k:'v',s:'◌ะ'},{k:'f',s:'น'}],ans:'กัน',ex:true,g:'กัน · together'},
+  {parts:[{k:'c',s:'ม'},{k:'v',s:'◌ะ'},{k:'f',s:'น'}],g:'มัน · it'},
+  {parts:[{k:'c',s:'ฟ'},{k:'v',s:'◌ะ'},{k:'f',s:'น'}],g:'ฟัน · tooth'},
+  {parts:[{k:'c',s:'ร'},{k:'v',s:'◌ะ'},{k:'f',s:'ก'}],g:'รัก · love'},
+  {parts:[{k:'c',s:'ห'},{k:'v',s:'◌ะ'},{k:'f',s:'ก'}],g:'หัก · break'},
+  {parts:[{k:'c',s:'ก'},{k:'v',s:'◌ะ'},{k:'f',s:'บ'}],g:'กับ · with'},
+],{key:true,note:'สังเกต: ◌ะ + ตัวสะกด → ◌ั (เช่น กะ + น = กัน)'}));
+
+/* 10 · short-vowel words */
+S.push(W.eqSheet(10,'Short vowels','Short-vowel words','คำสระเสียงสั้น','Build short-vowel words','ประสมคำที่มีสระเสียงสั้น',[
+  {parts:[{k:'c',s:'จ'},{k:'v',s:'◌ะ'}],ans:'จะ',ex:true,g:'จะ · will'},
+  {parts:[{k:'c',s:'ม'},{k:'v',s:'◌ะ'}],g:'มะ · (ผลไม้)'},
+  {parts:[{k:'c',s:'ก'},{k:'v',s:'◌ิ'},{k:'f',s:'น'}],g:'กิน · eat'},
+  {parts:[{k:'c',s:'ด'},{k:'v',s:'◌ิ'},{k:'f',s:'น'}],g:'ดิน · soil'},
+  {parts:[{k:'c',s:'ส'},{k:'v',s:'◌ุ'},{k:'f',s:'ข'}],g:'สุข · happy'},
+  {parts:[{k:'c',s:'น'},{k:'v',s:'◌ุ'},{k:'f',s:'น'}],g:'นุ่น · kapok'},
+]));
+
+/* 11 · add a tone mark (mid class ladder) */
+S.push(W.eqSheet(11,'Tone','Add a tone mark','เติมวรรณยุกต์ (อักษรกลาง)','Add the tone mark','อักษรกลางผันได้ครบ 5 เสียง — เติมรูปวรรณยุกต์',[
+  {parts:[{k:'c',s:'ก'},{k:'v',s:'า'},{k:'t',s:'◌่'}],ans:'ก่า',ex:true,g:'เสียงเอก'},
+  {parts:[{k:'c',s:'ก'},{k:'v',s:'า'},{k:'t',s:'◌้'}],g:'ก้า · เสียงโท'},
+  {parts:[{k:'c',s:'ก'},{k:'v',s:'า'},{k:'t',s:'◌๊'}],g:'ก๊า · เสียงตรี'},
+  {parts:[{k:'c',s:'ก'},{k:'v',s:'า'},{k:'t',s:'◌๋'}],g:'ก๋า · เสียงจัตวา'},
+  {parts:[{k:'c',s:'ป'},{k:'v',s:'◌ู'},{k:'t',s:'◌่'}],g:'ปู่ · grandpa'},
+  {parts:[{k:'c',s:'ต'},{k:'v',s:'◌ี'},{k:'t',s:'◌๋'}],g:'ตี๋ · (ชื่อเล่น)'},
+],{key:true}));
+
+/* 12 · build words with tone (family) */
+S.push(W.eqSheet(12,'Tone words','Build words with tone','ต่อคำมีวรรณยุกต์','Build the family words','ประสมคำครอบครัวที่มีวรรณยุกต์',[
+  {e:'👩‍🦰',parts:[{k:'c',s:'ป'},{k:'v',s:'า'},{k:'t',s:'◌้'}],ans:'ป้า',ex:true,g:'ป้า · aunt'},
+  {parts:[{k:'c',s:'น'},{k:'v',s:'า'},{k:'t',s:'◌้'}],g:'น้า · aunt/uncle'},
+  {e:'👨',parts:[{k:'c',s:'พ'},{k:'t',s:'◌่'},{k:'f',s:'อ'}],g:'พ่อ · father'},
+  {e:'👩',parts:[{k:'c',s:'แม'},{k:'t',s:'◌่'}],g:'แม่ · mother'},
+  {e:'🧒',parts:[{k:'c',s:'พ'},{k:'v',s:'◌ี'},{k:'t',s:'◌่'}],g:'พี่ · big sibling'},
+  {parts:[{k:'c',s:'ส'},{k:'v',s:'◌ี'},{k:'t',s:'◌่'}],g:'สี่ · four'},
+],{key:true}));
+
+/* 13 · clusters (คำควบกล้ำ) */
+S.push(W.eqSheet(13,'Clusters','Consonant clusters','คำควบกล้ำ','Build cluster words','พยัญชนะต้นควบกล้ำ + สระ (+ ตัวสะกด)',[
+  {e:'🐟',parts:[{k:'c',s:'ปล'},{k:'v',s:'า'}],ans:'ปลา',ex:true,g:'ปลา · fish'},
+  {parts:[{k:'c',s:'คร'},{k:'v',s:'◌ู'}],g:'ครู · teacher'},
+  {parts:[{k:'c',s:'กล'},{k:'v',s:'อ'},{k:'f',s:'ง'}],g:'กลอง · drum'},
+  {parts:[{k:'c',s:'ขว'},{k:'v',s:'◌'},{k:'f',s:'ด'}],g:'ขวด · bottle'},
+  {parts:[{k:'c',s:'ตร'},{k:'v',s:'◌'},{k:'f',s:'ง'}],g:'ตรง · straight'},
+  {parts:[{k:'c',s:'พร'},{k:'v',s:'◌ิ'},{k:'f',s:'ก'}],g:'พริก · chilli'},
+],{key:true}));
+
+/* 14 · fill the tiles (picture clue) */
+S.push(W.eqSheet(14,'Build it','Fill the tiles','ต่อคำจากภาพ','Fill each tile, then write','ดูภาพ เขียนพยัญชนะ–สระ–ตัวสะกดในช่อง แล้วเขียนคำ',[
+  {e:'🐟',parts:[{k:'c',s:'ปล'},{k:'v',s:'า'}],ans:'ปลา',ex:true,g:'ปลา · fish'},
+  {e:'🍽️',parts:[{k:'c',s:''},{k:'v',s:''},{k:'f',s:''}],g:'จาน · plate'},
+  {e:'⭐',parts:[{k:'c',s:''},{k:'v',s:''},{k:'f',s:''}],g:'ดาว · star'},
+  {e:'👄',parts:[{k:'c',s:''},{k:'v',s:''},{k:'f',s:''}],g:'ปาก · mouth'},
+  {e:'😋',parts:[{k:'c',s:''},{k:'v',s:''},{k:'f',s:''}],g:'กิน · eat'},
+  {e:'🐴',parts:[{k:'c',s:''},{k:'v',s:''},{k:'t',s:''}],g:'ม้า · horse'},
+]));
+
+/* 15 · change the final */
+S.push(W.eqSheet(15,'Swap','Change the final','เปลี่ยนตัวสะกด','Keep ต-า, change the final','พยัญชนะ–สระเดิม เปลี่ยนตัวสะกด แล้วเขียนคำใหม่',[
+  {parts:[{k:'c',s:'ตา'},{k:'f',s:'ก'}],ans:'ตาก',ex:true,g:'ตาก · dry'},
+  {parts:[{k:'c',s:'ตา'},{k:'f',s:'ม'}],g:'ตาม · follow'},
+  {parts:[{k:'c',s:'ตา'},{k:'f',s:'ย'}],g:'ตาย · die'},
+  {parts:[{k:'c',s:'จา'},{k:'f',s:'ก'}],g:'จาก · from'},
+  {parts:[{k:'c',s:'จา'},{k:'f',s:'น'}],g:'จาน · plate'},
+  {parts:[{k:'c',s:'จา'},{k:'f',s:'ม'}],g:'จาม · sneeze'},
+]));
+
+/* 16 · change the vowel */
+S.push(W.eqSheet(16,'Swap','Change the vowel','เปลี่ยนสระ','Keep the consonant, change the vowel','พยัญชนะเดิม เปลี่ยนสระ แล้วเขียนคำ',[
+  {parts:[{k:'c',s:'ก'},{k:'v',s:'า'}],ans:'กา',ex:true,g:'กา · crow'},
+  {parts:[{k:'c',s:'ก'},{k:'v',s:'◌ี'}],g:'กี · (เสียง)'},
+  {parts:[{k:'c',s:'ก'},{k:'v',s:'◌ู'}],g:'กู · (สรรพนาม)'},
+  {parts:[{k:'c',s:'ด'},{k:'v',s:'◌ี'}],g:'ดี · good'},
+  {parts:[{k:'c',s:'ด'},{k:'v',s:'◌ู'}],g:'ดู · look'},
+  {parts:[{k:'c',s:'ม'},{k:'v',s:'า'}],g:'มา · come'},
+]));
+
+/* 17 · sort by มาตรา */
+S.push(W.bucketSheet(17,'Sort','Sort by final','แยกตามมาตราตัวสะกด',
+  'เขียนคำลงช่องตามมาตราตัวสะกด',
+  ['กาง','จาน','ตาม','ปาก','ลิง','ฝน','ยาม','มาก'],
+  [{name:'แม่กง · -ง'},{name:'แม่กน · -น'},{name:'แม่กม · -ม'},{name:'แม่กก · -ก'}]));
+
+/* 18 · picture → choose the word */
+S.push(W.chooseSheet(18,'Read','Choose the word','เลือกคำให้ตรงภาพ','Circle the correct word','ดูภาพ แล้ววงกลมคำที่ถูกต้อง',[
+  {e:'🐟',opts:['ปลา','ปา','ปู']},
+  {e:'🍽️',opts:['จาน','จา','นา']},
+  {e:'⭐',opts:['ดาว','ดา','ดี']},
+  {e:'👄',opts:['ปาก','ปา','ปู']},
+  {e:'😋',opts:['กิน','กา','กี']},
+  {e:'🐴',opts:['ม้า','มา','นา']},
+]));
+
+/* 19 · match word ↔ picture */
+(function(){
+  const data=[{w:'ปลา',e:'🐟'},{w:'จาน',e:'🍽️'},{w:'ดาว',e:'⭐'},{w:'กิน',e:'😋'}];
+  const order=data.map((_,i,a)=>a[(i+2)%a.length]);
+  S.push(W.matchSheet(19,'Match','Word to picture','จับคู่คำกับภาพ',
+    'ลากเส้นจับคู่คำกับภาพ',
+    data.map(p=>p.w),
+    order.map(p=>'<span class="pic emoji">'+W.art(p.e)+'</span>')));
+})();
+
+/* 20 · free build */
+(function(){
+  const cats=[
+    {mk:'◌ง',h:'ตัวสะกด ง · 2 คำ'},{mk:'◌น',h:'ตัวสะกด น · 2 คำ'},
+    {mk:'◌ม',h:'ตัวสะกด ม · 2 คำ'},{mk:'◌ก',h:'ตัวสะกด ก · 2 คำ'},
+    {mk:'◌่',h:'มีวรรณยุกต์ · 2 คำ'},{mk:'✎',h:'คำของหนูเอง · 2 คำ'},
+  ];
+  const slots=cats.map(c=>'<div class="slot"><span class="mk">'+c.mk+'</span><span class="hint-th">'+c.h+'</span><span class="sline"></span></div>').join('');
+  S.push(W.custom(20,'Free build','My own words','ต่อคำของหนูเอง',
+    W.instruct(1,'Build real words','ต่อคำจริงตามหมวดที่กำหนด แล้วเขียนลงช่อง')
+    + '<div class="slot-grid">'+slots+'</div>' + W.extra('เลือกคำที่ชอบ วาดภาพประกอบ')));
+})();
+
+W.render(S);
+W.autoprint();
+</script>
+</body>
+</html>
