@@ -598,7 +598,7 @@ function WorksheetsPage() {
   const [filter, setFilter] = React.useState("All");
   const [lvl, setLvl] = React.useState("all");
   const [sheet, setSheet] = React.useState(null);
-  const filters = ["All", "Tracing", "Blending", "Dictation", "Assessment"];
+  const filters = ["All", "Tracing", "Blending", "Dictation", "Assessment", "Reading"];
   // The Beginner worksheets live in a single printable 20-page file; each card
   // jumps to its page (#sN) and Print opens the whole pack (?print=1).
   const WS_FILE = "activity-worksheet-beginner.html";
@@ -618,6 +618,11 @@ function WorksheetsPage() {
     { en: "Sound Dictation", th: "เขียนตามคำบอก", type: "Dictation", level: "intermediate", file: "activity-sound-dictation.html", page: 1, preview: ["1", "2", "3"] },
     { en: "Tone Mark Tracing", th: "คัดวรรณยุกต์", type: "Tracing", level: "advanced", file: "activity-tone-mark-tracing.html", page: 1, preview: ["◌่", "◌้", "◌๊"] },
     { en: "Unit Check", th: "ทดสอบท้ายหน่วย", type: "Assessment", level: "advanced", file: "activity-unit-check.html", page: 1, preview: ["A", "B", "C"] },
+    // Comprehension · ป.4–6 (read-to-learn) — Reading & Writing pack
+    { en: "Reading · Fluency", th: "อ่านคล่อง (ป.4–6)", type: "Reading", level: "comprehension", file: "activity-reading-comprehension.html", page: 1, preview: ["อ่าน", "ซ้ำ"] },
+    { en: "Reading · Vocabulary", th: "คลังคำ (ป.4–6)", type: "Reading", level: "comprehension", file: "activity-reading-comprehension.html", page: 6, preview: ["คำ", "พ้อง"] },
+    { en: "Reading · Comprehension", th: "จับใจความ (ป.4–6)", type: "Reading", level: "comprehension", file: "activity-reading-comprehension.html", page: 12, preview: ["จับ", "ใจความ"] },
+    { en: "Reading · Writing", th: "การเขียน (ป.4–6)", type: "Reading", level: "comprehension", file: "activity-reading-comprehension.html", page: 18, preview: ["เขียน", "เรียงความ"] },
   ];
   const sheetFile = (s) => s.file || WS_FILE;
   const sheetHref = (s) => s.page ? sheetFile(s) + "#s" + s.page : null;
@@ -643,7 +648,7 @@ function WorksheetsPage() {
               : <Placeholder label="worksheet preview" h={150} />}
             <h3>{s.en}<span className="th">{s.th}</span></h3>
             <div className="item-meta">
-              {s.level && <span className="tag">{s.level === "beginner" ? "Beginner" : s.level === "intermediate" ? "Intermediate" : "Advanced"}</span>}
+              {s.level && <span className="tag">{s.level === "beginner" ? "Beginner" : s.level === "intermediate" ? "Intermediate" : s.level === "comprehension" ? "ป.4–6" : "Advanced"}</span>}
               <span className="tag earth">{s.type}</span>
             </div>
             <div className="item-actions">

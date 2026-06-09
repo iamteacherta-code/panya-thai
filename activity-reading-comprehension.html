@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · Worksheets — Reading &amp; Writing (ป.4–6)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="activity-base.css" />
+<style>
+  .passage{border:1.6px solid var(--line);border-radius:14px;background:var(--surface);padding:15px 20px;font-family:var(--font-thai);font-size:21px;line-height:1.95;color:var(--ink);}
+  .passage .ttl{font-family:var(--font-ui);font-size:14px;font-weight:800;color:var(--earth-d);margin-bottom:8px;letter-spacing:.02em;}
+  .passage p{margin:0 0 8px;}
+  .passage.poem{text-align:center;line-height:2.2;}
+  .wlines{display:flex;flex-direction:column;gap:25px;margin-top:12px;padding:4px 2px;}
+  .wlines .wl{border-bottom:1.9px dotted var(--line-2);}
+  .rtable{width:100%;border-collapse:collapse;margin-top:8px;font-family:var(--font-thai);}
+  .rtable th,.rtable td{border:1.5px solid var(--line);padding:8px 12px;font-size:18px;text-align:center;}
+  .rtable th{background:var(--leaf-l);color:var(--leaf-d);font-weight:700;}
+  .frame{border:1.6px solid var(--line);border-radius:14px;background:var(--surface);padding:12px 16px;margin-bottom:10px;}
+  .frame .fh{font-family:var(--font-thai);font-weight:700;color:var(--earth-d);font-size:15px;margin-bottom:4px;}
+  .q .qline{min-height:26px;}
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <a class="btn btn-home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก · Home</a>
+  <div class="tb-title">PANYA · Worksheets <small>Reading &amp; Writing · อ่านเพื่อเรียนรู้ — ป.4–6</small></div>
+  <span class="spacer"></span>
+  <span class="hint">20 หน้า · พิมพ์ลงกระดาษ A4</span>
+  <button class="btn btn-primary" onclick="window.print()">🖨️ พิมพ์ / Print</button>
+</div>
+<div class="sheets" id="sheets"></div>
+
+<script src="activity-art.js"></script>
+<script src="activity-ws.js"></script>
+<script>
+window.WSMETA = { eyebrow:'Reading &amp; Writing', level:'Comprehension · ป.4–6', levelClass:'',
+  footTh:'PANYA Thai Foundation · อ่านเพื่อเรียนรู้ — Reading &amp; Writing (ป.4–6)' };
+const W = window.WS;
+const S = [];
+const passage = (ttl, paras, cls) => '<div class="passage'+(cls?' '+cls:'')+'"><div class="ttl">'+ttl+'</div>'+paras.map(p=>'<p>'+p+'</p>').join('')+'</div>';
+const qa = (items) => '<div class="qlist">'+items.map((it,i)=>
+  '<div class="q"><div class="qh"><span class="qn">'+(i+1)+'</span><span>'+it.q+'</span></div>'
+  +(it.opts?'<div class="qbody">'+it.opts.map(o=>'<span class="opt">'+o+'</span>').join('')+'</div>'
+           :'<div class="qbody"><span class="qline"></span></div>')+'</div>').join('')+'</div>';
+const wlines = (n) => { let s='<div class="wlines">'; for(let i=0;i<n;i++) s+='<span class="wl"></span>'; return s+'</div>'; };
+const P = (no,kind,en,th,body) => S.push(W.custom(no,kind,en,th,body));
+
+/* ===================== PHASE 7 · FLUENCY (อ่านคล่อง) ===================== */
+/* 1 */ P(1,'Fluency','Read it again — อ่านซ้ำให้คล่อง','C1',
+  W.instruct(1,'Read aloud 3 times','อ่านออกเสียง 3 รอบ ให้คล่องและเร็วขึ้นในแต่ละรอบ')
+  + passage('ต้นไม้ของพี่กับน้อง',[
+    'พี่กับน้องช่วยกันปลูกต้นไม้ที่หลังบ้าน ทุกเช้าน้องรดน้ำ ส่วนพี่พรวนดินและถอนหญ้า',
+    'ไม่นานต้นไม้ก็ออกดอกสีเหลืองสวยงาม นกตัวเล็กบินมาเกาะและร้องเพลงทุกวัน',
+    'พี่กับน้องดีใจมากที่ต้นไม้ของพวกเขาเติบโต'])
+  + '<div class="note-th">บันทึกเวลาอ่าน (วินาที): รอบ 1 ______ · รอบ 2 ______ · รอบ 3 ______</div>'
+  + W.instruct(2,'Answer','ตอบคำถามจากเรื่อง')
+  + qa([{q:'ใครรดน้ำต้นไม้ทุกเช้า?'},{q:'ต้นไม้ออกดอกสีอะไร?'},{q:'ตั้งชื่อเรื่องนี้ใหม่ 1 ชื่อ'}])
+  + W.extra('อ่านให้ผู้ปกครองฟัง แล้วให้เซ็นชื่อรับรอง'));
+
+/* 2 */ P(2,'Fluency','Read in phrases — อ่านเป็นวลี','C2–C3',
+  W.instruct(1,'Mark the phrases','ขีด / แบ่งคำเป็นวลี แล้วอ่านเว้นจังหวะให้เป็นธรรมชาติ')
+  + passage('วันหยุดที่ทะเล',[
+    'วันหยุด ครอบครัวของฉันไปเที่ยวทะเล เราเล่นน้ำ ก่อปราสาททราย และเก็บเปลือกหอย',
+    'ตอนเย็น เรานั่งดูพระอาทิตย์ตก ท้องฟ้าเป็นสีส้มสวยมาก ฉันมีความสุขที่สุด'])
+  + W.instruct(2,'Add punctuation','เติมเครื่องหมายวรรคตอนและช่องว่างให้อ่านง่ายขึ้น แล้วอ่านอีกครั้ง')
+  + qa([{q:'ครอบครัวไปเที่ยวที่ไหน?'},{q:'ตอนเย็นพวกเขาทำอะไร?'}])
+  + W.extra());
+
+/* 3 */ P(3,'Fluency','Read with rhythm — ทำนองเสนาะ','C4',
+  W.instruct(1,'Read aloud with rhythm','อ่านบทร้อยกรองตามจังหวะ เคาะมือเบา ๆ ทุกวรรค แล้วขีดเส้นแบ่งวรรค')
+  + passage('บทอาขยานสั้น — เด็กดี',[
+    'เด็กเอ๋ยเด็กดี &nbsp; ต้องมีน้ำใจ',
+    'ขยันเรียนไป &nbsp; ไม่เกียจไม่คร้าน',
+    'รักพ่อรักแม่ &nbsp; ดูแลบ้านงาน',
+    'เพื่อนพ้องสุขสานต์ &nbsp; แบ่งปันด้วยใจ'], 'poem')
+  + W.instruct(2,'Talk about it','คุยกับเพื่อน: บทนี้สอนให้เราเป็นเด็กแบบไหน?')
+  + qa([{q:'เด็กดีควรมีสิ่งใด? (ตอบ 2 อย่าง)'},{q:'หาคำที่สัมผัส (คล้องจอง) กัน 1 คู่'}])
+  + W.extra());
+
+/* 4 */ P(4,'Fluency','Break the syllables — แบ่งพยางค์','C5–C6',
+  W.instruct(1,'Split into syllables','ขีด - แบ่งพยางค์ แล้วอ่านออกเสียงทีละพยางค์')
+  + qa([
+    {q:'มะละกอ →', opts:['___ - ___ - ___']},
+    {q:'โรงเรียน →', opts:['___ - ___']},
+    {q:'สวนสัตว์ →', opts:['___ - ___']},
+    {q:'ห้องสมุด →', opts:['___ - ___']},
+    {q:'นักเรียน →', opts:['___ - ___']},
+    {q:'ผลไม้ →', opts:['___ - ___']},
+  ])
+  + W.instruct(2,'Read the cluster words','อ่านคำควบไม่แท้ (ทร อ่านเป็น ซ) ให้ถูกต้อง')
+  + '<div class="wordwall" style="font-size:30px">'+['ทราย','ทรง','จริง','เศร้า','สร้าง','ไซร้'].map(w=>'<span class="w">'+w+'</span>').join('')+'</div>');
+
+/* 5 */ P(5,'Fluency','Leading consonants — อักษรนำ','C7–C8',
+  W.instruct(1,'Read the อ-นำ-ย words','อ่าน 4 คำที่ อ นำ ย (อ ไม่ออกเสียง)')
+  + '<div class="wordwall" style="font-size:32px">'+['อย่า','อยู่','อย่าง','อยาก'].map(w=>'<span class="w">'+w+'</span>').join('')+'</div>'
+  + W.instruct(2,'Read two-syllable leaders','อ่านอักษรนำที่ออกเสียง 2 พยางค์ แล้วขีดแบ่งพยางค์')
+  + qa([
+    {q:'ขนม →', opts:['ขะ - หฺนม']},
+    {q:'สนาม →', opts:['สะ - หฺนาม']},
+    {q:'ตลาด →', opts:['ตะ - หฺลาด']},
+    {q:'ฉลาด →', opts:['ฉะ - หฺลาด']},
+  ])
+  + W.extra());
+
+/* ===================== PHASE 8 · VOCABULARY (คลังคำ) ===================== */
+/* 6 */ (function(){
+  const left=['การ','กาล','ใต้','ไต้','พาน'];
+  const right=['งาน, สิ่งที่ทำ','เวลา','ทิศทางข้างล่าง','คบไฟ','ภาชนะมีเชิง'];
+  S.push(W.matchSheet(6,'Vocabulary','Homophones — คำพ้องเสียง','C9',
+    'ลากเส้นจับคู่คำกับความหมาย (คำเสียงเหมือนแต่เขียน/ความหมายต่าง)', left, right,
+    {note:'คำพ้องเสียง: ออกเสียงเหมือนกัน แต่เขียนและความหมายต่างกัน', extra:'แต่งประโยคจากคำพ้องเสียง 1 คู่'}));
+})();
+
+/* 7 */ P(7,'Vocabulary','Homographs — คำพ้องรูป','C10',
+  W.instruct(1,'Choose the meaning','คำพ้องรูปเขียนเหมือนกัน แต่อ่าน/แปลต่างตามบริบท — วงกลมความหมายที่ถูก')
+  + qa([
+    {q:'“เพลา” ในประโยค “เพลาเย็นอากาศสบาย”', opts:['เวลา','แกนล้อ']},
+    {q:'“เพลา” ในประโยค “เพลารถม้าหัก”', opts:['เวลา','แกนล้อ']},
+    {q:'“สระ” ในประโยค “เด็กว่ายน้ำในสระ”', opts:['ที่เก็บน้ำ','สระภาษาไทย']},
+    {q:'“สระ” ในประโยค “ก ไม่มีสระอ่านไม่ได้”', opts:['ที่เก็บน้ำ','สระภาษาไทย']},
+  ])
+  + W.extra());
+
+/* 8 */ P(8,'Vocabulary','Tricky spelling — คำที่มักเขียนผิด','C11–C12',
+  W.instruct(1,'Circle the correct spelling','วงกลมคำที่สะกดถูกต้อง')
+  + qa([
+    {q:'ขออนุญาต →', opts:['อนุญาต','อนุญาติ']},
+    {q:'สังเกตการณ์ →', opts:['สังเกต','สังเกตุ']},
+    {q:'ผัด___ไก่ →', opts:['กะเพรา','กระเพรา']},
+    {q:'จำนวน___ →', opts:['โควตา','โควต้า']},
+    {q:'อาหารจาน___ →', opts:['ผัดไทย','ผัดไท']},
+  ])
+  + W.instruct(2,'Read loanwords','อ่านคำทับศัพท์/คำยืม')
+  + '<div class="wordwall" style="font-size:24px">'+['ฟุตบอล','คอมพิวเตอร์','เทคโนโลยี','ช็อกโกแลต'].map(w=>'<span class="w">'+w+'</span>').join('')+'</div>'
+  + W.extra());
+
+/* 9 */ P(9,'Vocabulary','Compound words — คำประสม','C13',
+  W.instruct(1,'Make compound words','รวมคำมูล 2 คำเป็นคำประสม แล้วเขียนความหมายสั้น ๆ')
+  + qa([
+    {q:'แม่ + น้ำ → ________ แปลว่า'},
+    {q:'รถ + ไฟ → ________ แปลว่า'},
+    {q:'พ่อ + ครัว → ________ แปลว่า'},
+    {q:'น้ำ + ตา → ________ แปลว่า'},
+    {q:'ไฟ + ฟ้า → ________ แปลว่า'},
+  ])
+  + W.extra('คิดคำประสมของหนูเองอีก 2 คำ'));
+
+/* 10 */ (function(){
+  S.push(W.bucketSheet(10,'Vocabulary','Word building — คำซ้ำ/คำซ้อน','C14–C15',
+    'อ่านคำ แล้วเขียนลงช่องว่าเป็น “คำซ้ำ” หรือ “คำซ้อน”',
+    ['เด็ก ๆ','บ้านเรือน','เร็ว ๆ','เสื้อผ้า','ช้า ๆ','มากมาย'],
+    [{name:'คำซ้ำ (ใช้ ๆ)'},{name:'คำซ้อน (ความหมายใกล้กัน)'}],
+    {note:'เพิ่มเติม: คำสมาส อ่านมีเสียงเชื่อม เช่น วิทยาศาสตร์ ประวัติศาสตร์ ราชการ', extra:'อ่านคำสมาส 3 คำ แล้วแบ่งเป็นคำเดิม'}));
+})();
+
+/* 11 */ (function(){
+  const left=['กิน','นอน','ตา','ผม'];
+  const right=['เสวย / รับประทาน','บรรทม','พระเนตร','พระเกศา'];
+  S.push(W.matchSheet(11,'Vocabulary','Royal &amp; idioms — ราชาศัพท์/สำนวน','C16–C18',
+    'ลากเส้นจับคู่คำสามัญกับราชาศัพท์',left,right,
+    {note:'สำนวน-สุภาษิต: “น้ำขึ้นให้รีบตัก” = รีบทำเมื่อมีโอกาส · “ชักแม่น้ำทั้งห้า” = พูดยืดยาวกว่าจะเข้าเรื่อง',
+     extra:'เลือกสำนวน 1 สำนวน อธิบายความหมายและวาดภาพ'}));
+})();
+
+/* ===================== PHASE 9 · COMPREHENSION (จับใจความ) ===================== */
+/* 12 */ P(12,'Comprehension','Read &amp; understand — จับใจความ','C19·C21',
+  W.instruct(1,'Read the story','อ่านเรื่องแล้วตอบคำถาม')
+  + passage('เด็กเลี้ยงแกะ',[
+    'เด็กเลี้ยงแกะคนหนึ่งชอบโกหก เขาตะโกนว่า “หมาป่ามา!” ทั้งที่ไม่มีหมาป่า',
+    'ชาวบ้านรีบวิ่งมาช่วย แต่ไม่เจออะไรเลย เด็กทำเช่นนี้หลายครั้งจนชาวบ้านเอือมระอา',
+    'วันหนึ่งหมาป่ามาจริง ๆ เด็กตะโกนขอความช่วยเหลือ แต่ไม่มีใครเชื่อเขาอีกต่อไป'])
+  + qa([
+    {q:'ทำไมตอนหลังชาวบ้านไม่มาช่วยเด็ก?'},
+    {q:'เรื่องนี้สอนอะไร (ข้อคิด)?'},
+    {q:'ตั้งชื่อเรื่องนี้ใหม่ 1 ชื่อ'},
+  ]));
+
+/* 13 */ P(13,'Comprehension','Main idea — ใจความสำคัญ','C20·C22',
+  W.instruct(1,'Find the main idea','อ่านย่อหน้า แล้วเลือกใจความสำคัญ และเขียนสรุป 1 ประโยค')
+  + passage('ประโยชน์ของการออกกำลังกาย',[
+    'การออกกำลังกายมีประโยชน์มาก ช่วยให้ร่างกายแข็งแรง ไม่ค่อยเจ็บป่วย',
+    'นอกจากนี้ยังช่วยให้อารมณ์ดี นอนหลับสบาย และมีสมาธิในการเรียนมากขึ้น'])
+  + qa([
+    {q:'ใจความสำคัญของเรื่องคือข้อใด', opts:['การออกกำลังกายมีประโยชน์','การนอนหลับ','การเรียนหนังสือ']},
+    {q:'เขียนสรุปเรื่องนี้เป็น 1 ประโยค'},
+  ])
+  + W.extra());
+
+/* 14 */ P(14,'Comprehension','Sequence — ลำดับเหตุการณ์','C23',
+  W.instruct(1,'Number the steps','ใส่หมายเลข 1–5 หน้าข้อ เรียงลำดับการปลูกต้นไม้ให้ถูกต้อง')
+  + qa([
+    {q:'____ รดน้ำทุกวันจนต้นไม้โต'},
+    {q:'____ ขุดหลุมในดิน'},
+    {q:'____ หาเมล็ดพันธุ์และเตรียมดิน'},
+    {q:'____ กลบดินและรดน้ำครั้งแรก'},
+    {q:'____ หยอดเมล็ดลงในหลุม'},
+  ])
+  + W.extra('เขียนเล่าวิธีทำสิ่งที่หนูถนัด เป็นขั้นตอน 1–4'));
+
+/* 15 */ (function(){
+  const left=['ฝนตกหนัก','ตั้งใจอ่านหนังสือ','ลืมตั้งนาฬิกาปลุก','ไม่ทานข้าวเช้า'];
+  const right=['จึงสอบได้คะแนนดี','จึงตื่นสาย','จึงหิวระหว่างเรียน','จึงถนนเปียกและน้ำท่วม'];
+  S.push(W.matchSheet(15,'Comprehension','Cause &amp; effect — เหตุและผล','C24–C25',
+    'ลากเส้นจับคู่ “เหตุ” กับ “ผล” ให้สมเหตุสมผล',left,right,
+    {note:'คำเชื่อมเหตุ-ผล: เพราะ · จึง · ดังนั้น', extra:'อ่านครึ่งเรื่องแล้วเขียนคาดเดาตอนจบ 1–2 ประโยค'}));
+})();
+
+/* 16 */ P(16,'Comprehension','Fact or opinion — ข้อเท็จจริง/ข้อคิดเห็น','C26–C27',
+  W.instruct(1,'Mark F or O','เขียน ✔ ในช่อง — ข = ข้อเท็จจริง, ค = ข้อคิดเห็น')
+  + qa([
+    {q:'น้ำเดือดที่อุณหภูมิ 100 องศาเซลเซียส', opts:['ข้อเท็จจริง','ข้อคิดเห็น']},
+    {q:'ส้มอร่อยกว่าทุกผลไม้', opts:['ข้อเท็จจริง','ข้อคิดเห็น']},
+    {q:'หนึ่งสัปดาห์มี 7 วัน', opts:['ข้อเท็จจริง','ข้อคิดเห็น']},
+    {q:'หนังเรื่องนี้สนุกที่สุด', opts:['ข้อเท็จจริง','ข้อคิดเห็น']},
+  ])
+  + W.instruct(2,'Author purpose','ผู้เขียนต้องการอะไร — เล่า / ให้ความรู้ / โน้มน้าว')
+  + qa([{q:'โฆษณาขนม → จุดประสงค์ผู้เขียนคือ', opts:['เล่า','ให้ความรู้','โน้มน้าว']}])
+  + W.extra());
+
+/* 17 */ P(17,'Comprehension','Read real data — อ่านตาราง','C28',
+  W.instruct(1,'Read the menu, then answer','อ่านเมนูอาหาร แล้วตอบคำถามจากตาราง')
+  + '<table class="rtable"><thead><tr><th>เมนู</th><th>ราคา (บาท)</th></tr></thead><tbody>'
+    +'<tr><td>ข้าวผัด</td><td>๔๐</td></tr>'
+    +'<tr><td>ก๋วยเตี๋ยว</td><td>๓๕</td></tr>'
+    +'<tr><td>ส้มตำ</td><td>๓๐</td></tr>'
+    +'<tr><td>น้ำส้ม</td><td>๒๐</td></tr></tbody></table>'
+  + qa([
+    {q:'ก๋วยเตี๋ยวราคาเท่าไร?'},
+    {q:'เมนูใดถูกที่สุด?'},
+    {q:'ซื้อข้าวผัด 1 จาน กับน้ำส้ม 1 แก้ว ต้องจ่ายกี่บาท?'},
+  ])
+  + W.extra());
+
+/* ===================== PHASE 10 · WRITING (การเขียน) ===================== */
+/* 18 */ P(18,'Writing','Summarise — ย่อความ','C29',
+  W.instruct(1,'Read, then summarise','อ่านเรื่อง แล้วย่อความให้เหลือใจความสำคัญ 2–3 บรรทัด')
+  + passage('ช้างเพื่อนรัก',[
+    'ช้างเป็นสัตว์ใหญ่ที่ฉลาดและใจดี สมัยก่อนคนไทยใช้ช้างลากไม้และออกศึกสงคราม',
+    'ช้างจำเจ้าของได้และมีความผูกพันกับคน ปัจจุบันเราช่วยกันอนุรักษ์ช้างไม่ให้สูญพันธุ์'])
+  + W.instruct(2,'Write your summary','เขียนย่อความของหนู')
+  + wlines(3)
+  + W.extra());
+
+/* 19 */ P(19,'Writing','Plan an essay — เรียงความ','C30–C32',
+  W.instruct(1,'Plan, then write','วางโครงเรื่อง หัวข้อ “สัตว์เลี้ยงที่ฉันรัก” แล้วเขียนตามโครง')
+  + '<div class="frame"><div class="fh">๑ คำนำ (เกริ่นนำ)</div>'+wlines(2)+'</div>'
+  + '<div class="frame"><div class="fh">๒ เนื้อเรื่อง (เล่ารายละเอียด)</div>'+wlines(3)+'</div>'
+  + '<div class="frame"><div class="fh">๓ สรุป (ความรู้สึก/ข้อคิด)</div>'+wlines(2)+'</div>');
+
+/* 20 */ P(20,'Writing','Letter &amp; book review — จดหมาย/รีวิว','C33–C36',
+  W.instruct(1,'Write a short letter','เขียนจดหมายสั้นถึงเพื่อน')
+  + '<div class="frame"><div class="fh">เรียน (ถึง) ____________</div>'+wlines(3)+'<div class="fh" style="text-align:right;margin-top:6px">ด้วยความระลึกถึง ____________</div></div>'
+  + W.instruct(2,'My book review','รีวิวหนังสือที่อ่าน — โครงงานรักการอ่าน')
+  + '<table class="rtable"><tbody>'
+    +'<tr><th style="width:34%">ชื่อหนังสือ</th><td></td></tr>'
+    +'<tr><th>ตัวละครที่ชอบ</th><td></td></tr>'
+    +'<tr><th>ข้อคิดที่ได้</th><td></td></tr>'
+    +'<tr><th>ให้คะแนน (ดาว)</th><td>☆ ☆ ☆ ☆ ☆</td></tr></tbody></table>');
+
+W.render(S);
+W.autoprint();
+</script>
+</body>
+</html>
