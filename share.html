@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · Share / แชร์</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="activity-base.css" />
+<style>
+  body{display:flex;flex-direction:column;align-items:center;}
+  .poster{width:210mm;min-height:auto;background:#fff;border:1px solid var(--line);border-radius:18px;
+    box-shadow:0 2px 6px rgba(60,48,28,.08),0 22px 50px -22px rgba(60,48,28,.30);
+    margin:26px 14px 60px;padding:30mm 18mm;display:flex;flex-direction:column;align-items:center;text-align:center;}
+  .p-brand{display:flex;align-items:center;gap:14px;margin-bottom:6px;}
+  .p-brand img{width:64px;height:64px;object-fit:contain;}
+  .p-brand .bn{font-weight:800;font-size:30px;letter-spacing:.26em;line-height:1;}
+  .p-brand .bs{font-size:13px;color:var(--ink-3);letter-spacing:.05em;margin-top:3px;text-align:left;}
+  .p-eyebrow{font-size:12px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--earth-d);margin-top:18px;}
+  .p-title{font-size:34px;font-weight:800;margin:6px 0 2px;}
+  .p-title .th{display:block;font-family:var(--font-thai);font-weight:500;font-size:22px;color:var(--ink-2);margin-top:4px;}
+  .p-sub{font-family:var(--font-thai);color:var(--ink-3);font-size:15px;max-width:460px;margin:10px 0 0;line-height:1.6;}
+  .qr-frame{margin:26px 0 8px;padding:20px;background:var(--leaf-l);border:2px solid var(--leaf);border-radius:24px;}
+  .qr-frame img{display:block;width:300px;height:300px;image-rendering:pixelated;}
+  .scan{font-family:var(--font-thai);color:var(--leaf-d);font-weight:700;font-size:16px;margin-top:4px;}
+  .scan span{color:var(--ink-3);font-weight:500;font-size:13px;display:block;}
+  .linkrow{display:flex;align-items:center;gap:10px;margin-top:22px;flex-wrap:wrap;justify-content:center;}
+  .urlbox{font-family:var(--font-ui);font-weight:700;font-size:16px;color:var(--ink);background:var(--surface);
+    border:1.6px solid var(--line-2);border-radius:999px;padding:11px 20px;user-select:all;}
+  .p-foot{margin-top:26px;font-family:var(--font-thai);color:var(--ink-3);font-size:13px;line-height:1.7;}
+  .p-foot b{color:var(--ink-2);}
+  .tags{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:14px;}
+  .tags .tag{font-family:var(--font-thai);font-size:13px;font-weight:700;background:var(--earth-l);color:var(--earth-d);border-radius:999px;padding:5px 14px;}
+  @media print{
+    @page{size:A4;margin:0;}
+    body{background:#fff;background-image:none;}
+    .toolbar{display:none !important;}
+    .poster{box-shadow:none;border:none;border-radius:0;margin:0;width:210mm;min-height:297mm;justify-content:center;}
+  }
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <a class="btn btn-home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก · Home</a>
+  <div class="tb-title">PANYA · Share <small>แชร์เว็บไซต์ให้ครูและนักเรียน</small></div>
+  <span class="spacer"></span>
+  <button class="btn" id="copyBtn">📋 คัดลอกลิงก์ · Copy</button>
+  <button class="btn btn-primary" onclick="window.print()">🖨️ พิมพ์ / Print</button>
+</div>
+
+<div class="poster">
+  <div class="p-brand">
+    <img src="images/panya-logo.png" alt="PANYA"
+         onerror="this.style.display='none'" />
+    <div><div class="bn">PANYA</div><div class="bs">Thai Foundation</div></div>
+  </div>
+
+  <div class="p-eyebrow">Thai Literacy Studio</div>
+  <h1 class="p-title">Learn to read Thai online
+    <span class="th">เรียนอ่านภาษาไทยออนไลน์</span></h1>
+  <p class="p-sub">สแกน QR หรือเปิดลิงก์ด้านล่างเพื่อใช้กระดานประสมคำ บทเรียน และใบงานพิมพ์ได้กว่า 120 หน้า ได้ทุกที่ ทุกอุปกรณ์</p>
+
+  <div class="qr-frame"><img src="panya-qr.svg" alt="QR code · PANYA Thai Foundation" /></div>
+  <div class="scan">📱 สแกนเพื่อเปิดเว็บไซต์ <span>scan to open the website</span></div>
+
+  <div class="linkrow">
+    <span class="urlbox" id="url">https://iamteacherta-code.github.io/panya-thai/</span>
+  </div>
+
+  <div class="tags">
+    <span class="tag">Blending Board</span><span class="tag">Word Work Mat</span>
+    <span class="tag">Lessons</span><span class="tag">Activity Sheets</span><span class="tag">Worksheets</span>
+  </div>
+
+  <div class="p-foot">
+    <b>เปิดได้ทุกอุปกรณ์</b> — มือถือ แท็บเล็ต คอมพิวเตอร์ · ไม่ต้องติดตั้งอะไร<br>
+    Panyaden International School · Chiang Mai
+  </div>
+</div>
+
+<script>
+  const url = document.getElementById('url').textContent.trim();
+  const btn = document.getElementById('copyBtn');
+  btn.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(url); btn.textContent = '✓ คัดลอกแล้ว'; }
+    catch (e) { btn.textContent = '✓ ' + url; }
+    setTimeout(() => { btn.textContent = '📋 คัดลอกลิงก์ · Copy'; }, 2000);
+  });
+</script>
+</body>
+</html>

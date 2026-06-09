@@ -61,6 +61,7 @@ function HomePage({ go }) {
             <Ico name="board" style={{ width: 18, height: 18 }} /> Open Blending Board
           </button>
           <button className="btn btn-ghost" onClick={() => go("lesson")}>View the lesson sequence</button>
+          <a className="btn btn-ghost" href="share.html">📱 แชร์ · Share</a>
         </div>
       </div>
 
