@@ -259,7 +259,7 @@
   function openUnit(uid){
     view='detail'; const u=uById[uid]; const lv=lvById[u.level];
     const items=lessonsByUnit[uid];
-    hubEl.style.display='none'; detEl.style.display='';
+    hubEl.style.display='none'; detEl.style.display='block';
     detEl.style.setProperty('--dc',u.color);
     detEl.innerHTML='<div class="crumb"><button class="back" id="backBtn">← กล่องเครื่องมือ</button>'+
       '<span class="sep">/</span><span class="here">'+esc(lv.label)+' · '+esc(lv.th)+'</span></div>'+
@@ -276,7 +276,7 @@
 
   // ---- SEARCH RESULTS ----
   function renderSearch(){
-    view='search'; hubEl.style.display='none'; detEl.style.display='';
+    view='search'; hubEl.style.display='none'; detEl.style.display='block';
     detEl.style.setProperty('--dc',var_accent());
     const hits=LESSONS.filter(l=>matches(l) && (active==='all'|| (uById[l.unitId]&&uById[l.unitId].level===active)));
     detEl.innerHTML='<div class="detail-head" style="--dc:var(--accent)"><span class="tag" style="background:var(--accent)">ผลการค้นหา</span><h2>“'+esc(query)+'”</h2><p>พบ '+hits.length+' บทเรียนที่ตรงกับคำค้น</p></div>';
