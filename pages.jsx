@@ -321,6 +321,13 @@ function LessonsPage({ grade }) {
     <div>
       <PageHead eyebrow="Scope & Sequence" en="Lessons" th="บทเรียน"
         sub="ลำดับการสอนแบบเป็นระบบ (UFLI-style) — เลือกระดับเพื่อดูหน่วยและบทเรียน" />
+      <div className="lessons-cta">
+        <span className="lc-txt">
+          ดูหลักสูตรเต็มทุกบท ทุกช่วงชั้น <b>K2–ป.6</b> (174 บท · 4 ระดับ) พร้อมจุดประสงค์ คำตัวอย่าง และกิจกรรม
+          <span className="th"> · รวมสาย “อ่านเพื่อเรียนรู้” ป.4–6</span>
+        </span>
+        <a className="btn btn-sm btn-leaf" href="curriculum.html">📚 Full Scope &amp; Sequence →</a>
+      </div>
       <LevelBar value={lvl} onChange={setLvl} />
       {grades.map((gid) => {
         const g = THAI.GRADES[gid];

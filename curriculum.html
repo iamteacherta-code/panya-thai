@@ -61,6 +61,20 @@
 
   main{padding:30px 0 80px;}
 
+  /* ---------- LEVEL ↔ GRADE MAP ---------- */
+  .levelmap{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:4px 0 28px;background:var(--paper-2);box-shadow:var(--shadow);}
+  .levelmap .lm-h{font-family:"Kanit";font-weight:600;font-size:1.02rem;padding:13px 16px;border-bottom:1px solid var(--line);}
+  .lm-h small{display:block;font-weight:400;color:var(--ink-soft);font-size:.8rem;margin-top:2px;}
+  .lm-row{display:grid;grid-template-columns:130px 96px 1fr 96px;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);cursor:pointer;font-size:.92rem;background:none;border-left:none;border-right:none;border-top:none;width:100%;text-align:left;font-family:inherit;color:var(--ink);}
+  .lm-row:last-child{border-bottom:none;}
+  .lm-row:hover{background:var(--paper);}
+  .lm-row:focus-visible{outline:3px solid rgba(192,69,61,.3);outline-offset:-3px;}
+  .lm-row .lm-lv{font-family:"Kanit";font-weight:600;color:#fff;padding:4px 10px;border-radius:7px;font-size:.8rem;text-align:center;}
+  .lm-row .lm-grade{font-family:"Kanit";font-weight:700;color:var(--ink);}
+  .lm-row .lm-focus{color:var(--ink-soft);}
+  .lm-row .lm-cnt{font-family:"Kanit";font-size:.82rem;color:var(--ink-soft);text-align:right;}
+  @media(max-width:640px){.lm-row{grid-template-columns:1fr auto;}.lm-row .lm-focus{display:none;}}
+
   /* ---------- HUB (tiles) ---------- */
   .lv-hd{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:30px 0 16px;
     padding-bottom:9px;border-bottom:2px solid var(--lvc);}
@@ -68,6 +82,7 @@
   .lv-hd .b{font-family:"Kanit";font-weight:600;color:#fff;background:var(--lvc);
     padding:3px 11px;border-radius:7px;font-size:.78rem;}
   .lv-hd h2{font-family:"Kanit";font-weight:600;font-size:1.22rem;margin:0;}
+  .lv-hd .lv-grade{font-family:"Kanit";font-weight:600;font-size:.78rem;color:var(--lvc);border:1.4px solid var(--lvc);padding:2px 9px;border-radius:7px;}
   .lv-hd .g{margin-left:auto;font-family:"Kanit";font-size:.83rem;color:var(--ink-soft);}
   .lv-goal{font-size:.92rem;color:var(--ink-soft);margin:-6px 0 16px;max-width:80ch;}
 
@@ -138,7 +153,7 @@
 
 <header class="hero">
   <div class="wrap">
-    <p class="eyebrow">Thai Foundations Toolbox · ปรับจาก UFLI · ระดับประถมต้น (เทียบ K–2)</p>
+    <p class="eyebrow">Thai Foundations Toolbox · ปรับจาก UFLI · อนุบาล–ประถม (K2–ป.6)</p>
     <h1 class="title">กล่องเครื่องมือหลักสูตรการอ่านภาษาไทย<span class="en">Lesson Resources · 138 บทเรียน · 3 ระดับ · 17 หน่วยย่อย</span></h1>
     <div class="bricks" id="bricks" aria-hidden="true"></div>
     <p class="lede">รวมบทเรียนทั้งหมดจัดเป็น “หน่วยย่อย” เพื่อให้เข้าถึงและนำไปสอนได้ง่าย เลือกกลุ่มบทเรียนด้านล่างเพื่อดูรายละเอียดของแต่ละบท ทั้งจุดประสงค์ สิ่งที่สอนใหม่ คำตัวอย่าง และกิจกรรม · หน่วยย่อยจัดเรียงตามลำดับการสอนและแบ่งเป็น 3 ระดับตามหลัก UFLI</p>
@@ -175,6 +190,79 @@
 <script>
 (function(){
   const DATA=JSON.parse(document.getElementById('data').textContent);
+
+  /* ===== ADDED: grade bands + ป.4–6 "read-to-learn" strand =====
+     Appended in JS so the original 138-lesson data stays untouched. */
+  const GRADE_BAND={beginner:"K2–ป.1",intermediate:"ป.2",advanced:"ป.3",comprehension:"ป.4–ป.6"};
+  DATA.levels.push({id:"comprehension",label:"Comprehension",num:"๔",
+    th:"อ่านเพื่อเรียนรู้ · ความเข้าใจและการเขียน",color:"#356859",range:"บท C1–C36 · 36 บท",
+    goal:"อ่านคล่อง เข้าใจความ จับใจความ–สรุป–วิเคราะห์ และเขียนสื่อสารได้",
+    principle:"เปลี่ยนจาก ‘เรียนเพื่ออ่าน’ สู่ ‘อ่านเพื่อเรียนรู้’ — เมื่อถอดรหัสได้คล่องแล้ว เป้าหมายเปลี่ยนเป็นคลังคำ ความเข้าใจ การคิดวิเคราะห์ และการเขียนสื่อสาร ตามแนว Simple View of Reading (การอ่าน = การถอดรหัส × ความเข้าใจภาษา) ช่วงนี้คือ ป.4–6 ที่ต่อยอดจากการถอดรหัสในช่วงต้น"});
+  const cPhases=[
+    {id:"c1",label:"Phase 7 · อ่านคล่อง",short:"Phase 7",range:"บท C1–C8",color:"#2E8B74",level:"comprehension"},
+    {id:"c2",label:"Phase 8 · คลังคำและคำศัพท์",short:"Phase 8",range:"บท C9–C18",color:"#3E8E7E",level:"comprehension"},
+    {id:"c3",label:"Phase 9 · อ่านจับใจความ",short:"Phase 9",range:"บท C19–C28",color:"#356859",level:"comprehension"},
+    {id:"c4",label:"Phase 10 · การเขียนและนำเสนอ",short:"Phase 10",range:"บท C29–C36",color:"#A4476F",level:"comprehension"}
+  ];
+  const cUnits=[
+    {id:"c1-1",phase:"c1",level:"comprehension",title:"อ่านคล่องและถูกต้อง",range:"บท C1–C4",hint:"อ่านซ้ำ อ่านเป็นวลี เว้นวรรค ทำนองเสนาะ",color:"#2E8B74"},
+    {id:"c1-2",phase:"c1",level:"comprehension",title:"คำหลายพยางค์ & อักษรนำ/ควบไม่แท้",range:"บท C5–C8",hint:"แบ่งพยางค์ · ทร→ซ · อ-นำ · อักษรนำ",color:"#2E8B74"},
+    {id:"c2-1",phase:"c2",level:"comprehension",title:"คำพ้องและคำที่มักเขียนผิด",range:"บท C9–C12",hint:"พ้องรูป พ้องเสียง คำยืม",color:"#3E8E7E"},
+    {id:"c2-2",phase:"c2",level:"comprehension",title:"การสร้างคำ",range:"บท C13–C15",hint:"คำมูล ประสม ซ้ำ ซ้อน สมาส",color:"#3E8E7E"},
+    {id:"c2-3",phase:"c2",level:"comprehension",title:"ราชาศัพท์ สำนวน สุภาษิต",range:"บท C16–C18",hint:"คำสุภาพ ราชาศัพท์ สำนวนไทย",color:"#3E8E7E"},
+    {id:"c3-1",phase:"c3",level:"comprehension",title:"ใจความสำคัญและการสรุป",range:"บท C19–C22",hint:"",color:"#356859"},
+    {id:"c3-2",phase:"c3",level:"comprehension",title:"ลำดับเหตุการณ์และเหตุผล",range:"บท C23–C25",hint:"",color:"#356859"},
+    {id:"c3-3",phase:"c3",level:"comprehension",title:"คิดวิเคราะห์และอ่านข้อมูลจริง",range:"บท C26–C28",hint:"ข้อเท็จจริง/ข้อคิดเห็น · ตาราง · ป้าย",color:"#356859"},
+    {id:"c4-1",phase:"c4",level:"comprehension",title:"ย่อความและเรียงความ",range:"บท C29–C32",hint:"",color:"#A4476F"},
+    {id:"c4-2",phase:"c4",level:"comprehension",title:"เขียนสร้างสรรค์และนำเสนอ",range:"บท C33–C36",hint:"เล่าเรื่อง จดหมาย พจนานุกรม โครงงาน",color:"#A4476F"}
+  ];
+  const cUP={},cUT={}; cUnits.forEach(u=>{cUP[u.id]=u.phase;cUT[u.id]=u.title;});
+  const cL=(num,uid,title,o,n,e,a)=>({phase:cUP[uid],group:cUT[uid],num:num,title:title,
+    fields:{"จุดประสงค์":o,"สอนใหม่":n,"คำตัวอย่าง":e,"กิจกรรม":a},unitId:uid});
+  const cLessons=[
+    cL("C1","c1-1","อ่านซ้ำเพื่อความคล่อง","อ่านข้อความเดิมซ้ำจนคล่องและเร็วขึ้น","เทคนิคอ่านซ้ำ 3 รอบ พร้อมจับเวลา","อ่านนิทานสั้น 1 ย่อหน้า ซ้ำ 3 รอบ","อ่านคู่กับเพื่อน จับเวลา บันทึกพัฒนาการ"),
+    cL("C2","c1-1","อ่านเป็นวลี ไม่อ่านทีละคำ","รวมคำเป็นกลุ่มความหมายเพื่ออ่านลื่น","การจัดกลุ่มคำและเว้นจังหวะ","“เด็ก ๆ วิ่งเล่น | ในสนาม”","ขีดแบ่งวลีในประโยคแล้วอ่านออกเสียง"),
+    cL("C3","c1-1","การเว้นวรรคและอ่านตามเครื่องหมาย","เว้นวรรคถูกที่ และอ่านตามจุด/จุลภาค","การเว้นวรรคในภาษาไทย (ไม่เว้นทุกคำ)","ประโยคยาวที่มีวรรคตอน","อ่านออกเสียงเว้นจังหวะตามเครื่องหมาย"),
+    cL("C4","c1-1","อ่านทำนองเสนาะ (ร้อยกรองง่าย)","อ่านบทร้อยกรองตามจังหวะและสัมผัส","จังหวะวรรคและสัมผัสของกาพย์/กลอน","กาพย์ยานี/กลอนสี่บทสั้น","อ่านพร้อมกันเป็นจังหวะ เคาะตามวรรค"),
+    cL("C5","c1-2","แบ่งพยางค์คำหลายพยางค์","อ่านคำยาวโดยแบ่งพยางค์","หลักการแบ่งพยางค์คำยาว","มะ-ละ-กอ · โรง-เรียน · สวน-สัตว์","ตัดพยางค์ด้วยบัตรคำแล้วต่อกลับ"),
+    cL("C6","c1-2","อักษรควบไม่แท้ (ทร → ซ)","อ่านคำควบไม่แท้ให้ถูก","ทร อ่านเป็นเสียง ซ; บางคำ ร ไม่ออกเสียง","ทราย ทรง จริง เศร้า สร้าง","คัดแยกควบแท้ vs ควบไม่แท้"),
+    cL("C7","c1-2","อักษรนำ อ นำ ย","อ่าน 4 คำที่ อ นำ ย ได้ถูก","อ นำ ย มี 4 คำ (อ ไม่ออกเสียง)","อย่า อยู่ อย่าง อยาก","ท่องและเขียน 4 คำ อ นำ ย"),
+    cL("C8","c1-2","อักษรนำ (อ่านสองพยางค์)","อ่านคำอักษรนำที่ออกเสียง 2 พยางค์","อักษรสูง/กลางนำอักษรต่ำ (สะ-หฺมุด)","ขนม สนาม ตลาด ฉลาด","อ่านออกเสียงโดยแยกพยางค์นำ"),
+    cL("C9","c2-1","คำพ้องเสียง","แยกคำเสียงเหมือนแต่เขียน/ความหมายต่าง","พ้องเสียง: เขียนต่าง ความหมายต่าง","การ–กาล · ใต้–ไต้ · พาน–พาล","จับคู่คำพ้องเสียงกับความหมาย"),
+    cL("C10","c2-1","คำพ้องรูป","อ่านคำเขียนเหมือนแต่ออกเสียงต่างตามบริบท","พ้องรูป: รูปเดียว อ่านได้หลายแบบ","เพลา · สระ · แหน","อ่านประโยคแล้วเลือกเสียงให้ถูกบริบท"),
+    cL("C11","c2-1","คำที่มักเขียน/อ่านผิด","สะกดและอ่านคำที่พบผิดบ่อยให้ถูก","คำที่มักผิด","อนุญาต กะเพรา สังเกต ผัดกะเพรา","วงคำที่สะกดถูกจากตัวเลือก"),
+    cL("C12","c2-1","คำยืม/คำทับศัพท์","อ่านคำยืมจากภาษาอื่นที่ใช้บ่อย","คำทับศัพท์อังกฤษและการอ่าน","ฟุตบอล คอมพิวเตอร์ เทคโนโลยี","จับคู่คำทับศัพท์กับภาพ/ความหมาย"),
+    cL("C13","c2-2","คำมูล–คำประสม","สร้างและอ่านคำประสมจากคำมูล","คำประสม = คำมูล 2 คำรวมเป็นความหมายใหม่","แม่น้ำ พ่อครัว รถไฟ น้ำตา","รวมคำมูลให้เป็นคำประสม"),
+    cL("C14","c2-2","คำซ้ำ–คำซ้อน","แยกและใช้คำซ้ำกับคำซ้อน","ซ้ำ (ใช้ ๆ) · ซ้อน (ความหมายใกล้กัน)","เด็ก ๆ เร็ว ๆ · บ้านเรือน เสื้อผ้า","คัดแยกคำซ้ำ/คำซ้อน"),
+    cL("C15","c2-2","คำสมาส (เบื้องต้น)","อ่านคำสมาสที่พบบ่อยให้ถูก","คำบาลี-สันสกฤตรวมกัน (มักอ่านมีเสียง อะ เชื่อม)","วิทยาศาสตร์ ประวัติศาสตร์ ราชการ","อ่านคำสมาสและแบ่งคำเดิม"),
+    cL("C16","c2-3","คำสุภาพและราชาศัพท์เบื้องต้น","เลือกใช้คำสุภาพ/ราชาศัพท์พื้นฐาน","คำสามัญ ↔ คำสุภาพ/ราชาศัพท์","รับประทาน(กิน) บรรทม(นอน) พระเนตร(ตา)","จับคู่คำสามัญกับราชาศัพท์"),
+    cL("C17","c2-3","สำนวนไทย","เข้าใจความหมายของสำนวนที่พบบ่อย","สำนวน = ความหมายไม่ตรงตัว","น้ำขึ้นให้รีบตัก · ชักแม่น้ำทั้งห้า","จับคู่สำนวนกับความหมาย"),
+    cL("C18","c2-3","สุภาษิต–คำพังเพย","อธิบายข้อคิดจากสุภาษิต","สุภาษิตสอนใจและคำพังเพย","รักวัวให้ผูก รักลูกให้ตี","อธิบาย/วาดภาพสุภาษิต 1 บท"),
+    cL("C19","c3-1","ใจความสำคัญของย่อหน้า","บอกใจความสำคัญของย่อหน้าได้","ประโยคใจความหลักในย่อหน้า","ย่อหน้า 4–5 ประโยค","ขีดเส้นใต้ประโยคใจความสำคัญ"),
+    cL("C20","c3-1","ใจความสำคัญ vs รายละเอียด","แยกใจความหลักจากส่วนขยาย","ประโยคหลัก vs ประโยคขยาย","ข้อความตัวอย่างพร้อมรายละเอียด","คัดแยกประโยคหลัก–ประโยคขยาย"),
+    cL("C21","c3-1","ตั้งชื่อเรื่อง/หัวข้อ","ตั้งชื่อเรื่องให้ตรงกับเนื้อหา","ชื่อเรื่องสะท้อนใจความรวม","อ่านเรื่องสั้นแล้วตั้งชื่อ","เลือกหรือเขียนชื่อเรื่องที่เหมาะสม"),
+    cL("C22","c3-1","สรุปความเป็นประโยคเดียว","สรุปเรื่องที่อ่านเป็นประโยคเดียว","การเก็บเฉพาะใจความ","สรุปนิทานเป็น 1 ประโยค","เขียนสรุปนิทานสั้น"),
+    cL("C23","c3-2","เรียงลำดับเหตุการณ์","เรียงเหตุการณ์ก่อน–หลังได้","คำเชื่อม ก่อน จากนั้น สุดท้าย","บัตรเหตุการณ์ในนิทาน","เรียงบัตรเหตุการณ์ตามลำดับ"),
+    cL("C24","c3-2","เหตุและผล","โยงความสัมพันธ์เหตุ–ผลได้","คำเชื่อม เพราะ จึง ดังนั้น","“ฝนตก จึง ถนนเปียก”","จับคู่เหตุกับผล"),
+    cL("C25","c3-2","คาดเดาเรื่องจากเบาะแส","คาดเดาตอนต่อไปอย่างมีเหตุผล","การใช้เบาะแสในเรื่องทำนาย","อ่านครึ่งเรื่องแล้วเดาตอนจบ","เขียนตอนจบของหนูเอง"),
+    cL("C26","c3-3","ข้อเท็จจริง vs ข้อคิดเห็น","แยกข้อเท็จจริงจากความคิดเห็น","ข้อเท็จจริงพิสูจน์ได้ ความเห็นคือความรู้สึก","ประโยคคละข้อเท็จจริง/ความเห็น","คัดแยกประโยค 2 ประเภท"),
+    cL("C27","c3-3","จุดประสงค์ของผู้เขียน","บอกได้ว่าผู้เขียนต้องการเล่า/บอก/ชวนเชื่อ","จุดประสงค์: เล่า ให้ความรู้ โน้มน้าว","ข่าว โฆษณา นิทาน","ดูสื่อแล้วบอกจุดประสงค์"),
+    cL("C28","c3-3","อ่านข้อมูลจริง (ตาราง/ป้าย)","อ่านและตอบคำถามจากข้อมูลจริง","อ่านตาราง แผนภูมิ ป้าย ฉลาก เมนู","ตารางเวร · เมนูอาหาร · ป้ายราคา","ตอบคำถามจากตาราง/ป้าย"),
+    cL("C29","c4-1","ย่อความ","ย่อเรื่องโดยคงใจความสำคัญ","ตัดรายละเอียด เก็บใจความ","ย่อย่อหน้าให้เหลือ 2–3 บรรทัด","ฝึกย่อความจากบทอ่าน"),
+    cL("C30","c4-1","โครงเรื่องเรียงความ","วางโครงคำนำ–เนื้อเรื่อง–สรุป","โครงสร้างเรียงความ 3 ส่วน","ผังโครงเรื่องหัวข้อใกล้ตัว","ทำผังโครงเรื่องก่อนเขียน"),
+    cL("C31","c4-1","เขียนคำนำและสรุป","เขียนคำนำและบทสรุปที่ดึงดูด","หน้าที่ของคำนำและสรุป","คำนำ 1 ย่อหน้า + สรุป 1 ย่อหน้า","เขียนคำนำ/สรุปจากผังเรื่อง"),
+    cL("C32","c4-1","เขียนเรียงความสั้น","เขียนเรียงความ 3 ย่อหน้าจบเรื่อง","ประกอบคำนำ–เนื้อ–สรุปเป็นเรื่องเดียว","หัวข้อ: ครอบครัวของฉัน","เขียนเรียงความ 3 ย่อหน้า"),
+    cL("C33","c4-2","เขียนเล่าเรื่องจากภาพ/ประสบการณ์","เล่าเรื่องเป็นลำดับและน่าสนใจ","การเล่าเรื่องตามลำดับเวลา","เล่าวันหยุดของฉัน","เขียนเล่าเรื่อง 1 หน้า"),
+    cL("C34","c4-2","เขียนจดหมาย/บันทึก","เขียนจดหมายถึงเพื่อนตามรูปแบบ","ส่วนประกอบของจดหมายอย่างง่าย","จดหมายถึงเพื่อน","เขียนจดหมายสั้นถึงเพื่อน"),
+    cL("C35","c4-2","ใช้พจนานุกรม & มารยาทการอ่าน","ค้นความหมายคำในพจนานุกรมได้","การเรียงคำตามพยัญชนะ–สระในพจนานุกรม","ค้นคำ 5 คำที่ไม่รู้ความหมาย","เปิดพจนานุกรมหาความหมาย"),
+    cL("C36","c4-2","โครงงานรักการอ่าน (Capstone)","อ่านหนังสือ 1 เล่มแล้วนำเสนอ","สรุปเรื่อง ตัวละคร ข้อคิด","ทำสมุดรีวิวหนังสือ","อ่าน 1 เล่ม + นำเสนอหน้าชั้น")
+  ];
+  DATA.phases.push.apply(DATA.phases,cPhases);
+  DATA.units.push.apply(DATA.units,cUnits);
+  DATA.lessons.push.apply(DATA.lessons,cLessons);
+  DATA.levels.forEach(function(l){l.grade=GRADE_BAND[l.id]||"";});
+  /* ===== END ADDED ===== */
+
   const LEVELS=DATA.levels, PHASES=DATA.phases, UNITS=DATA.units, LESSONS=DATA.lessons;
   const FIELDS=["จุดประสงค์","สอนใหม่","คำตัวอย่าง","กิจกรรม"];
   const lvById={}; LEVELS.forEach(l=>lvById[l.id]=l);
@@ -227,15 +315,34 @@
     view='hub'; detEl.style.display='none'; detEl.innerHTML=''; hubEl.style.display='';
     render(); window.scrollTo({top:0});
   }
+  function buildLevelMap(){
+    const box=document.createElement('div');box.className='levelmap';
+    let h='<div class="lm-h">🧭 ตารางเทียบระดับ ↔ ชั้น<small>Levels &amp; grade bands — แตะแถวเพื่อกรองระดับนั้น</small></div>';
+    LEVELS.forEach(lv=>{
+      const us=UNITS.filter(u=>u.level===lv.id);
+      const cnt=us.reduce((n,u)=>n+lessonsByUnit[u.id].length,0);
+      h+='<button class="lm-row" type="button" data-lv="'+lv.id+'">'
+        +'<span class="lm-lv" style="background:'+lv.color+'">'+esc(lv.label)+'</span>'
+        +'<span class="lm-grade">'+esc(lv.grade||'')+'</span>'
+        +'<span class="lm-focus">'+esc(lv.goal||'')+'</span>'
+        +'<span class="lm-cnt">'+us.length+' หน่วย · '+cnt+' บท</span></button>';
+    });
+    box.innerHTML=h;
+    box.querySelectorAll('.lm-row').forEach(r=>r.addEventListener('click',()=>{active=r.dataset.lv;syncChips();showHubInner();window.scrollTo({top:0});}));
+    return box;
+  }
   function renderHub(){
     hubEl.innerHTML=''; let shownUnits=0,shownLessons=0;
+    if(active==='all') hubEl.appendChild(buildLevelMap());
     LEVELS.forEach(lv=>{
       if(active!=='all'&&active!==lv.id)return;
       const us=UNITS.filter(u=>u.level===lv.id);
       if(!us.length)return;
       const lessonsInLv=us.reduce((n,u)=>n+lessonsByUnit[u.id].length,0);
       const hd=document.createElement('div');hd.className='lv-hd';hd.style.setProperty('--lvc',lv.color);
-      hd.innerHTML='<span class="b">'+esc(lv.label)+'</span><h2>'+esc(lv.th)+'</h2><span class="g">'+us.length+' หน่วย · '+lessonsInLv+' บท</span>';
+      hd.innerHTML='<span class="b">'+esc(lv.label)+'</span><h2>'+esc(lv.th)+'</h2>'
+        +(lv.grade?'<span class="lv-grade">ชั้น '+esc(lv.grade)+'</span>':'')
+        +'<span class="g">'+us.length+' หน่วย · '+lessonsInLv+' บท</span>';
       hubEl.appendChild(hd);
       const goal=document.createElement('p');goal.className='lv-goal';goal.textContent='เป้าหมาย: '+lv.goal;hubEl.appendChild(goal);
       const grid=document.createElement('div');grid.className='tilegrid';
@@ -296,6 +403,12 @@
     query=e.target.value.trim();
     if(query){renderSearch();} else {showHub();}
   },120);});
+
+  // dynamic header / footer counts (reflect the added strand)
+  const enEl=document.querySelector('h1.title .en');
+  if(enEl) enEl.textContent='Lesson Resources · '+LESSONS.length+' บทเรียน · '+LEVELS.length+' ระดับ · '+UNITS.length+' หน่วยย่อย';
+  const ftEl=document.querySelector('footer .wrap');
+  if(ftEl) ftEl.innerHTML='<b>กล่องเครื่องมือหลักสูตรการอ่านภาษาไทย</b> · '+LESSONS.length+' บท · '+UNITS.length+' หน่วยย่อย · K2–ป.6 · โครงสร้างอ้างอิง UFLI Foundations Scope &amp; Sequence ปรับสำหรับภาษาไทย';
 
   // initial
   showHubInner();
