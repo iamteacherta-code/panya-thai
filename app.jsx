@@ -98,6 +98,10 @@ function NavBar({ page, go }) {
             ? <NavDropdown key="mat" label={app.navEn || app.en} icon={app.icon} items={MAT_ITEMS} page={page} go={go} />
             : mk(app))}
           <NavDropdown label="Lessons" icon="lesson" items={LESSON_MENU} page={page} go={go} />
+          <a className="nav-btn" href="curriculum.html" title="หลักสูตร 138 บทเรียน · Scope &amp; Sequence">
+            <Ico name="reading" />
+            <span>หลักสูตร</span>
+          </a>
         </nav>
       </div>
     </header>
