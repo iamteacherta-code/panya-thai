@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · ความคิดเห็นต่อโครงการ · Project Feedback</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#f4efe4; --surface:#fbf8f1; --line:#e3d9c4; --line-2:#d6c8ab;
+    --ink:#2f2a20; --ink-2:#5c5341; --ink-3:#8a7e66;
+    --leaf:#5b7a4b; --leaf-d:#45603a; --leaf-l:#e6eddf;
+    --earth:#c98a3b; --earth-d:#a86d24; --earth-l:#f6e8d2;
+    --clay:#b05c3c; --sky:#6f9bb0; --purple:#7a5fb0;
+    --font-ui:"Sarabun",system-ui,sans-serif; --font-thai:"Sarabun",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-ui);line-height:1.6;
+    background-image:radial-gradient(circle at 1px 1px,rgba(120,100,60,.06) 1px,transparent 0);background-size:22px 22px;}
+  .wrap{max-width:760px;margin:0 auto;padding:0 18px 70px;}
+  .wrap.wide{max-width:1080px;}
+  /* header */
+  .top{display:flex;align-items:center;gap:13px;padding:20px 0 14px;flex-wrap:wrap;}
+  .logo{width:48px;height:48px;border-radius:13px;background:var(--leaf);color:#fff;display:grid;place-items:center;font-weight:800;font-size:22px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.15);}
+  .top .bn{font-weight:800;letter-spacing:.22em;font-size:19px;line-height:1;}
+  .top .bs{font-size:12px;color:var(--ink-3);margin-top:2px;}
+  .top .spacer{margin-left:auto;}
+  .mode{font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;border:1.5px solid var(--line-2);background:var(--surface);color:var(--ink-3);}
+  .mode.live{background:var(--leaf-l);color:var(--leaf-d);border-color:var(--leaf);}
+  .seg{display:inline-flex;border:1.5px solid var(--line-2);border-radius:999px;overflow:hidden;background:var(--surface);}
+  .seg button{border:none;background:none;font-family:inherit;font-weight:700;font-size:13px;padding:8px 15px;cursor:pointer;color:var(--ink-3);}
+  .seg button.on{background:var(--leaf);color:#fff;}
+  .eyebrow{font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--earth-d);font-size:12px;margin:6px 0 4px;}
+  h1{font-size:clamp(1.5rem,4vw,2.1rem);margin:0 0 6px;font-weight:800;}
+  .sub{color:var(--ink-2);margin:0 0 18px;}
+  /* form */
+  .card{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:18px 18px;margin-bottom:14px;box-shadow:0 1px 0 rgba(60,48,28,.04);}
+  .q-lbl{font-weight:700;font-size:1.02rem;margin-bottom:3px;}
+  .q-en{font-size:.8rem;color:var(--ink-3);font-weight:600;margin-bottom:11px;}
+  .stars{display:flex;gap:8px;}
+  .star{width:46px;height:46px;border:1.8px solid var(--line-2);border-radius:12px;background:#fff;font-size:24px;cursor:pointer;display:grid;place-items:center;transition:.12s;}
+  .star.on{background:var(--earth);border-color:var(--earth-d);color:#fff;transform:translateY(-2px);}
+  .opts{display:flex;flex-direction:column;gap:9px;}
+  .opt{display:flex;align-items:center;gap:11px;border:1.8px solid var(--line-2);border-radius:12px;background:#fff;padding:11px 15px;cursor:pointer;font-size:1rem;}
+  .opt .box{width:20px;height:20px;border:2px solid var(--line-2);border-radius:6px;flex:none;display:grid;place-items:center;font-size:13px;color:#fff;}
+  .opt.multi .box{border-radius:6px;} .opt.single .box{border-radius:50%;}
+  .opt.sel{border-color:var(--leaf);background:var(--leaf-l);}
+  .opt.sel .box{background:var(--leaf);border-color:var(--leaf-d);}
+  textarea{width:100%;border:1.8px solid var(--line-2);border-radius:12px;background:#fff;font-family:inherit;font-size:1rem;padding:11px 13px;resize:vertical;min-height:74px;color:var(--ink);}
+  textarea:focus,.opt:focus-visible{outline:3px solid rgba(91,122,75,.3);}
+  .submit{width:100%;border:none;border-radius:14px;background:var(--leaf);color:#fff;font-family:inherit;font-weight:800;font-size:1.08rem;padding:15px;cursor:pointer;box-shadow:inset 0 -4px 0 rgba(0,0,0,.14);}
+  .submit:hover{background:var(--leaf-d);}
+  .submit:disabled{opacity:.5;cursor:not-allowed;}
+  .thanks{display:none;text-align:center;padding:40px 16px;}
+  .thanks .big{font-size:54px;}
+  .thanks h2{font-size:1.5rem;margin:8px 0 4px;}
+  .linkbtn{display:inline-block;margin-top:12px;color:var(--leaf-d);font-weight:700;text-decoration:none;}
+  /* dashboard */
+  .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px;}
+  .stat{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;text-align:center;}
+  .stat .n{font-size:2rem;font-weight:800;color:var(--leaf-d);line-height:1;}
+  .stat .l{font-size:.82rem;color:var(--ink-3);margin-top:4px;}
+  .stat .stars-sm{color:var(--earth-d);font-size:1.1rem;}
+  .chart{margin:14px 0;}
+  .chart h3{font-size:1rem;margin:0 0 2px;font-weight:700;}
+  .chart .che{font-size:.78rem;color:var(--ink-3);font-weight:600;margin-bottom:10px;}
+  .bar{display:grid;grid-template-columns:160px 1fr 52px;gap:10px;align-items:center;margin-bottom:8px;font-size:.92rem;}
+  .bar .blab{color:var(--ink-2);}
+  .bar .btrack{background:#ede4d0;border-radius:999px;height:22px;overflow:hidden;}
+  .bar .bfill{height:100%;border-radius:999px;background:var(--leaf);min-width:2px;transition:width .4s ease;}
+  .bar .bfill.c1{background:var(--leaf);} .bar .bfill.c2{background:var(--earth);} .bar .bfill.c3{background:var(--sky);} .bar .bfill.c4{background:var(--clay);} .bar .bfill.c5{background:var(--purple);}
+  .bar .bval{text-align:right;color:var(--ink-3);font-weight:700;font-size:.85rem;}
+  .comments{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .clist{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;max-height:300px;overflow:auto;}
+  .clist h4{margin:0 0 8px;font-size:.92rem;color:var(--earth-d);}
+  .cmt{font-family:var(--font-thai);font-size:.95rem;border-bottom:1px dashed var(--line);padding:7px 0;color:var(--ink-2);}
+  .cmt:last-child{border-bottom:none;}
+  .empty{color:var(--ink-3);font-size:.9rem;}
+  @media(max-width:620px){.bar{grid-template-columns:110px 1fr 44px;}.comments{grid-template-columns:1fr;}}
+  @media print{.seg,.submit,.mode{display:none;}}
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <div class="top">
+    <div class="logo">P</div>
+    <div><div class="bn">PANYA</div><div class="bs">Thai Literacy Studio · Project Feedback</div></div>
+    <span class="spacer"></span>
+    <span class="mode" id="mode">demo</span>
+    <span class="seg"><button id="tabForm" class="on">📝 ตอบแบบสอบถาม</button><button id="tabRes">📊 ผลสด</button></span>
+  </div>
+
+  <!-- ===== FORM ===== -->
+  <section id="formView">
+    <div class="eyebrow">Your voice shapes this project</div>
+    <h1>ความคิดเห็นต่อโครงการ PANYA</h1>
+    <p class="sub">ขอบคุณที่ร่วมให้ความเห็น — ใช้เวลาประมาณ 2 นาที คำตอบจะช่วยกำหนดทิศทางการพัฒนาเครื่องมือนี้ต่อไป</p>
+    <form id="form"></form>
+    <button class="submit" id="submitBtn" type="button">ส่งความคิดเห็น · Submit</button>
+    <div class="thanks" id="thanks">
+      <div class="big">🌱</div><h2>ขอบคุณมากครับ!</h2>
+      <p class="sub">บันทึกความคิดเห็นของท่านแล้ว</p>
+      <a class="linkbtn" href="#" id="seeRes">📊 ดูผลสดทั้งหมด →</a>
+    </div>
+  </section>
+
+  <!-- ===== RESULTS ===== -->
+  <section id="resView" style="display:none;">
+    <div class="eyebrow">Live results · ผลแบบเรียลไทม์</div>
+    <h1>สรุปความคิดเห็น</h1>
+    <p class="sub" id="resSub">กำลังรอคำตอบ…</p>
+    <div class="stat-row" id="stats"></div>
+    <div id="charts"></div>
+    <div class="comments">
+      <div class="clist"><h4>👍 สิ่งที่ชอบ · Likes</h4><div id="likes"></div></div>
+      <div class="clist"><h4>💡 ข้อเสนอแนะ · Improve</h4><div id="improves"></div></div>
+    </div>
+  </section>
+</div>
+
+<!-- Firebase (optional). Loaded but only used if FB_CONFIG.databaseURL is set. -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" onerror="window.__noFB=1"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js" onerror="window.__noFB=1"></script>
+<script>
+/* ============================================================
+   CONFIG — to enable real-time across devices, create a free
+   Firebase project → Realtime Database → paste its config below.
+   Leave empty {} to run in single-device demo mode (localStorage).
+   ============================================================ */
+const FB_CONFIG = {
+  // apiKey: "...", authDomain: "...", databaseURL: "https://xxxx.firebaseio.com", projectId: "..."
+};
+
+const QS = [
+  { id:"q1", type:"rating", max:5, th:"โครงการนี้มีประโยชน์ต่อการสอนเพียงใด", en:"How useful is this project for teaching?" },
+  { id:"q2", type:"single", th:"ท่านคิดจะนำไปใช้ในชั้นเรียนหรือไม่", en:"Will you use it in your classroom?",
+    opts:["ใช่ แน่นอน","น่าจะใช้","ยังไม่แน่ใจ","คงไม่ใช้"] },
+  { id:"q3", type:"multi", th:"เครื่องมือที่ท่านสนใจมากที่สุด (เลือกได้หลายข้อ)", en:"Tools you find most useful (choose any)",
+    opts:["Blending Board","Word Work Mat","Lessons & Curriculum","ใบงานพิมพ์ได้ · Worksheets","Reading & Writing (Y4–6)"] },
+  { id:"q4", type:"single", th:"ระดับชั้นที่ท่านสอน/ดูแล", en:"Grades you teach / oversee",
+    opts:["K2–K3","Y1–Y3","Y4–Y6","ผู้บริหาร / อื่น ๆ"] },
+  { id:"q5", type:"rating", max:5, th:"ความพร้อมของท่านในการเริ่มใช้", en:"How ready are you to start using it?" },
+  { id:"like", type:"text", th:"สิ่งที่ท่านชอบที่สุด", en:"What do you like most?" },
+  { id:"improve", type:"text", th:"สิ่งที่อยากให้ปรับปรุงหรือเพิ่มเติม", en:"What should we improve or add?" },
+];
+
+/* ---------- storage (Firebase live OR localStorage demo) ---------- */
+let MODE="demo", dbref=null, onDataCb=()=>{};
+function lread(){ try{ return JSON.parse(localStorage.getItem("panya_feedback")||"[]"); }catch(e){ return []; } }
+function initStore(cb){
+  onDataCb=cb;
+  const hasFB = FB_CONFIG && FB_CONFIG.databaseURL && !window.__noFB && window.firebase;
+  if(hasFB){
+    try{
+      firebase.initializeApp(FB_CONFIG);
+      dbref=firebase.database().ref("panya_feedback");
+      MODE="live";
+      dbref.on("value",s=>{ const v=s.val()||{}; cb(Object.keys(v).map(k=>v[k])); });
+      setMode(); return;
+    }catch(e){ console.warn("Firebase init failed, using demo",e); }
+  }
+  MODE="demo"; setMode();
+  cb(lread());
+  window.addEventListener("storage",e=>{ if(e.key==="panya_feedback") cb(lread()); });
+}
+function addEntry(obj){
+  obj.ts=Date.now();
+  if(MODE==="live" && dbref){ dbref.push(obj); }
+  else{ const a=lread(); a.push(obj); localStorage.setItem("panya_feedback",JSON.stringify(a)); onDataCb(a); }
+}
+function setMode(){ const m=document.getElementById("mode"); m.textContent = MODE==="live"?"● LIVE":"demo (เครื่องนี้)"; m.className="mode"+(MODE==="live"?" live":""); }
+
+/* ---------- build form ---------- */
+const answers={};
+const form=document.getElementById("form");
+QS.forEach(q=>{
+  const card=document.createElement("div"); card.className="card";
+  card.innerHTML='<div class="q-lbl">'+q.th+'</div><div class="q-en">'+q.en+'</div>';
+  if(q.type==="rating"){
+    answers[q.id]=0;
+    const row=document.createElement("div"); row.className="stars";
+    for(let i=1;i<=q.max;i++){ const s=document.createElement("div"); s.className="star"; s.textContent="★"; s.dataset.v=i;
+      s.onclick=()=>{ answers[q.id]=i; [...row.children].forEach(c=>c.classList.toggle("on",+c.dataset.v<=i)); };
+      row.appendChild(s); }
+    card.appendChild(row);
+  } else if(q.type==="single"||q.type==="multi"){
+    answers[q.id]= q.type==="multi"?[]:null;
+    const box=document.createElement("div"); box.className="opts";
+    q.opts.forEach(o=>{ const el=document.createElement("div"); el.className="opt "+q.type;
+      el.innerHTML='<span class="box">'+(q.type==="multi"?"✓":"●")+'</span><span>'+o+'</span>';
+      el.onclick=()=>{
+        if(q.type==="single"){ answers[q.id]=o; [...box.children].forEach(c=>c.classList.toggle("sel",c===el)); }
+        else{ const i=answers[q.id].indexOf(o); if(i>=0){answers[q.id].splice(i,1);el.classList.remove("sel");} else {answers[q.id].push(o);el.classList.add("sel");} }
+      };
+      box.appendChild(el); });
+    card.appendChild(box);
+  } else {
+    answers[q.id]="";
+    const ta=document.createElement("textarea"); ta.placeholder="พิมพ์ความคิดเห็น…";
+    ta.oninput=()=>answers[q.id]=ta.value;
+    card.appendChild(ta);
+  }
+  form.appendChild(card);
+});
+
+document.getElementById("submitBtn").onclick=()=>{
+  const e={}; QS.forEach(q=>e[q.id]=answers[q.id]);
+  addEntry(e);
+  document.getElementById("form").style.display="none";
+  document.getElementById("submitBtn").style.display="none";
+  document.getElementById("thanks").style.display="block";
+  window.scrollTo({top:0,behavior:"smooth"});
+};
+document.getElementById("seeRes").onclick=(ev)=>{ ev.preventDefault(); showView("res"); };
+
+/* ---------- dashboard ---------- */
+function pct(n,t){ return t?Math.round(n/t*100):0; }
+function render(entries){
+  const total=entries.length;
+  document.getElementById("resSub").textContent = total? ("มีผู้ตอบแล้ว "+total+" คน · responses update live") : "ยังไม่มีคำตอบ — สแกน QR เพื่อร่วมตอบ";
+  // stats
+  const avg=(id)=>{ const v=entries.map(e=>+e[id]||0).filter(x=>x>0); return v.length?(v.reduce((a,b)=>a+b,0)/v.length):0; };
+  const a1=avg("q1"), a5=avg("q5");
+  const willUse=entries.filter(e=>e.q2==="ใช่ แน่นอน"||e.q2==="น่าจะใช้").length;
+  document.getElementById("stats").innerHTML=
+    stat(total,"ผู้ตอบทั้งหมด · responses")+
+    stat('<span class="stars-sm">'+starStr(a1)+'</span><br>'+a1.toFixed(1),"ประโยชน์ (เฉลี่ย)")+
+    stat(a5.toFixed(1),"ความพร้อม (เฉลี่ย/5)")+
+    stat(pct(willUse,total)+"%","ตั้งใจจะนำไปใช้");
+  // charts
+  let html="";
+  QS.forEach(q=>{
+    if(q.type==="rating"){
+      html+='<div class="chart"><h3>'+q.th+'</h3><div class="che">'+q.en+' · เฉลี่ย '+avg(q.id).toFixed(2)+'/'+q.max+'</div>';
+      for(let i=q.max;i>=1;i--){ const c=entries.filter(e=>+e[q.id]===i).length; html+=barRow(i+" ★",c,total,((q.max-i)%5)+1); }
+      html+='</div>';
+    } else if(q.type==="single"||q.type==="multi"){
+      html+='<div class="chart"><h3>'+q.th+'</h3><div class="che">'+q.en+'</div>';
+      q.opts.forEach((o,idx)=>{ const c=entries.filter(e=> q.type==="multi"? (Array.isArray(e[q.id])&&e[q.id].indexOf(o)>=0) : e[q.id]===o ).length;
+        html+=barRow(o,c,total,(idx%5)+1); });
+      html+='</div>';
+    }
+  });
+  document.getElementById("charts").innerHTML=html;
+  // comments
+  const cl=(id)=>{ const t=entries.map(e=>(e[id]||"").trim()).filter(Boolean).reverse();
+    return t.length? t.map(x=>'<div class="cmt">'+esc(x)+'</div>').join('') : '<div class="empty">ยังไม่มีความเห็น</div>'; };
+  document.getElementById("likes").innerHTML=cl("like");
+  document.getElementById("improves").innerHTML=cl("improve");
+}
+function stat(n,l){ return '<div class="stat"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>'; }
+function barRow(label,count,total,ci){ const p=pct(count,total);
+  return '<div class="bar"><span class="blab">'+esc(label)+'</span><span class="btrack"><span class="bfill c'+ci+'" style="width:'+p+'%"></span></span><span class="bval">'+count+' · '+p+'%</span></div>'; }
+function starStr(a){ const f=Math.round(a); return "★★★★★".slice(0,f)+"☆☆☆☆☆".slice(0,5-f); }
+function esc(s){ return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
+
+/* ---------- view switching ---------- */
+function showView(v){
+  const isRes=v==="res";
+  document.getElementById("formView").style.display=isRes?"none":"block";
+  document.getElementById("resView").style.display=isRes?"block":"none";
+  document.getElementById("tabForm").classList.toggle("on",!isRes);
+  document.getElementById("tabRes").classList.toggle("on",isRes);
+  document.getElementById("wrap").classList.toggle("wide",isRes);
+  window.scrollTo({top:0});
+}
+document.getElementById("tabForm").onclick=()=>showView("form");
+document.getElementById("tabRes").onclick=()=>showView("res");
+
+initStore(render);
+if(new URLSearchParams(location.search).get("view")==="results") showView("res");
+</script>
+</body>
+</html>
