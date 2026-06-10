@@ -103,10 +103,10 @@ function HomePage({ go }) {
 /* ---------------- ACTIVITY SHEETS ---------------- */
 /* shared 3-level selector — Beginner / Intermediate / Advanced (optional "All") */
 function LevelBar({ value, onChange, withAll, extra }) {
-  const opts = (withAll ? [{ key: "all", n: "•", en: "All", th: "ทั้งหมด" }] : []).concat([
-    { key: "beginner", n: "1", en: "Beginner", th: "พื้นฐาน" },
-    { key: "intermediate", n: "2", en: "Intermediate", th: "ปานกลาง" },
-    { key: "advanced", n: "3", en: "Advanced", th: "ขั้นสูง" },
+  const opts = (withAll ? [{ key: "all", n: "•", en: "All", th: "" }] : []).concat([
+    { key: "beginner", n: "1", en: "Beginner", th: "" },
+    { key: "intermediate", n: "2", en: "Intermediate", th: "" },
+    { key: "advanced", n: "3", en: "Advanced", th: "" },
   ]).concat(extra || []);
   return (
     <div className="level-bar">
@@ -307,7 +307,7 @@ const LESSONS_BY_GRADE = {
 const LESSON_ITEMS = THAI.GRADE_ORDER.map((id) => ({
   id: "lesson-" + id,
   en: "Lessons · " + THAI.GRADES[id].en,
-  th: THAI.GRADES[id].th,
+  th: "",   // English grade code only (avoid Thai grade-name confusion for int'l schools)
   icon: "lesson",
   grade: id,
 }));
@@ -338,7 +338,7 @@ function LessonsPage({ grade }) {
       <LevelBar value={lvl} onChange={setLvl} extra={[{ key: "comprehension", n: "4", en: "Comprehension", th: "Y4–6" }]} />
       {lvl === "comprehension" ? (
         <div>
-          <h3 className="page-title" style={{ fontSize: 18, marginTop: 20, marginBottom: 2 }}>Comprehension<span className="th"> · อ่านเพื่อเรียนรู้ (Y4–6)</span></h3>
+          <h3 className="page-title" style={{ fontSize: 18, marginTop: 20, marginBottom: 2 }}>Comprehension<span className="th"> · Read to Learn (Y4–6)</span></h3>
           <p className="lv-goal" style={{ fontSize: 14, color: "var(--ink-3)", margin: "4px 0 14px" }}>
             เมื่อถอดรหัสได้คล่องแล้ว เน้นความเข้าใจ คลังคำ และการเขียน · ดูบทเรียนเต็ม (C1–C36) ได้ในหลักสูตร แล้วฝึกด้วยใบงาน
           </p>
@@ -360,7 +360,7 @@ function LessonsPage({ grade }) {
         const units = LESSONS_BY_GRADE[gid] || [];
         return (
           <div key={gid}>
-            <h3 className="page-title" style={{ fontSize: 18, marginTop: 20, marginBottom: 2 }}>{g.en}<span className="th"> · {g.th}</span></h3>
+            <h3 className="page-title" style={{ fontSize: 18, marginTop: 20, marginBottom: 2 }}>{g.en}</h3>
       {units.map((u) => (
         <div className="unit" key={gid + "-" + u.n}>
           <div className="unit-head">
@@ -700,7 +700,7 @@ function WorksheetsPage() {
 const MAT_ITEMS = THAI.MAT_LEVELS.map((id) => ({
   id: "mat-" + id,
   en: THAI.GRADES[id].en,
-  th: THAI.GRADES[id].th,
+  th: "",   // English level name only
   icon: "activity",
   level: id,
 }));
