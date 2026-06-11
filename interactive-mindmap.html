@@ -49,37 +49,34 @@
 </div>
 
 <script>
+const BR={
+  kong:{id:"kong",name:"แม่กง (–ง)"}, kon:{id:"kon",name:"แม่กน (–น)"},
+  kom:{id:"kom",name:"แม่กม (–ม)"},   koei:{id:"koei",name:"แม่เกย (–ย)"},
+  keow:{id:"keow",name:"แม่เกอว (–ว)"}, kok:{id:"kok",name:"แม่กก (–ก)"},
+  kot:{id:"kot",name:"แม่กด (–ด)"},   kop:{id:"kop",name:"แม่กบ (–บ)"},
+};
+const mkSet=(ids,pairs)=>({ branches:ids.map(i=>BR[i]), words:pairs.flatMap(([c,ws])=>ws.map(w=>({w,c}))) });
 const SETS = [
-  { branches:[
-      {id:"kong",name:"แม่กง (–ง)"},{id:"kon",name:"แม่กน (–น)"},
-      {id:"kom",name:"แม่กม (–ม)"},{id:"koei",name:"แม่เกย (–ย)"},
-    ],
-    words:[
-      {w:"ลิง",c:"kong"},{w:"ทอง",c:"kong"},
-      {w:"จาน",c:"kon"},{w:"ปีน",c:"kon"},
-      {w:"ตาม",c:"kom"},{w:"ลม",c:"kom"},
-      {w:"สาย",c:"koei"},{w:"โรย",c:"koei"},
-    ] },
-  { branches:[
-      {id:"kok",name:"แม่กก (–ก)"},{id:"kot",name:"แม่กด (–ด)"},
-      {id:"kop",name:"แม่กบ (–บ)"},{id:"keow",name:"แม่เกอว (–ว)"},
-    ],
-    words:[
-      {w:"ปาก",c:"kok"},{w:"นก",c:"kok"},
-      {w:"ปิด",c:"kot"},{w:"มืด",c:"kot"},
-      {w:"จับ",c:"kop"},{w:"ดิบ",c:"kop"},
-      {w:"ดาว",c:"keow"},{w:"แมว",c:"keow"},
-    ] },
-  { branches:[
-      {id:"kong",name:"แม่กง (–ง)"},{id:"kon",name:"แม่กน (–น)"},
-      {id:"kok",name:"แม่กก (–ก)"},{id:"kot",name:"แม่กด (–ด)"},
-    ],
-    words:[
-      {w:"ฟัง",c:"kong"},{w:"แรง",c:"kong"},
-      {w:"กิน",c:"kon"},{w:"นอน",c:"kon"},
-      {w:"สุก",c:"kok"},{w:"เลข",c:"kok"},
-      {w:"รถ",c:"kot"},{w:"จืด",c:"kot"},
-    ] },
+  // ชุด 1
+  mkSet(["kong","kon","kom","koei"],[["kong",["ลิง","ทอง","กาง"]],["kon",["จาน","ปีน","กิน"]],["kom",["ตาม","ลม"]],["koei",["สาย","โรย"]]]),
+  // ชุด 2
+  mkSet(["kok","kot","kop","keow"],[["kok",["ปาก","นก","มาก"]],["kot",["ปิด","มืด","รด"]],["kop",["จับ","ดิบ"]],["keow",["ดาว","แมว"]]]),
+  // ชุด 3
+  mkSet(["kong","kon","kok","kot"],[["kong",["ฟัง","แรง"]],["kon",["นอน","บาน","วาน"]],["kok",["สุก","จาก"]],["kot",["บาด","หมด","พูด"]]]),
+  // ชุด 4
+  mkSet(["kom","koei","keow","kop"],[["kom",["ชิม","ยาม","ถาม"]],["koei",["ขาย","ยาย"]],["keow",["หิว","เร็ว"]],["kop",["ตอบ","ลูบ","พบ"]]]),
+  // ชุด 5
+  mkSet(["kong","kom","kok","kop"],[["kong",["ของ","ยุง","ปลิง"]],["kom",["นม","ริม"]],["kok",["ลูก","รัก"]],["kop",["คับ","ทับ","รับ"]]]),
+  // ชุด 6
+  mkSet(["kon","kot","koei","keow"],[["kon",["คน","ฝน","ดิน"]],["kot",["จืด","เปิด"]],["koei",["ลอย","ควาย"]],["keow",["แล้ว","ขาว","เลว"]]]),
+  // ชุด 7
+  mkSet(["kong","kon","kom","kok"],[["kong",["สอง","สิง"]],["kon",["หิน","คาน","ขน"]],["kom",["ดม","สนาม"]],["kok",["ปลูก","ฉีก","ตึก"]]]),
+  // ชุด 8
+  mkSet(["kot","kop","koei","keow"],[["kot",["ขูด","มด","ชุด"]],["kop",["สูบ","กราบ"]],["koei",["สวย","ดอย"]],["keow",["สาว","ทิว","เคียว"]]]),
+  // ชุด 9
+  mkSet(["kong","kom","kot","kop"],[["kong",["ลง","ดัง"]],["kom",["ลืม","ส้ม","ตุ่ม"]],["kot",["ตลาด","สะอาด"]],["kop",["จีบ","หลับ","กราบ"]]]),
+  // ชุด 10
+  mkSet(["kok","kot","koei","keow"],[["kok",["ลาก","เลข","หมึก"]],["kot",["ราด","ขีด"]],["koei",["ป้าย","ตาย","โปรย"]],["keow",["กาว","นิ้ว"]]]),
 ];
 const $=id=>document.getElementById(id);
 const shuffle=a=>{a=a.slice();for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]];}return a;};
