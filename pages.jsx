@@ -234,7 +234,7 @@ const LESSONS_BY_GRADE = {
       ],
     },
     {
-      n: 2, en: "Changing-form vowels", th: "สระเปลี่ยนรูป/หลายรูป",
+      n: 2, en: "Special & short vowels", th: "สระพิเศษและสระเสียงสั้น",
       lessons: [
         { no: "L4", name: "ไ‑ ใ‑", ex: "ไก · ใจ" },
         { no: "L5", name: "‑ำ เ‑า", ex: "กำ · เรา" },
