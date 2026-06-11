@@ -321,6 +321,7 @@ const COMP_PHASES = [
   { en: "Comprehension", th: "อ่านจับใจความ", range: "C19–C28", page: 12 },
   { en: "Writing", th: "การเขียนและนำเสนอ", range: "C29–C36", page: 18 },
   { en: "Writing Workshop", th: "การเขียนเชิงโครงสร้าง", range: "Y4–Y6", page: 1, file: "activity-writing-workshop.html" },
+  { en: "Sentence Builder", th: "เรียงประโยค (เกมโต้ตอบ)", range: "🎮 Interactive", file: "interactive-sentence-scramble.html", interactive: true },
 ];
 function LessonsPage({ grade }) {
   const [lvl, setLvl] = React.useState(() => lessonGradeLevel(grade));
@@ -344,16 +345,19 @@ function LessonsPage({ grade }) {
             เมื่อถอดรหัสได้คล่องแล้ว เน้นความเข้าใจ คลังคำ และการเขียน · ดูบทเรียนเต็ม (C1–C36) ได้ในหลักสูตร แล้วฝึกด้วยใบงาน
           </p>
           <div className="grid-3">
-            {COMP_PHASES.map((ph) => (
-              <div className="item-card" key={ph.page}>
-                <h3>{ph.en}<span className="th">{ph.th}</span></h3>
-                <div className="item-meta"><span className="tag">Y4–6</span><span className="tag earth">{ph.range}</span></div>
-                <div className="item-actions">
-                  <a className="btn btn-sm btn-leaf" href={(ph.file || "activity-reading-comprehension.html") + "#s" + ph.page}><Ico name="worksheet" style={{ width: 15, height: 15 }} /> ใบงาน · Worksheet</a>
-                  <a className="btn btn-sm btn-ghost" href="curriculum.html">บทเรียน</a>
+            {COMP_PHASES.map((ph) => {
+              const href = ph.file ? (ph.page ? ph.file + "#s" + ph.page : ph.file) : "activity-reading-comprehension.html#s" + ph.page;
+              return (
+                <div className="item-card" key={ph.en}>
+                  <h3>{ph.en}<span className="th">{ph.th}</span></h3>
+                  <div className="item-meta"><span className="tag">Y4–6</span><span className="tag earth">{ph.range}</span></div>
+                  <div className="item-actions">
+                    <a className="btn btn-sm btn-leaf" href={href}><Ico name={ph.interactive ? "play" : "worksheet"} style={{ width: 15, height: 15 }} /> {ph.interactive ? "เล่นเกม · Play" : "ใบงาน · Worksheet"}</a>
+                    {!ph.interactive && <a className="btn btn-sm btn-ghost" href="curriculum.html">บทเรียน</a>}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       ) : grades.map((gid) => {
