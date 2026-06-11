@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · Writing Workshop (Y4–Y6)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="activity-base.css" />
+<style>
+  .passage{border:1.6px solid var(--line);border-radius:14px;background:var(--surface);padding:14px 18px;font-family:var(--font-thai);font-size:20px;line-height:1.9;color:var(--ink);}
+  .passage .ttl{font-family:var(--font-ui);font-size:13px;font-weight:800;color:var(--earth-d);margin-bottom:6px;}
+  .passage p{margin:0 0 6px;}
+  .wlines{display:flex;flex-direction:column;gap:24px;margin-top:10px;padding:4px 2px;}
+  .wlines .wl{border-bottom:1.9px dotted var(--line-2);}
+  .frame{border:1.6px solid var(--line);border-radius:14px;background:var(--surface);padding:12px 16px;margin-bottom:10px;}
+  .frame .fh{font-family:var(--font-thai);font-weight:700;color:var(--earth-d);font-size:14px;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+  .frame .fh .tag{background:var(--leaf);color:#fff;border-radius:7px;padding:2px 9px;font-size:12px;}
+  /* mind map */
+  .mm-center{background:var(--leaf-l);border:2px solid var(--leaf);border-radius:16px;text-align:center;font-family:var(--font-thai);font-weight:700;font-size:21px;color:var(--leaf-d);padding:14px;margin:6px 0 12px;}
+  .mm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .mm-branch{border:1.7px dashed var(--line-2);border-radius:14px;min-height:120px;padding:9px 11px;background:var(--surface);}
+  .mm-branch .mm-lbl{font-family:var(--font-thai);font-weight:700;color:var(--earth-d);font-size:14px;border-bottom:1.5px solid var(--line);padding-bottom:5px;margin-bottom:6px;}
+  /* scramble */
+  .scrap{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 4px;}
+  .chipx{font-family:var(--font-thai);font-size:22px;border:1.7px solid var(--line-2);border-radius:11px;padding:6px 14px;background:#fff;color:var(--ink);}
+  .scr-line{border-bottom:1.9px dotted var(--line-2);height:30px;margin-bottom:14px;}
+  /* heart words */
+  .heart{display:flex;align-items:center;gap:12px;border:1.6px solid var(--line);border-radius:13px;background:var(--surface);padding:9px 14px;margin-bottom:9px;}
+  .heart .hw{font-family:var(--font-thai);font-size:30px;color:var(--leaf-d);min-width:96px;}
+  .heart .hboxes{display:flex;gap:6px;}
+  .heart .hbox{width:42px;height:50px;border:1.6px solid var(--line);border-radius:9px;background:#fff;}
+  .heart .hnote{flex:1;font-family:var(--font-thai);font-size:13px;color:var(--ink-3);}
+  /* checklist (vertical) */
+  .vcheck{display:flex;flex-direction:column;gap:7px;margin-top:6px;}
+  .vcheck .ck{display:flex;align-items:center;gap:11px;border:1.6px solid var(--line);border-radius:11px;background:var(--surface);padding:9px 14px;}
+  .vcheck .box{width:22px;height:22px;border:1.9px solid var(--line-2);border-radius:6px;flex:none;}
+  .vcheck .w{font-family:var(--font-thai);font-size:16px;color:var(--ink-2);}
+  /* word-build rows */
+  .wb{display:flex;align-items:center;gap:10px;border:1.6px solid var(--line);border-radius:12px;background:var(--surface);padding:9px 14px;margin-bottom:8px;font-family:var(--font-thai);}
+  .wb .root{font-size:24px;font-weight:700;color:var(--clay);min-width:74px;}
+  .wb .op{color:var(--ink-3);font-weight:800;}
+  .wb .line{flex:1;border-bottom:1.9px dotted var(--line-2);height:28px;}
+  .pic-box{border:1.8px dashed var(--line-2);border-radius:14px;min-height:150px;background:repeating-linear-gradient(45deg,transparent 0 12px,rgba(170,140,90,.05) 12px 24px);display:grid;place-items:center;color:var(--ink-3);font-family:var(--font-thai);}
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <a class="btn btn-home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก · Home</a>
+  <div class="tb-title">PANYA · Writing Workshop <small>การเขียนเชิงโครงสร้าง — Y4–Y6</small></div>
+  <span class="spacer"></span>
+  <span class="hint">20 หน้า · พิมพ์ลงกระดาษ A4</span>
+  <button class="btn btn-primary" onclick="window.print()">🖨️ พิมพ์ / Print</button>
+</div>
+<div class="sheets" id="sheets"></div>
+
+<script src="activity-art.js"></script>
+<script src="activity-ws.js"></script>
+<script>
+window.WSMETA = { eyebrow:'Writing Workshop', level:'Comprehension · Y4–Y6', levelClass:'',
+  footTh:'PANYA Thai Foundation · Writing Workshop — การเขียนเชิงโครงสร้าง (Y4–Y6)' };
+const W = window.WS;
+const S = [];
+const P = (no,kind,en,th,body)=>S.push(W.custom(no,kind,en,th,body));
+const passage=(ttl,ps)=>'<div class="passage"><div class="ttl">'+ttl+'</div>'+ps.map(p=>'<p>'+p+'</p>').join('')+'</div>';
+const wlines=(n)=>{let s='<div class="wlines">';for(let i=0;i<n;i++)s+='<span class="wl"></span>';return s+'</div>';};
+const qa=(items)=>'<div class="qlist">'+items.map((it,i)=>'<div class="q"><div class="qh"><span class="qn">'+(i+1)+'</span><span>'+it+'</span></div><div class="qbody"><span class="qline"></span></div></div>').join('')+'</div>';
+const frame=(title,tag,inner)=>'<div class="frame"><div class="fh">'+(tag?'<span class="tag">'+tag+'</span>':'')+title+'</div>'+inner+'</div>';
+const mindmap=(center,branches)=>'<div class="mm-center">'+center+'</div><div class="mm-grid">'+branches.map(b=>'<div class="mm-branch"><div class="mm-lbl">'+b+'</div></div>').join('')+'</div>';
+const scramble=(rows)=>rows.map(r=>'<div class="scrap">'+r.map(c=>'<span class="chipx">'+c+'</span>').join('')+'</div><div class="scr-line"></div>').join('');
+const heart=(items)=>items.map(it=>'<div class="heart"><span class="hw">'+it.w+'</span><div class="hboxes">'+Array.from({length:it.n},()=>'<span class="hbox"></span>').join('')+'</div><span class="hnote">วงหัวใจ ♥ รอบส่วนที่ต้องจำ · '+(it.note||'')+'</span></div>').join('');
+const vcheck=(items)=>'<div class="vcheck">'+items.map(t=>'<div class="ck"><span class="box"></span><span class="w">'+t+'</span></div>').join('')+'</div>';
+const wbrows=(rows)=>rows.map(r=>'<div class="wb"><span class="root">'+r+'</span><span class="op">+</span><span class="line"></span></div>').join('');
+
+/* ===== 1 · OVERVIEW (teacher) ===== */
+P(1,'Overview','Writing Workshop','การเขียนเชิงโครงสร้าง Y4–Y6',
+  W.instruct(1,'How to use this pack','กรอบการสอนเขียนแบบ Structured Literacy (ปรับจาก UFLI) — เน้นทั้งความถูกต้อง (Accuracy) และความคล่อง (Fluency)')
+  + frame('Y4 · โครงสร้างคำและความถูกต้อง','Word Structure','การวางสระ–วรรณยุกต์ซ้อนชั้น · ตัวสะกดไม่ตรงมาตรา · คำควบกล้ำ/อักษรนำ · เรียงประโยค · เขียนตามคำบอก')
+  + frame('Y5 · รากศัพท์และการขยายประโยค','Morphology','สร้างคำจากราก (การ/ความ/ผู้) · คำประสม-ซ้อน-คำยืม · Heart Words · คำเชื่อม · อ่าน-ตอบเชิงวิเคราะห์')
+  + frame('Y6 · ความคล่องและการเขียนเชิงวิเคราะห์','Fluency','วางโครงเรียงความ · ขยายประโยค · ระดับภาษา/ราชาศัพท์ · ย่อความ · เขียนโน้มน้าว (หลายร่าง)')
+  + '<div class="teacher">วงจรการเขียน: <b>วางแผน (Mind Map) → ร่าง (Draft) → ตรวจ (Checklist) → ติชมโดยเพื่อน (Berger) → ขัดเกลา</b></div>');
+
+/* ============================ Y4 ============================ */
+/* 2 · Mind Map by spelling family */
+P(2,'Y4 · Mind Map','Sort words by final','จัดกลุ่มคำตามมาตราตัวสะกด',
+  W.instruct(1,'Build a word map','เขียนคำที่รู้จักลงในแต่ละกิ่งตามมาตราตัวสะกด ให้เห็นคำที่มีโครงสร้างใกล้กัน')
+  + mindmap('คำในภาษาไทย · จัดตาม “มาตราตัวสะกด”',['แม่กง (–ง)','แม่กน (–น)','แม่กม (–ม)','แม่กก (–ก)','แม่กด (–ด)','แม่กบ (–บ)'])
+  + W.extra('เลือกคำจากกิ่งหนึ่งมาแต่งประโยค 1 ประโยค'));
+
+/* 3 · Layering + spelling self-check */
+P(3,'Y4 · Layering','Stacked vowels & tones','การวางสระ–วรรณยุกต์ซ้อนชั้น',
+  W.instruct(1,'Copy carefully','คัดคำที่มีสระ/วรรณยุกต์ซ้อนกันให้ถูกตำแหน่ง (บน–ล่าง–หน้า–หลัง)')
+  + '<div class="scrap" style="font-size:30px;gap:16px">'+['เปลี่ยน','เรียน','น้ำ','เสื้อ','กลั้ว','เกี๊ยว'].map(w=>'<span class="chipx" style="font-size:30px">'+w+'</span>').join('')+'</div>'
+  + wlines(2)
+  + W.instruct(2,'Spelling self-check','ตรวจงานของตัวเองก่อนส่ง')
+  + vcheck(['วางสระบน/ล่างตรงตำแหน่ง','วางวรรณยุกต์เหนือพยัญชนะต้น (หรือเหนือสระบน)','ใส่ตัวการันต์ครบ','เว้นช่องไฟ/วรรคตอนถูกต้อง']));
+
+/* 4 · irregular finals */
+P(4,'Y4 · Accuracy','Irregular finals','ตัวสะกดไม่ตรงมาตรา',
+  W.instruct(1,'Read & sort','อ่านคำ แล้วเขียนลงช่องตามมาตราเสียงท้ายคำ (พยัญชนะอื่นที่ทำหน้าที่สะกด)')
+  + '<div class="bank"><span class="bk-lbl">คำให้เลือก</span>'+['คุณ','อาหาร','สุข','โรค','รถ','บาท','บาป','ภาพ','กาล','เลข'].map(w=>'<span class="chip">'+w+'</span>').join('')+'</div>'
+  + '<div class="buckets" style="grid-template-columns:repeat(4,1fr);margin-top:8px">'
+    +['แม่กน (น ร ล ณ)','แม่กก (ก ข ค)','แม่กด (ด ต ถ ส)','แม่กบ (บ ป พ ภ)'].map(h=>'<div class="bucket"><div class="bhead">'+h+'</div><div class="bbody"></div></div>').join('')
+  +'</div>' + W.extra());
+
+/* 5 · clusters & leading consonants */
+P(5,'Y4 · Accuracy','Clusters &amp; leading','คำควบกล้ำและอักษรนำ',
+  W.instruct(1,'Separate the sounds, then write','แยกเสียงพยัญชนะต้น แล้วคัดคำให้ถูก')
+  + '<div class="scrap" style="font-size:28px;gap:14px">'+['ปลา','ครู','กว้าง','ขนม','สนาม','หมา','หลาย','อย่าง'].map(w=>'<span class="chipx" style="font-size:26px">'+w+'</span>').join('')+'</div>'
+  + qa(['คำควบกล้ำแท้ในข้อบน มีคำใดบ้าง?','คำอักษรนำในข้อบน มีคำใดบ้าง?'])
+  + W.extra('คัดคำควบกล้ำ 3 คำ และอักษรนำ 3 คำ'));
+
+/* 6 · sentence scramble */
+P(6,'Y4 · Sentence','Sentence scramble','เรียงประโยค (ประธาน–กริยา–กรรม)',
+  W.instruct(1,'Reorder into a sentence','เรียงคำให้เป็นประโยคที่สมบูรณ์ แล้วเขียนลงบรรทัด')
+  + scramble([
+    ['ข้าว','กิน','น้อง'],
+    ['ไป','โรงเรียน','พี่','ทุกวัน'],
+    ['ปลูก','ต้นไม้','คุณยาย','ที่สวน'],
+    ['อ่าน','หนังสือ','นักเรียน','ในห้องสมุด'],
+  ]) + W.extra());
+
+/* 7 · auditory drill (dictation) */
+P(7,'Y4 · Dictation','Auditory drill','เขียนตามคำบอก',
+  W.instruct(1,'Listen, then write','ครูออกเสียงคำ/ประโยคสั้น นักเรียนเขียนลงช่อง (ฝึกเปลี่ยนเสียงเป็นตัวอักษร · Encoding)')
+  + '<div class="teacher"><b>สำหรับครู:</b> กัน · ฟัน · มาก · บาท · ครู · ขนม · “พ่อพาน้องไปตลาด”</div>'
+  + '<div class="dict-grid">'+Array.from({length:8},(_,i)=>'<div class="dict"><span class="num">'+(i+1)+'</span><div class="wbox"></div></div>').join('')+'</div>'
+  + W.instruct(2,'Self-check','ตรวจการสะกดของตัวเอง')
+  + vcheck(['สระถูกตำแหน่ง','วรรณยุกต์ถูก','ตัวสะกดถูกมาตรา']));
+
+/* ============================ Y5 ============================ */
+/* 8 · morphology root building */
+P(8,'Y5 · Morphology','Build from roots','สร้างคำจากรากศัพท์',
+  W.instruct(1,'Make new words','เติมคำต่อท้ายรากศัพท์ให้เป็นคำใหม่ พร้อมเขียนความหมายสั้น ๆ')
+  + wbrows(['การ','ความ','ผู้','นัก'])
+  + '<div class="note-th">ตัวอย่าง: การ + เรียน → การเรียน · ความ + สุข → ความสุข · ผู้ + นำ → ผู้นำ · นัก + กีฬา → นักกีฬา</div>'
+  + W.extra('เลือกคำใหม่ 2 คำมาแต่งประโยค'));
+
+/* 9 · compounds / loanwords */
+P(9,'Y5 · Word study','Compounds &amp; loanwords','คำประสม คำซ้อน คำยืม',
+  W.instruct(1,'Sort the words','อ่านแล้วเขียนลงช่องตามชนิดของคำ')
+  + '<div class="bank"><span class="bk-lbl">คำให้เลือก</span>'+['แม่น้ำ','บ้านเรือน','คอมพิวเตอร์','วิทยาศาสตร์','รถไฟ','เสื้อผ้า','ฟุตบอล','ประวัติศาสตร์'].map(w=>'<span class="chip">'+w+'</span>').join('')+'</div>'
+  + '<div class="buckets" style="grid-template-columns:repeat(3,1fr);margin-top:8px">'
+    +['คำประสม','คำซ้อน','คำยืม (บาลี-สันสกฤต/อังกฤษ)'].map(h=>'<div class="bucket"><div class="bhead">'+h+'</div><div class="bbody"></div></div>').join('')
+  +'</div>' + W.extra());
+
+/* 10 · heart words / orthographic mapping */
+P(10,'Y5 · Heart Words','Tricky-spelling words','คำที่ต้องจำ (Orthographic Mapping)',
+  W.instruct(1,'Map the word','เขียนคำลงในช่องทีละส่วน แล้ววงหัวใจ ♥ รอบส่วนที่สะกดไม่ตรงเสียง (ต้องจำ)')
+  + heart([
+    {w:'สะอาด',n:4,note:'อ่าน สะ-อาด'},
+    {w:'อนุญาต',n:5,note:'ลงท้าย ต ไม่ใช่ ติ'},
+    {w:'สังเกต',n:4,note:'ไม่มี ◌ุ'},
+    {w:'ปรารถนา',n:5,note:'มี ร การันต์ซ่อนเสียง'},
+  ]) + W.extra('เลือกคำที่หนูสะกดผิดบ่อย 2 คำ มาทำ Heart Word'));
+
+/* 11 · conjunctions / compound sentences */
+P(11,'Y5 · Sentence','Join with conjunctions','คำเชื่อมและประโยคความรวม',
+  W.instruct(1,'Combine the sentences','รวมประโยคสั้นให้เป็นประโยคเดียวด้วยคำเชื่อม (และ · แต่ · เพราะ · จึง · หรือ)')
+  + qa([
+    'ฝนตกหนัก. ถนนเปียก. → (เพราะ/จึง)',
+    'ฉันชอบอ่านหนังสือ. ฉันชอบวาดรูป. → (และ)',
+    'เขาตั้งใจเรียน. เขายังเล่นกีฬาเก่ง. → (แต่)',
+  ]) + '<div class="bank"><span class="bk-lbl">คำเชื่อม</span>'+['และ','แต่','เพราะ','จึง','หรือ','ดังนั้น'].map(w=>'<span class="chip">'+w+'</span>').join('')+'</div>' + W.extra());
+
+/* 12 · analytical Q&A */
+P(12,'Y5 · Reading','Analytical Q&amp;A','อ่านแล้วตอบเชิงวิเคราะห์',
+  W.instruct(1,'Read, then answer with evidence','อ่านเรื่อง แล้วตอบคำถามโดย “อ้างอิงข้อความจากเรื่อง”')
+  + passage('มดน้อยกับการเตรียมตัว',[
+    'ในฤดูร้อน มดน้อยขยันสะสมอาหารเก็บไว้ในรัง ส่วนจักจั่นเอาแต่ร้องเพลงไปวัน ๆ',
+    'เมื่อถึงฤดูหนาว อาหารหายาก จักจั่นหิวโหย แต่มดน้อยมีอาหารพอเพราะเตรียมตัวไว้ล่วงหน้า'])
+  + qa([
+    'เพราะเหตุใดมดน้อยจึงมีอาหารพอในฤดูหนาว? (อ้างจากเรื่อง)',
+    'นักเรียนคิดว่าเรื่องนี้สอนอะไร? ให้เหตุผลประกอบ',
+  ]));
+
+/* 13 · picture prompt + Berger feedback */
+P(13,'Y5 · Writing','Picture prompt','เขียนจากภาพ + ติชมโดยเพื่อน',
+  W.instruct(1,'Look, talk, then write','ติดภาพหรือวาดภาพ แล้วเขียนบรรยายเชิงสร้างสรรค์ 3–4 ประโยค')
+  + '<div class="pic-box">วาด/ติดภาพที่นี่ · draw or paste a picture</div>'
+  + wlines(3)
+  + frame('Berger · ติชมโดยเพื่อน (Critique)','Peer',
+      '<div class="note-th">⭐ สิ่งที่ทำได้ดี (เช่น เลือกใช้คำ): __________________________<br>💡 ข้อเสนอแนะให้ชัดเจนขึ้น: __________________________</div>'));
+
+/* ============================ Y6 ============================ */
+/* 14 · argumentative mind map */
+P(14,'Y6 · Plan','Argumentative map','วางโครงเรียงความ (โน้มน้าว)',
+  W.instruct(1,'Plan before you write','เขียนหัวข้อ/ความเห็น แล้วแตกเป็นเหตุผล 3 ข้อ พร้อมข้อสนับสนุน')
+  + mindmap('หัวข้อ/ความคิดเห็นของฉัน: ____________________',['เหตุผลที่ 1 + ข้อสนับสนุน','เหตุผลที่ 2 + ข้อสนับสนุน','เหตุผลที่ 3 + ข้อสนับสนุน'])
+  + W.extra('นำโครงนี้ไปเขียนเป็นย่อหน้าในหน้าถัดไป'));
+
+/* 15 · sentence expansion */
+P(15,'Y6 · Sentence','Sentence expansion','ขยายประโยคให้เห็นภาพ',
+  W.instruct(1,'Add detail','นำประโยคใจความหลักมาเติมส่วนขยาย (ที่ไหน · เมื่อไร · อย่างไร · ทำไม) ให้ละเอียดขึ้น')
+  + qa([
+    'นกบิน → (ขยาย: ที่ไหน/อย่างไร)',
+    'เด็กวิ่ง → (ขยาย: เมื่อไร/ทำไม)',
+    'ฝนตก → (ขยาย: อย่างไร/ที่ไหน)',
+  ]) + W.extra());
+
+/* 16 · register / royal words */
+P(16,'Y6 · Register','Level of language','ระดับภาษาและคำราชาศัพท์',
+  W.instruct(1,'Choose the right word','เลือกคำให้เหมาะกับกาลเทศะและบุคคล')
+  + qa([
+    'พูดกับครู: “ขอ____ถามครับ” (ถาม/เรียน)',
+    'คำสุภาพของ “กิน” คือ ____',
+    'คำราชาศัพท์ของ “นอน” คือ ____',
+    'เขียนทางการของ “เยอะ” คือ ____',
+  ]) + W.extra());
+
+/* 17 · summarising */
+P(17,'Y6 · Summary','Summarise in your words','ย่อความและสรุปความ',
+  W.instruct(1,'Read, then summarise','อ่านเรื่อง จับใจความสำคัญ แล้วเรียบเรียงใหม่ด้วยสำนวนของตนเอง 2–3 บรรทัด')
+  + passage('ป่าไม้กับชีวิต',[
+    'ป่าไม้เป็นแหล่งต้นน้ำ ให้อากาศบริสุทธิ์ และเป็นบ้านของสัตว์ป่า การตัดไม้ทำลายป่าทำให้เกิดน้ำท่วม ดินถล่ม และสัตว์สูญพันธุ์',
+    'เราทุกคนช่วยกันรักษาป่าได้ด้วยการปลูกต้นไม้และไม่ทำลายธรรมชาติ'])
+  + wlines(3) + W.extra());
+
+/* 18 · persuasive multi-draft (Berger) */
+P(18,'Y6 · Drafting','Persuasive writing','เขียนโน้มน้าว (หลายร่าง · Berger)',
+  W.instruct(1,'Draft → feedback → improve','เขียนร่างแรก รับคำติชม แล้วเขียนร่างที่ดีขึ้น')
+  + frame('ร่างที่ 1 · First draft','Draft 1', wlines(3))
+  + frame('คำติชม · Feedback (ครู/เพื่อน)','Berger','<div class="note-th">⭐ จุดเด่น: ____________ &nbsp; 💡 ปรับให้ดีขึ้น: ____________</div>')
+  + frame('ร่างที่ 2 · Improved draft','Draft 2', wlines(3)));
+
+/* 19 · analytical summary checklist */
+P(19,'Y6 · Check','Analytical checklist','รายการตรวจงานเขียนขั้นสูง',
+  W.instruct(1,'Check before submitting','ตรวจงานเขียนเชิงวิเคราะห์ก่อนส่ง')
+  + vcheck([
+    'มีใจความสำคัญชัดเจนในแต่ละย่อหน้า',
+    'ย่อหน้าเชื่อมโยงต่อเนื่อง (Flow) ด้วยคำเชื่อม',
+    'เนื้อหาสม่ำเสมอ ไม่ออกนอกเรื่อง',
+    'ใช้คำศัพท์/ระดับภาษาเหมาะสมและถูกต้อง',
+    'มีเหตุผลและหลักฐานสนับสนุน',
+    'สะกดคำ วรรณยุกต์ และเครื่องหมายถูกต้อง',
+  ]) + W.extra('เขียนสิ่งที่จะปรับปรุงในงานครั้งต่อไป'));
+
+/* 20 · teacher integration tips */
+P(20,'Teacher','Integration tips','แนวทางบูรณาการสำหรับครู',
+  W.instruct(1,'Make it routine','นำไปใช้ใน Writing Workshop ให้เป็นกิจวัตร')
+  + frame('Word Work Mat (ดิจิทัล)','สร้างคำ','ใช้แอป “สร้างคำ” (Encoding) โดยเฉพาะคำสระซ้อนหลายชั้น เพื่อให้เห็นโครงสร้างคำผ่านการลากวาง')
+  + frame('Interactive Notebooks','สมุดโต้ตอบ','ติดแถบคำศัพท์ · แยกราก/คำต่อท้าย · จดบันทึก “Heart Words” ที่มักสะกดผิด')
+  + frame('Concept-based Spelling','ประเมินตามแนวคิด','แทนการสอบสะกดแบบเดิม — ประเมินเป็นกลุ่มแนวคิด (เช่น สัปดาห์นี้เน้น “ร หัน” หรือ มาตราแม่กด) เพื่อวัดความเข้าใจกฎเชิงลึก')
+  + '<div class="teacher" style="margin-top:10px">วงจรทุกชิ้นงาน: <b>วางแผน → ร่าง → ตรวจด้วย Checklist → ติชม (Berger) → ขัดเกลา → เผยแพร่</b></div>');
+
+W.render(S);
+W.autoprint();
+</script>
+</body>
+</html>

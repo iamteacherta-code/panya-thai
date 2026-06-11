@@ -320,6 +320,7 @@ const COMP_PHASES = [
   { en: "Vocabulary", th: "คลังคำและคำศัพท์", range: "C9–C18", page: 6 },
   { en: "Comprehension", th: "อ่านจับใจความ", range: "C19–C28", page: 12 },
   { en: "Writing", th: "การเขียนและนำเสนอ", range: "C29–C36", page: 18 },
+  { en: "Writing Workshop", th: "การเขียนเชิงโครงสร้าง", range: "Y4–Y6", page: 1, file: "activity-writing-workshop.html" },
 ];
 function LessonsPage({ grade }) {
   const [lvl, setLvl] = React.useState(() => lessonGradeLevel(grade));
@@ -348,7 +349,7 @@ function LessonsPage({ grade }) {
                 <h3>{ph.en}<span className="th">{ph.th}</span></h3>
                 <div className="item-meta"><span className="tag">Y4–6</span><span className="tag earth">{ph.range}</span></div>
                 <div className="item-actions">
-                  <a className="btn btn-sm btn-leaf" href={"activity-reading-comprehension.html#s" + ph.page}><Ico name="worksheet" style={{ width: 15, height: 15 }} /> ใบงาน · Worksheet</a>
+                  <a className="btn btn-sm btn-leaf" href={(ph.file || "activity-reading-comprehension.html") + "#s" + ph.page}><Ico name="worksheet" style={{ width: 15, height: 15 }} /> ใบงาน · Worksheet</a>
                   <a className="btn btn-sm btn-ghost" href="curriculum.html">บทเรียน</a>
                 </div>
               </div>
@@ -656,6 +657,10 @@ function WorksheetsPage() {
     { en: "Reading · Vocabulary", th: "คลังคำ (Y4–6)", type: "Reading", level: "comprehension", file: "activity-reading-comprehension.html", page: 6, preview: ["คำ", "พ้อง"] },
     { en: "Reading · Comprehension", th: "จับใจความ (Y4–6)", type: "Reading", level: "comprehension", file: "activity-reading-comprehension.html", page: 12, preview: ["จับ", "ใจความ"] },
     { en: "Reading · Writing", th: "การเขียน (Y4–6)", type: "Reading", level: "comprehension", file: "activity-reading-comprehension.html", page: 18, preview: ["เขียน", "เรียงความ"] },
+    // Writing Workshop (structured literacy) — by grade
+    { en: "Writing · Y4 (Word structure)", th: "Workshop การเขียน Y4", type: "Reading", level: "comprehension", file: "activity-writing-workshop.html", page: 2, preview: ["Mind", "Map"] },
+    { en: "Writing · Y5 (Morphology)", th: "Workshop การเขียน Y5", type: "Reading", level: "comprehension", file: "activity-writing-workshop.html", page: 8, preview: ["ราก", "ศัพท์"] },
+    { en: "Writing · Y6 (Analysis)", th: "Workshop การเขียน Y6", type: "Reading", level: "comprehension", file: "activity-writing-workshop.html", page: 14, preview: ["เรียง", "ความ"] },
   ];
   const sheetFile = (s) => s.file || WS_FILE;
   const sheetHref = (s) => s.page ? sheetFile(s) + "#s" + s.page : null;
