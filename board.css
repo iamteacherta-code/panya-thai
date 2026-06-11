@@ -441,6 +441,22 @@
   .otr { margin-left: 0; }
 }
 
-/* ===== Fullscreen: stack vertically — keypad panel moves below, fills the screen ===== */
-body.is-fs .board-cols { grid-template-columns: 1fr; max-width: 1000px; margin: 0 auto; }
-body.is-fs .board-stage { position: static; top: auto; }
+/* ===== Fullscreen: compact, fits on one screen — focus on the keypad ===== */
+body.is-fs .board-cols { grid-template-columns: 1fr; max-width: 1150px; margin: 0 auto; gap: 10px; }
+body.is-fs .board-stage { position: static; top: auto; gap: 8px; }
+/* shrink the big blended word so it doesn't push the keypad off-screen */
+body.is-fs .bb-word, body.is-fs .bb-display, body.is-fs .mat-canvas .bb-word { font-size: 84px !important; }
+body.is-fs .mat-canvas, body.is-fs .bb-stage { min-height: 0 !important; }
+body.is-fs .mat-foot { display: none; }
+/* smaller keypad tiles + more columns → all consonants/vowels/finals visible, no scrolling */
+body.is-fs .board-keys .tiles.cons  { grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 5px; }
+body.is-fs .board-keys .tiles.vow   { grid-template-columns: repeat(auto-fill, minmax(46px, 1fr)); gap: 5px; }
+body.is-fs .board-keys .tiles.final { grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: 5px; }
+body.is-fs .board-keys .tiles.tone  { grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); gap: 5px; }
+body.is-fs .board-keys .tile { min-height: 38px !important; padding: 3px 2px; border-radius: 9px; }
+body.is-fs .board-keys .tile .g { font-size: 18px !important; height: auto; }
+body.is-fs .board-keys .tiles.vow .tile, body.is-fs .board-keys .tiles.tone .tile { min-height: 44px !important; }
+body.is-fs .board-keys .tiles.vow .tile .g, body.is-fs .board-keys .tiles.tone .tile .g { font-size: 24px !important; height: auto; }
+body.is-fs .board-keys .tile .nm { font-size: 8px; }
+body.is-fs .board-keys .panel { padding: 9px 10px 10px; }
+body.is-fs .board-keys .panels { gap: 10px; }
