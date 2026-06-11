@@ -111,8 +111,8 @@ function NavBar({ page, go }) {
 /* ---------- Board page wrapper ---------- */
 function BoardPage({ t }) {
   return (
-    <div>
-      <div className="page-head">
+    <div className="board-page">
+      <div className="page-head board-intro">
         <span className="eyebrow"><Ico name="board" style={{ width: 16, height: 16 }} /> Build a syllable</span>
         <h1 className="page-title">Blending Board <span className="th">· กระดานประสมคำ</span></h1>
         <p className="page-sub">
@@ -121,6 +121,34 @@ function BoardPage({ t }) {
         </p>
       </div>
       <BlendingBoard t={t} />
+    </div>
+  );
+}
+
+/* ---------- Floating controls for the focused board view ---------- */
+function FocusControls({ go }) {
+  const [full, setFull] = useState(false);
+  useEffect(() => {
+    const h = () => setFull(!!(document.fullscreenElement || document.webkitFullscreenElement));
+    document.addEventListener("fullscreenchange", h);
+    document.addEventListener("webkitfullscreenchange", h);
+    return () => { document.removeEventListener("fullscreenchange", h); document.removeEventListener("webkitfullscreenchange", h); };
+  }, []);
+  const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
+  const exit = () => { const x = document.exitFullscreen || document.webkitExitFullscreen; if (fsEl() && x) try { x.call(document); } catch (e) {} };
+  const toggleFull = () => {
+    if (!fsEl()) { const el = document.documentElement; const r = el.requestFullscreen || el.webkitRequestFullscreen || el.webkitRequestFullScreen; if (r) try { const p = r.call(el); if (p && p.catch) p.catch(() => {}); } catch (e) {} }
+    else exit();
+  };
+  const back = () => { exit(); go("home"); };
+  return (
+    <div className="focus-fabs">
+      <button className="fab fab-full" onClick={toggleFull} aria-label="Fullscreen" title="ขยายเต็มจอ / Fullscreen">
+        <span className="fi">{full ? "🡼" : "⛶"}</span><span className="fl">{full ? "ออกเต็มจอ" : "เต็มจอ"}</span>
+      </button>
+      <button className="fab fab-home" onClick={back} aria-label="Back to start" title="กลับจุดเริ่มต้น / Back to start">
+        <span className="fi">↩</span><span className="fl">เริ่มต้น</span>
+      </button>
     </div>
   );
 }
@@ -183,10 +211,13 @@ function App() {
   else if (page === "worksheet") body = <WorksheetsPage />;
   else body = <HomePage go={go} />;
 
+  const isBoard = page === "board" || page.indexOf("mat") === 0;
+
   return (
-    <div className="app-bg">
+    <div className={"app-bg" + (isBoard ? " focus-board" : "")}>
       <NavBar page={page} go={go} />
       <main className="page">{body}</main>
+      {isBoard && <FocusControls go={go} />}
 
       <TweaksPanel>
         <TweakSection label="Blending board" />
