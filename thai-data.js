@@ -309,14 +309,30 @@
   function toneBare(t) {
     return t.mark ? "\u00A0" + t.mark : "";
   }
+  // Short vowels that LOSE or CHANGE their written form when a final consonant
+  // is added (สระลดรูป / สระเปลี่ยนรูป). Keyed by vowel id; values override the
+  // vowel's before/above/after parts only when a final is present.
+  //   –ะ→–ั · เ–ะ→เ–็ · แ–ะ→แ–็ · โ–ะ→(ลดรูป) · เ–าะ→–็อ · เ–อ→เ–ิ · –ัว→–ว
+  const VOWEL_REDUCE = {
+    a:    { before: "", above: "ั", after: "" },                       // –ะ → –ั
+    o_s:  { before: "", above: "", after: "" },                             // โ–ะ → ลดรูป (ไม่มีรูป)
+    e_s:  { before: "เ", above: "็", after: "" },                 // เ–ะ → เ–็
+    ae_s: { before: "แ", above: "็", after: "" },                 // แ–ะ → แ–็
+    aw_s: { before: "", above: "็", after: "อ" },                 // เ–าะ → –็อ
+    oe:   { before: "เ", above: "ิ", after: "" },                 // เ–อ → เ–ิ
+    ua:   { before: "", above: "", after: "ว" },                       // –ัว → –ว
+  };
   // Build the full combined syllable string in correct Unicode order:
   //   before + initial + above/below + tone + after + final
   function buildSyllable(initialChar, vowel, tone, finalChar) {
     const c = initialChar || DOT;
-    const v = vowel || { before: "", above: "", after: "" };
-    const tmark = (tone && tone.mark) || "";
+    let v = vowel || { before: "", above: "", after: "" };
     const fin = finalChar || "";
-    return v.before + c + v.above + tmark + v.after + fin;
+    if (fin && vowel && VOWEL_REDUCE[vowel.id]) {
+      v = Object.assign({ before: vowel.before, above: vowel.above, after: vowel.after }, VOWEL_REDUCE[vowel.id]);
+    }
+    const tmark = (tone && tone.mark) || "";
+    return (v.before || "") + c + (v.above || "") + tmark + (v.after || "") + fin;
   }
   // Consonants with a low "เชิง" (descender loop). When stacked with a below
   // vowel (◌ุ ◌ู) the glyph drops very low and looks cramped, so the big word
