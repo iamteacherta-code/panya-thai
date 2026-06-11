@@ -400,6 +400,7 @@ const COMP_UNITS = [
 ];
 function LessonsPage({ grade }) {
   const [lvl, setLvl] = React.useState(() => lessonGradeLevel(grade));
+  const [compYear, setCompYear] = React.useState(() => (["y4", "y5", "y6"].includes(grade) ? grade.toUpperCase() : "Y4"));
   const grades = (LESSON_LEVELS[lvl] || []).filter((id) => LESSONS_BY_GRADE[id]);
   return (
     <div>
@@ -416,10 +417,21 @@ function LessonsPage({ grade }) {
       {lvl === "comprehension" ? (
         <div>
           <h3 className="page-title" style={{ fontSize: 18, marginTop: 20, marginBottom: 2 }}>Comprehension<span className="th"> · Read to Learn (Y4–6)</span></h3>
-          <p className="lv-goal" style={{ fontSize: 14, color: "var(--ink-3)", margin: "4px 0 14px" }}>
-            เมื่อถอดรหัสได้คล่องแล้ว เน้นความเข้าใจ คลังคำ และการเขียน · บทเรียนทั้งหมด 36 บท แบ่งตามชั้น Y4–Y6 ด้านล่าง แล้วฝึกด้วยใบงาน/เกม
+          <p className="lv-goal" style={{ fontSize: 14, color: "var(--ink-3)", margin: "4px 0 12px" }}>
+            เมื่อถอดรหัสได้คล่องแล้ว เน้นความเข้าใจ คลังคำ และการเขียน · เลือกชั้นปีเพื่อดูบทเรียนของชั้นนั้น แล้วฝึกด้วยใบงาน/เกม
           </p>
-          {["Y4", "Y5", "Y6"].map((yr) => (
+          <div className="level-bar" style={{ marginBottom: 6 }}>
+            <span className="lvl-lead">ชั้นปี <span className="en">· Year</span></span>
+            <div className="lvl-seg">
+              {[{ key: "all", n: "•", en: "All" }, { key: "Y4", n: "4", en: "Y4" }, { key: "Y5", n: "5", en: "Y5" }, { key: "Y6", n: "6", en: "Y6" }].map((Y) => (
+                <button key={Y.key} className={compYear === Y.key ? "on" : ""} onClick={() => setCompYear(Y.key)}>
+                  <span className="lvl-step">{Y.n}</span>
+                  <span className="lvl-txt"><b>{Y.en}</b></span>
+                </button>
+              ))}
+            </div>
+          </div>
+          {["Y4", "Y5", "Y6"].filter((yr) => compYear === "all" || compYear === yr).map((yr) => (
             <div key={yr}>
               <h3 className="page-title" style={{ fontSize: 16, marginTop: 18, marginBottom: 2, color: "var(--leaf-d)" }}>
                 {yr}<span className="th"> · {YEAR_FOCUS[yr]}</span>
