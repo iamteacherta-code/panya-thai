@@ -9,6 +9,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="interactive.css" />
 <style>
+  .hud{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+  .hud .pill{display:flex;align-items:center;gap:7px;font-weight:800;color:var(--ink-2);font-size:.95rem;
+    background:var(--surface);border:1.6px solid var(--line-2);border-radius:999px;padding:7px 14px;}
+  .hud .pill b{color:var(--leaf-d);font-variant-numeric:tabular-nums;}
+  .hud .pill.timer b{color:var(--clay);}
+  .meter{position:relative;flex:1;min-width:160px;height:24px;background:#fff;border:1.6px solid var(--line-2);border-radius:999px;overflow:hidden;}
+  .meter-fill{position:absolute;inset:0 auto 0 0;width:0;background:linear-gradient(90deg,var(--leaf),var(--earth));transition:width .3s ease;}
+  .meter span{position:relative;display:block;text-align:center;line-height:24px;font-size:.8rem;font-weight:800;color:var(--ink-2);text-shadow:0 1px 2px rgba(255,255,255,.6);}
   .bankzone{display:flex;flex-wrap:wrap;gap:9px;min-height:60px;border:2px dashed var(--line-2);border-radius:14px;background:#fff;padding:12px;margin:6px 0 16px;}
   .branches{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
   .branch{border:1.7px solid var(--line);border-radius:14px;background:var(--surface);padding:10px;min-height:130px;cursor:pointer;}
@@ -16,6 +24,14 @@
   .branch .bh{font-family:var(--thai);font-weight:700;color:var(--earth-d);font-size:.95rem;border-bottom:1.5px solid var(--line);padding-bottom:6px;margin-bottom:8px;text-align:center;}
   .branch .drop{display:flex;flex-wrap:wrap;gap:8px;}
   .w.small{font-size:1.2rem;padding:7px 12px;}
+  .stars{font-size:2.4rem;letter-spacing:6px;margin:6px 0 2px;}
+  .clear-stats{display:flex;justify-content:center;gap:26px;flex-wrap:wrap;margin:10px 0 4px;font-family:var(--thai);}
+  .clear-stats .cs{font-size:.95rem;color:var(--ink-3);font-weight:700;}
+  .clear-stats .cs b{display:block;font-size:1.5rem;color:var(--leaf-d);font-variant-numeric:tabular-nums;}
+  .lvdots{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:10px;}
+  .lvdots i{width:13px;height:13px;border-radius:50%;background:var(--line-2);}
+  .lvdots i.on{background:var(--leaf);}
+  .lvdots i.cur{background:var(--earth);box-shadow:0 0 0 3px var(--earth-l);}
 </style>
 </head>
 <body>
@@ -27,8 +43,13 @@
   </div>
   <div class="eyebrow">Interactive · จัดกลุ่มตามมาตราตัวสะกด</div>
   <h1>ลากคำเข้ากิ่งให้ถูกมาตรา</h1>
-  <p class="sub">แตะคำในกล่อง แล้วแตะกิ่งที่ถูกต้อง · แตะคำในกิ่งเพื่อเอาออก แล้วกด “ตรวจ”</p>
-  <div class="bar"><div class="prog" id="prog"></div></div>
+  <p class="sub">แตะคำในกล่อง แล้วแตะกิ่งที่ถูกต้อง · ทำให้ครบทุกคำเพื่อ “ผ่านด่าน” · ยิ่งเร็วยิ่งได้ดาวเยอะ! ⏱️⭐</p>
+
+  <div class="hud">
+    <span class="pill">🎯 ด่าน <b id="lvNum">1</b> / <span id="lvTot">10</span></span>
+    <div class="meter"><div class="meter-fill" id="meterFill"></div><span id="meterTxt">0 / 10</span></div>
+    <span class="pill timer">⏱️ <b id="timer">0:00</b></span>
+  </div>
 
   <div id="game">
     <div class="card">
@@ -37,14 +58,36 @@
       <div class="feedback" id="feedback"></div>
       <div class="actions">
         <button class="btn check" id="checkBtn">✓ ตรวจ</button>
-        <button class="btn ghost" id="resetBtn">เริ่มชุดนี้ใหม่</button>
-        <button class="btn next" id="nextBtn" disabled>ชุดต่อไป →</button>
+        <button class="btn ghost" id="resetBtn">เริ่มด่านนี้ใหม่</button>
       </div>
     </div>
   </div>
-  <div class="card done" id="done" style="display:none">
-    <div class="big">🗺️</div><h2 id="dt"></h2><p class="sub" id="ds"></p>
-    <div class="actions"><button class="btn check" id="again">เล่นอีกครั้ง</button></div>
+
+  <!-- ผ่านด่าน -->
+  <div class="card done" id="clear" style="display:none">
+    <div class="big">🎉</div>
+    <h2 id="clearTitle">ผ่านด่านที่ 1!</h2>
+    <div class="stars" id="clearStars">⭐⭐⭐</div>
+    <div class="clear-stats">
+      <div class="cs">เวลา<b id="clearTime">0:00</b></div>
+      <div class="cs">ความแม่นยำ<b id="clearAcc">100%</b></div>
+      <div class="cs">ดาวสะสม<b id="clearTotalStars">0</b></div>
+    </div>
+    <div class="lvdots" id="lvdots"></div>
+    <div class="actions"><button class="btn next" id="nextLvBtn">ด่านต่อไป →</button></div>
+  </div>
+
+  <!-- จบเกม -->
+  <div class="card done" id="finish" style="display:none">
+    <div class="big">🏆</div>
+    <h2 id="finishTitle"></h2>
+    <div class="stars" id="finishStars"></div>
+    <div class="clear-stats">
+      <div class="cs">เวลารวม<b id="finishTime">0:00</b></div>
+      <div class="cs">ดาวทั้งหมด<b id="finishStarCnt">0</b></div>
+    </div>
+    <p class="sub" id="finishMsg"></p>
+    <div class="actions"><button class="btn check" id="againBtn">เล่นอีกครั้ง</button></div>
   </div>
 </div>
 
@@ -57,77 +100,121 @@ const BR={
 };
 const mkSet=(ids,pairs)=>({ branches:ids.map(i=>BR[i]), words:pairs.flatMap(([c,ws])=>ws.map(w=>({w,c}))) });
 const SETS = [
-  // ชุด 1
   mkSet(["kong","kon","kom","koei"],[["kong",["ลิง","ทอง","กาง"]],["kon",["จาน","ปีน","กิน"]],["kom",["ตาม","ลม"]],["koei",["สาย","โรย"]]]),
-  // ชุด 2
   mkSet(["kok","kot","kop","keow"],[["kok",["ปาก","นก","มาก"]],["kot",["ปิด","มืด","รด"]],["kop",["จับ","ดิบ"]],["keow",["ดาว","แมว"]]]),
-  // ชุด 3
   mkSet(["kong","kon","kok","kot"],[["kong",["ฟัง","แรง"]],["kon",["นอน","บาน","วาน"]],["kok",["สุก","จาก"]],["kot",["บาด","หมด","พูด"]]]),
-  // ชุด 4
   mkSet(["kom","koei","keow","kop"],[["kom",["ชิม","ยาม","ถาม"]],["koei",["ขาย","ยาย"]],["keow",["หิว","เร็ว"]],["kop",["ตอบ","ลูบ","พบ"]]]),
-  // ชุด 5
   mkSet(["kong","kom","kok","kop"],[["kong",["ของ","ยุง","ปลิง"]],["kom",["นม","ริม"]],["kok",["ลูก","รัก"]],["kop",["คับ","ทับ","รับ"]]]),
-  // ชุด 6
   mkSet(["kon","kot","koei","keow"],[["kon",["คน","ฝน","ดิน"]],["kot",["จืด","เปิด"]],["koei",["ลอย","ควาย"]],["keow",["แล้ว","ขาว","เลว"]]]),
-  // ชุด 7
   mkSet(["kong","kon","kom","kok"],[["kong",["สอง","สิง"]],["kon",["หิน","คาน","ขน"]],["kom",["ดม","สนาม"]],["kok",["ปลูก","ฉีก","ตึก"]]]),
-  // ชุด 8
   mkSet(["kot","kop","koei","keow"],[["kot",["ขูด","มด","ชุด"]],["kop",["สูบ","กราบ"]],["koei",["สวย","ดอย"]],["keow",["สาว","ทิว","เคียว"]]]),
-  // ชุด 9
   mkSet(["kong","kom","kot","kop"],[["kong",["ลง","ดัง"]],["kom",["ลืม","ส้ม","ตุ่ม"]],["kot",["ตลาด","สะอาด"]],["kop",["จีบ","หลับ","กราบ"]]]),
-  // ชุด 10
   mkSet(["kok","kot","koei","keow"],[["kok",["ลาก","เลข","หมึก"]],["kot",["ราด","ขีด"]],["koei",["ป้าย","ตาย","โปรย"]],["keow",["กาว","นิ้ว"]]]),
 ];
+
 const $=id=>document.getElementById(id);
 const shuffle=a=>{a=a.slice();for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]];}return a;};
-let r=0, place={}, sel=null, solved=false; // place[word]=branchId
-const SET=()=>SETS[r];
+const fmt=ms=>{const s=Math.floor(ms/1000);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0");};
+
+let lv=0, place={}, sel=null, solved=false;
+let startMs=null, tInt=null, wrongTries=0;
+const results=[];                 // {time, stars, acc} per cleared level
+const SET=()=>SETS[lv];
+
+$("lvTot").textContent=SETS.length;
+
+function startTimer(){ if(startMs)return; startMs=Date.now(); tInt=setInterval(()=>{ $("timer").textContent=fmt(Date.now()-startMs); },200); }
+function stopTimer(){ if(tInt){clearInterval(tInt);tInt=null;} }
+
+function startLevel(){
+  place={}; sel=null; solved=false; wrongTries=0; startMs=null; stopTimer();
+  $("timer").textContent="0:00";
+  $("game").style.display=""; $("clear").style.display="none"; $("finish").style.display="none";
+  $("checkBtn").disabled=false; $("feedback").textContent=""; $("feedback").className="feedback";
+  $("lvNum").textContent=lv+1;
+  render();
+}
+function meter(){ const placed=Object.keys(place).length, tot=SET().words.length;
+  $("meterFill").style.width=(placed/tot*100)+"%"; $("meterTxt").textContent=placed+" / "+tot; }
 
 function render(){
   const set=SET(), placedWords=Object.keys(place);
-  // bank
   $("bank").innerHTML="";
   shuffle(set.words.map(x=>x.w)).filter(w=>!placedWords.includes(w)).forEach(w=>{
-    const b=mk(w,()=>{ if(solved)return; sel=(sel===w?null:w); paint(); });
-    $("bank").appendChild(b);
+    $("bank").appendChild(mk(w,()=>{ if(solved)return; startTimer(); sel=(sel===w?null:w); paint(); }));
   });
-  // branches
   $("branches").innerHTML="";
   set.branches.forEach(br=>{
     const d=document.createElement("div"); d.className="branch"; d.dataset.id=br.id;
     d.innerHTML='<div class="bh">'+br.name+'</div>';
     const drop=document.createElement("div"); drop.className="drop";
-    placedWords.filter(w=>place[w]===br.id).forEach(w=>{ const b=mk(w,()=>{ if(solved)return; delete place[w]; sel=null; render(); }); drop.appendChild(b); });
+    placedWords.filter(w=>place[w]===br.id).forEach(w=>{ drop.appendChild(mk(w,()=>{ if(solved)return; delete place[w]; sel=null; render(); })); });
     d.appendChild(drop);
-    d.onclick=(e)=>{ if(solved||e.target.classList.contains("w"))return; if(sel){ place[sel]=br.id; sel=null; render(); } };
+    d.onclick=(e)=>{ if(solved||e.target.classList.contains("w"))return; if(sel){ startTimer(); place[sel]=br.id; sel=null; render(); } };
     $("branches").appendChild(d);
   });
-  paint();
-  $("prog").innerHTML="ชุด <b>"+(r+1)+"</b> / "+SETS.length+" · วางแล้ว "+placedWords.length+" / "+set.words.length;
+  paint(); meter();
 }
 function mk(w,fn){ const b=document.createElement("button"); b.className="w small"; b.textContent=w; b.onclick=(e)=>{e.stopPropagation();fn();}; return b; }
-function paint(){ [...$("bank").children].forEach(c=>c.classList.toggle("sel",c.textContent===sel)); [...document.querySelectorAll(".branch")].forEach(b=>b.classList.toggle("aim",!!sel&&!solved)); }
+function paint(){ [...$("bank").children].forEach(c=>c.classList.toggle("sel",c.textContent===sel));
+  [...document.querySelectorAll(".branch")].forEach(b=>b.classList.toggle("aim",!!sel&&!solved)); }
+
+function starsFor(timeSec){
+  let s = timeSec<=30 ? 3 : timeSec<=55 ? 2 : 1;     // ยิ่งเร็วยิ่งได้ดาว
+  if(wrongTries>0) s=Math.min(s,2);                  // เคยตรวจผิด ลดดาว
+  if(wrongTries>2) s=1;
+  return s;
+}
+function totalStars(){ return results.reduce((n,r)=>n+r.stars,0); }
 
 $("checkBtn").onclick=()=>{
-  const set=SET(), placed=Object.keys(place);
-  if(placed.length<set.words.length){ $("feedback").textContent="วางให้ครบทุกคำก่อนนะ"; $("feedback").className="feedback bad"; return; }
+  const set=SET();
+  if(Object.keys(place).length<set.words.length){ $("feedback").textContent="วางให้ครบทุกคำก่อนนะ"; $("feedback").className="feedback bad"; return; }
   let correct=0; set.words.forEach(x=>{ if(place[x.w]===x.c) correct++; });
   document.querySelectorAll(".branch").forEach(br=>{ [...br.querySelectorAll(".w")].forEach(el=>{ const ok=set.words.find(x=>x.w===el.textContent).c===br.dataset.id; el.classList.add(ok?"right":"wrong"); }); });
+
   if(correct===set.words.length){
-    $("feedback").textContent="✓ ถูกทั้งหมด เก่งมาก! 🎉"; $("feedback").className="feedback good";
-    solved=true; $("checkBtn").disabled=true; $("nextBtn").disabled=false;
-    $("nextBtn").textContent = r<SETS.length-1 ? "ชุดต่อไป →" : "ดูสรุป";
-  } else { $("feedback").textContent="ถูก "+correct+" / "+set.words.length+" — คำสีแดงอยู่ผิดกิ่ง แตะออกแล้วย้ายใหม่"; $("feedback").className="feedback bad"; }
+    solved=true; stopTimer(); $("checkBtn").disabled=true;
+    const timeMs=startMs?Date.now()-startMs:0, timeSec=Math.round(timeMs/1000);
+    const stars=starsFor(timeSec), acc=Math.round(set.words.length/(set.words.length+wrongTries*set.words.length+0.0001)*100);
+    results.push({time:timeMs, stars, acc});
+    setTimeout(()=>showClear(timeMs, stars), 450);
+  } else {
+    wrongTries++;
+    $("feedback").textContent="ถูก "+correct+" / "+set.words.length+" — คำสีแดงอยู่ผิดกิ่ง แตะออกแล้วย้ายใหม่"; $("feedback").className="feedback bad";
+    // เปิดให้แก้ต่อ: คืนสถานะคำผิดให้ขยับได้
+    setTimeout(()=>{ document.querySelectorAll(".branch .w").forEach(el=>el.classList.remove("wrong","right")); },900);
+  }
 };
-$("resetBtn").onclick=()=>{ place={}; sel=null; solved=false; $("checkBtn").disabled=false; $("nextBtn").disabled=true; $("feedback").textContent=""; $("feedback").className="feedback"; render(); };
-$("nextBtn").onclick=()=>{
-  r++;
-  if(r>=SETS.length){ $("game").style.display="none"; $("done").style.display="";
-    $("dt").textContent="จัดกลุ่มครบทุกชุดแล้ว! 🎉"; $("ds").textContent="หนูจัดคำตามมาตราตัวสะกดได้ครบทั้ง 8 มาตราแล้ว"; return; }
-  place={}; sel=null; solved=false; $("checkBtn").disabled=false; $("nextBtn").disabled=true; $("feedback").textContent=""; $("feedback").className="feedback"; render();
-};
-$("again").onclick=()=>{ r=0; place={}; sel=null; solved=false; $("done").style.display="none"; $("game").style.display=""; $("checkBtn").disabled=false; $("nextBtn").disabled=true; $("feedback").textContent=""; $("feedback").className="feedback"; render(); };
-render();
+function showClear(timeMs, stars){
+  $("game").style.display="none"; $("clear").style.display="";
+  const last=lv===SETS.length-1;
+  $("clearTitle").textContent="ผ่านด่านที่ "+(lv+1)+"!";
+  $("clearStars").textContent="⭐".repeat(stars)+"☆".repeat(3-stars);
+  $("clearTime").textContent=fmt(timeMs);
+  $("clearAcc").textContent=(wrongTries===0?"100%":Math.max(50,100-wrongTries*10)+"%");
+  $("clearTotalStars").textContent=totalStars();
+  // dots ความคืบหน้าด่าน
+  let dh=""; for(let i=0;i<SETS.length;i++){ dh+='<i class="'+(i<=lv?"on":"")+(i===lv?" cur":"")+'"></i>'; } $("lvdots").innerHTML=dh;
+  $("nextLvBtn").textContent = last ? "ดูสรุป 🏆" : ("ด่านต่อไป → (ด่าน "+(lv+2)+")");
+}
+$("nextLvBtn").onclick=()=>{ lv++; if(lv>=SETS.length) showFinish(); else startLevel(); };
+$("resetBtn").onclick=startLevel;
+
+function showFinish(){
+  stopTimer(); $("game").style.display="none"; $("clear").style.display="none"; $("finish").style.display="";
+  const tot=totalStars(), max=SETS.length*3, totMs=results.reduce((n,r)=>n+r.time,0);
+  $("finishTitle").textContent="จบทุกด่านแล้ว! เก่งมาก 🎉";
+  $("finishStars").textContent="⭐ "+tot+" / "+max;
+  $("finishTime").textContent=fmt(totMs);
+  $("finishStarCnt").textContent=tot+" / "+max;
+  $("finishMsg").textContent = tot>=max*0.9 ? "สุดยอด! แม่นและเร็วมาก เป็นเซียนมาตราตัวสะกดแล้ว"
+                              : tot>=max*0.6 ? "เยี่ยมมาก! ลองเล่นใหม่เพื่อทำเวลาให้ไวขึ้น"
+                              : "เก่งมากที่ทำครบทุกด่าน ลองอีกครั้งเพื่อเก็บดาวให้ครบ";
+}
+$("againBtn").onclick=()=>{ lv=0; results.length=0; startLevel(); };
+
+startLevel();
 </script>
 </body>
 </html>
