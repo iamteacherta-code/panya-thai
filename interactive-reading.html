@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · Connected Text · อ่านจับใจความ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="interactive.css" />
+<style>
+  .passage{font-family:var(--thai);font-size:1.25rem;line-height:2;color:var(--ink);border:1.6px solid var(--line);border-radius:14px;background:#fff;padding:16px 20px;margin-bottom:14px;}
+  .passage .pt{font-family:var(--font);font-weight:800;color:var(--earth-d);font-size:1rem;margin-bottom:8px;}
+  .q{border:1.5px solid var(--line);border-radius:14px;background:var(--surface);padding:14px 16px;margin-bottom:12px;}
+  .q .qt{font-family:var(--thai);font-weight:700;font-size:1.08rem;margin-bottom:10px;}
+  .opt{display:block;width:100%;text-align:left;font-family:var(--thai);font-size:1.05rem;border:1.8px solid var(--line-2);border-radius:11px;background:#fff;color:var(--ink);padding:11px 15px;margin-bottom:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+  .opt:hover{background:var(--earth-l);}
+  .opt.right{background:var(--leaf-l);border-color:var(--leaf);color:var(--leaf-d);font-weight:700;}
+  .opt.wrong{background:#fde7ea;border-color:var(--clay);color:var(--clay);}
+  .opt:disabled{cursor:default;}
+  .reflect{font-family:var(--thai);}
+  textarea{width:100%;border:1.8px solid var(--line-2);border-radius:12px;font-family:var(--thai);font-size:1.05rem;padding:11px 13px;min-height:80px;resize:vertical;color:var(--ink);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <span class="logo">P</span>
+    <div><div class="bn">PANYA</div><div class="bs">Connected Text · อ่านจับใจความ</div></div>
+    <span class="spacer"></span><a class="home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก</a>
+  </div>
+  <div class="eyebrow">Interactive · อ่านแล้วตอบเชิงวิเคราะห์</div>
+  <h1>อ่านเรื่องแล้วตอบคำถาม</h1>
+  <p class="sub">เลือกระดับ อ่านเรื่อง แล้วตอบคำถาม — ระบบเฉลยทันทีพร้อมคะแนน</p>
+  <div class="bar"><div class="chips" id="levels"></div><div class="prog" id="prog"></div></div>
+
+  <div id="view"></div>
+</div>
+
+<script>
+const STORIES=[
+  { lv:"Y4", title:"กระต่ายกับเต่า",
+    text:["กระต่ายชอบล้อเต่าว่าเดินช้า วันหนึ่งทั้งคู่จึงแข่งวิ่งกัน",
+          "กระต่ายวิ่งนำไปไกลแล้วแวะนอนพักใต้ต้นไม้เพราะมั่นใจว่าตนเองชนะแน่",
+          "เต่าค่อย ๆ เดินไปเรื่อย ๆ ไม่หยุดพัก จนถึงเส้นชัยก่อนกระต่ายที่ยังหลับอยู่"],
+    qs:[
+      {q:"ทำไมกระต่ายจึงแพ้?",o:["เพราะเต่าวิ่งเร็วกว่า","เพราะกระต่ายแวะนอนพัก","เพราะกระต่ายหลงทาง"],a:1},
+      {q:"เรื่องนี้สอนเรื่องใดมากที่สุด?",o:["ความขยันและไม่ประมาท","การวิ่งให้เร็ว","การนอนพักผ่อน"],a:0},
+      {q:"คำว่า “เส้นชัย” หมายถึงอะไร?",o:["จุดเริ่มต้น","จุดสิ้นสุดการแข่ง","ต้นไม้ใหญ่"],a:1},
+    ],
+    reflect:"ถ้าหนูเป็นกระต่าย หนูจะทำต่างไปอย่างไร?" },
+  { lv:"Y5", title:"ป่าชายเลน",
+    text:["ป่าชายเลนคือป่าที่ขึ้นบริเวณริมทะเล มีต้นโกงกางที่มีรากค้ำยันแข็งแรง",
+          "ป่าชนิดนี้เป็นแหล่งอนุบาลสัตว์น้ำวัยอ่อน และช่วยป้องกันคลื่นลมไม่ให้ทำลายชายฝั่ง",
+          "หากเราตัดต้นไม้ในป่าชายเลน ชายฝั่งจะถูกกัดเซาะและสัตว์น้ำจะลดลง"],
+    qs:[
+      {q:"ป่าชายเลนขึ้นอยู่บริเวณใด?",o:["บนภูเขา","ริมทะเล","กลางทุ่งนา"],a:1},
+      {q:"ข้อใดเป็นประโยชน์ของป่าชายเลนตามเรื่อง?",o:["เป็นแหล่งอนุบาลสัตว์น้ำ","ใช้ปลูกข้าว","เป็นที่อยู่ของนกอินทรี"],a:0},
+      {q:"ผลของการตัดต้นไม้ในป่าชายเลนคืออะไร?",o:["ชายฝั่งถูกกัดเซาะ","ฝนตกมากขึ้น","อากาศหนาวลง"],a:0},
+    ],
+    reflect:"เราจะช่วยอนุรักษ์ป่าชายเลนได้อย่างไรบ้าง?" },
+  { lv:"Y6", title:"ประโยชน์ของการอ่าน",
+    text:["การอ่านหนังสือไม่เพียงให้ความเพลิดเพลิน แต่ยังเปิดโลกความรู้ที่กว้างไกล",
+          "ผู้ที่อ่านมากย่อมมีคลังคำและความคิดที่หลากหลาย ทำให้สื่อสารและเขียนได้ดีขึ้น",
+          "ดังนั้น การฝึกนิสัยรักการอ่านตั้งแต่เด็กจึงเป็นรากฐานสำคัญของการเรียนรู้ตลอดชีวิต"],
+    qs:[
+      {q:"ใจความสำคัญของเรื่องนี้คือข้อใด?",o:["การอ่านมีประโยชน์และควรฝึกตั้งแต่เด็ก","หนังสือมีราคาแพง","การเขียนยากกว่าการอ่าน"],a:0},
+      {q:"ตามเรื่อง ผู้ที่อ่านมากจะได้สิ่งใด?",o:["คลังคำและความคิดหลากหลาย","เงินทองมากมาย","เพื่อนมากขึ้น"],a:0},
+      {q:"คำว่า “รากฐาน” ในเรื่องสื่อความหมายใด?",o:["สิ่งที่อยู่ใต้ดิน","สิ่งสำคัญที่เป็นพื้นฐาน","ต้นไม้ใหญ่"],a:1},
+    ],
+    reflect:"หนังสือเล่มโปรดของหนูคือเล่มใด เพราะอะไร?" },
+];
+const $=id=>document.getElementById(id);
+let level="all", pool=[], i=0, answered=0, score=0;
+
+["all","Y4","Y5","Y6"].forEach(l=>{ const b=document.createElement("button"); b.className="lvchip"+(l==="all"?" on":""); b.textContent=l==="all"?"ทั้งหมด":l; b.dataset.l=l;
+  b.onclick=()=>{ level=l; [...$("levels").children].forEach(c=>c.classList.toggle("on",c.dataset.l===l)); start(); }; $("levels").appendChild(b); });
+
+function start(){ pool=STORIES.filter(s=>level==="all"||s.lv===level); i=0;score=0;answered=0; render(); }
+function render(){
+  const s=pool[i]; if(!s){ $("view").innerHTML=""; return; }
+  $("prog").innerHTML="เรื่อง <b>"+(i+1)+"</b> / "+pool.length+" · คะแนน "+score;
+  let h='<div class="card"><div class="passage"><div class="pt">['+s.lv+'] '+s.title+'</div>'+s.text.map(p=>'<p style="margin:0 0 6px">'+p+'</p>').join('')+'</div>';
+  s.qs.forEach((q,qi)=>{ h+='<div class="q" data-qi="'+qi+'"><div class="qt">'+(qi+1)+'. '+q.q+'</div>'+q.o.map((o,oi)=>'<button class="opt" data-oi="'+oi+'">'+o+'</button>').join('')+'</div>'; });
+  h+='<div class="q"><div class="qt">✍️ '+s.reflect+'</div><textarea placeholder="เขียนความคิดของหนู…"></textarea></div>';
+  h+='<div class="feedback" id="fb"></div><div class="actions"><button class="btn next" id="nextBtn" disabled>'+(i<pool.length-1?"เรื่องต่อไป →":"ดูสรุป")+'</button></div></div>';
+  $("view").innerHTML=h;
+  let done=0;
+  s.qs.forEach((q,qi)=>{
+    const box=$("view").querySelector('.q[data-qi="'+qi+'"]');
+    box.querySelectorAll(".opt").forEach(btn=>{
+      btn.onclick=()=>{
+        if(box.dataset.done) return; box.dataset.done="1"; done++; answered++;
+        const oi=+btn.dataset.oi;
+        if(oi===q.a){ btn.classList.add("right"); score++; }
+        else { btn.classList.add("wrong"); box.querySelectorAll(".opt")[q.a].classList.add("right"); }
+        box.querySelectorAll(".opt").forEach(b=>b.disabled=true);
+        $("prog").innerHTML="เรื่อง <b>"+(i+1)+"</b> / "+pool.length+" · คะแนน "+score;
+        if(done===s.qs.length){ $("fb").textContent="ทำคำถามครบแล้ว 👍"; $("fb").className="feedback good"; $("nextBtn").disabled=false; }
+      };
+    });
+  });
+  $("nextBtn").onclick=()=>{ i++; if(i>=pool.length) finish(); else render(); };
+}
+function finish(){ const total=pool.reduce((n,s)=>n+s.qs.length,0);
+  $("view").innerHTML='<div class="card done"><div class="big">📖</div><h2>อ่านครบแล้ว! ตอบถูก '+score+' / '+total+'</h2><p class="sub">'+(score===total?"ยอดเยี่ยม เข้าใจเรื่องดีมาก!":"เก่งมาก ลองอ่านซ้ำเพื่อจับใจความให้แม่นขึ้น")+'</p><div class="actions"><button class="btn check" id="again">เริ่มใหม่</button></div></div>';
+  $("again").onclick=start; $("prog").innerHTML="";
+}
+start();
+</script>
+</body>
+</html>

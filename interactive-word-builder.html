@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · Word Builder · สร้างคำ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="interactive.css" />
+<style>
+  .preview{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:150px;border:2px solid var(--line);border-radius:16px;background:#fff;margin:10px 0 4px;}
+  .preview .big{font-family:var(--thai);font-size:84px;line-height:1.1;color:var(--ink);}
+  .preview .hint{font-family:var(--thai);color:var(--ink-3);font-size:1rem;}
+  .row{margin:12px 0;}
+  .row .rl{font-family:var(--thai);font-weight:700;font-size:.85rem;color:var(--earth-d);margin-bottom:6px;}
+  .tiles{display:flex;gap:8px;flex-wrap:wrap;}
+  .tiles .w{min-width:52px;text-align:center;}
+  .target{font-family:var(--thai);font-weight:800;color:var(--leaf-d);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <span class="logo">P</span>
+    <div><div class="bn">PANYA</div><div class="bs">Word Builder · สร้างคำ</div></div>
+    <span class="spacer"></span><a class="home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก</a>
+  </div>
+  <div class="eyebrow">Interactive · ประสมคำ (สระลดรูปอัตโนมัติ)</div>
+  <h1>สร้างคำตามเป้าหมาย</h1>
+  <p class="sub">แตะ พยัญชนะ + สระ + ตัวสะกด ให้ได้คำตามเป้าหมาย — ระบบจะลดรูป/เปลี่ยนรูปสระให้อัตโนมัติเมื่อมีตัวสะกด</p>
+  <div class="bar"><div class="prog" id="prog"></div></div>
+
+  <div id="game">
+    <div class="card">
+      <p class="ins">เป้าหมาย: <span class="target" id="target"></span> &nbsp;·&nbsp; <span id="hint" style="color:var(--ink-3)"></span></p>
+      <div class="preview"><div class="big" id="preview">—</div><div class="hint">คำที่ประสมได้</div></div>
+      <div class="row"><div class="rl">พยัญชนะต้น · Initial</div><div class="tiles" id="rowI"></div></div>
+      <div class="row"><div class="rl">สระ · Vowel</div><div class="tiles" id="rowV"></div></div>
+      <div class="row"><div class="rl">ตัวสะกด · Final</div><div class="tiles" id="rowF"></div></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="actions">
+        <button class="btn check" id="checkBtn">✓ ตรวจ</button>
+        <button class="btn ghost" id="clearBtn">ล้าง</button>
+        <button class="btn next" id="nextBtn" disabled>ถัดไป →</button>
+      </div>
+    </div>
+  </div>
+  <div class="card done" id="done" style="display:none">
+    <div class="big">🧩</div><h2 id="dt"></h2><p class="sub" id="ds"></p>
+    <div class="actions"><button class="btn check" id="again">เล่นอีกครั้ง</button></div>
+  </div>
+</div>
+
+<script src="thai-data.js"></script>
+<script>
+const T = window.THAI;
+const DOT="◌";
+const VLABEL={a:"◌ะ",aa:"า",i:"◌ิ",ii:"◌ี",u:"◌ุ",uu:"◌ู",e_s:"เ◌ะ",o_s:"โ◌ะ",aw_s:"เ◌าะ",oe:"เ◌อ",ua:"◌ัว",e:"เ◌",o:"โ◌"};
+const INITS=["ก","ง","จ","ด","ต","ป","ม","ส","ล","ห"];
+const VOWS=["a","aa","ii","uu","e_s","o_s","aw_s","oe","ua","e","o"];
+const FINS=["","ง","น","ม","ก","ด","บ","ว","ย"];
+const ROUNDS=[
+  {t:"งง",hint:"อาการมึน"},
+  {t:"กัน",hint:"ด้วยกัน"},
+  {t:"เป็น",hint:"มีสภาพเป็น"},
+  {t:"ล็อก",hint:"ใส่กุญแจ"},
+  {t:"สวน",hint:"ที่ปลูกต้นไม้"},
+  {t:"เดิน",hint:"ก้าวขาไป"},
+  {t:"กา",hint:"นกสีดำ"},
+  {t:"ปู",hint:"สัตว์ทะเลก้ามใหญ่"},
+];
+const $=id=>document.getElementById(id);
+const vobj=id=>T.vowels.find(v=>v.id===id);
+let i=0,score=0,selI=null,selV=null,selF="";
+
+function tilesInit(){
+  $("rowI").innerHTML=""; INITS.forEach(c=>{ const b=mk(c,()=>{selI=c;mark("rowI",c);upd();}); $("rowI").appendChild(b); });
+  $("rowV").innerHTML=""; VOWS.forEach(id=>{ const b=mk(VLABEL[id]||id,()=>{selV=id;mark("rowV",VLABEL[id]);upd();}); $("rowV").appendChild(b); });
+  $("rowF").innerHTML=""; FINS.forEach(f=>{ const b=mk(f===""?"— ไม่มี":f,()=>{selF=f;mark("rowF",f===""?"— ไม่มี":f);upd();}); $("rowF").appendChild(b); });
+}
+function mk(txt,fn){ const b=document.createElement("button"); b.className="w"; b.textContent=txt; b.onclick=fn; return b; }
+function mark(row,txt){ [...$(row).children].forEach(c=>c.classList.toggle("sel",c.textContent===txt)); }
+function upd(){ $("preview").textContent = (selI&&selV) ? T.buildSyllable(selI, vobj(selV), null, selF) : (selI||"—"); }
+
+function load(){
+  const r=ROUNDS[i]; selI=null;selV=null;selF="";
+  $("target").textContent=r.t; $("hint").textContent=r.hint; $("preview").textContent="—";
+  $("feedback").textContent=""; $("feedback").className="feedback"; $("nextBtn").disabled=true; $("checkBtn").disabled=false;
+  $("prog").innerHTML="ข้อ <b>"+(i+1)+"</b> / "+ROUNDS.length+" · ถูก "+score;
+  tilesInit();
+}
+$("checkBtn").onclick=()=>{
+  if(!selI||!selV){ $("feedback").textContent="เลือกพยัญชนะและสระก่อน"; $("feedback").className="feedback bad"; return; }
+  const got=T.buildSyllable(selI,vobj(selV),null,selF), r=ROUNDS[i];
+  if(got===r.t){ $("feedback").textContent="✓ ถูกต้อง! "+got+" 🎉"; $("feedback").className="feedback good"; score++; $("nextBtn").disabled=false; $("checkBtn").disabled=true; }
+  else { $("feedback").textContent="ได้ \""+got+"\" — ยังไม่ตรงเป้าหมาย ลองปรับสระ/ตัวสะกด"; $("feedback").className="feedback bad"; }
+  $("prog").innerHTML="ข้อ <b>"+(i+1)+"</b> / "+ROUNDS.length+" · ถูก "+score;
+};
+$("clearBtn").onclick=()=>{ selI=null;selV=null;selF=""; ["rowI","rowV","rowF"].forEach(r=>[...$(r).children].forEach(c=>c.classList.remove("sel"))); $("preview").textContent="—"; $("feedback").textContent=""; };
+$("nextBtn").onclick=()=>{ i++; if(i>=ROUNDS.length){ $("game").style.display="none"; $("done").style.display=""; $("dt").textContent="ทำครบแล้ว! ได้ "+score+" / "+ROUNDS.length; $("ds").textContent=score===ROUNDS.length?"ยอดเยี่ยม! ประสมคำถูกทุกข้อ":"เก่งมาก ลองอีกครั้งให้คล่องขึ้น"; } else load(); };
+$("again").onclick=()=>{ i=0;score=0;$("done").style.display="none";$("game").style.display="";load(); };
+load();
+</script>
+</body>
+</html>

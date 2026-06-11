@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · Heart Words · คำที่ต้องจำ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="interactive.css" />
+<style>
+  .word{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:14px 0 8px;}
+  .part{font-family:var(--thai);font-size:2.6rem;border:1.9px solid var(--line-2);border-radius:14px;background:#fff;color:var(--ink);
+    padding:8px 16px;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent;}
+  .part.heart{background:#fde7ea;border-color:var(--clay);color:var(--clay);}
+  .part.heart::after{content:"♥";position:absolute;top:-10px;right:-6px;font-size:1rem;color:var(--clay);}
+  .part.right{background:var(--leaf-l);border-color:var(--leaf);}
+  .part.miss{outline:3px dashed var(--clay);}
+  .meaning{text-align:center;font-family:var(--thai);color:var(--ink-3);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <span class="logo">P</span>
+    <div><div class="bn">PANYA</div><div class="bs">Heart Words · คำที่ต้องจำ</div></div>
+    <span class="spacer"></span><a class="home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก</a>
+  </div>
+  <div class="eyebrow">Interactive · Orthographic Mapping</div>
+  <h1>แตะส่วนของคำที่ “ต้องจำ”</h1>
+  <p class="sub">คำเหล่านี้สะกดไม่ตรงเสียง — แตะส่วนที่ต้องจำเป็นพิเศษ (♥) แล้วกด “ตรวจ”</p>
+  <div class="bar"><div class="prog" id="prog"></div></div>
+
+  <div id="game">
+    <div class="card">
+      <div class="meaning" id="meaning"></div>
+      <div class="word" id="word"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="actions">
+        <button class="btn check" id="checkBtn">✓ ตรวจ</button>
+        <button class="btn ghost" id="clearBtn">ล้าง</button>
+        <button class="btn next" id="nextBtn" disabled>ถัดไป →</button>
+      </div>
+    </div>
+  </div>
+  <div class="card done" id="done" style="display:none">
+    <div class="big">❤️</div><h2 id="dt"></h2><p class="sub" id="ds"></p>
+    <div class="actions"><button class="btn check" id="again">เล่นอีกครั้ง</button></div>
+  </div>
+</div>
+
+<script>
+const WORDS=[
+  {parts:["อ","นุ","ญา","ต"],heart:[3],m:"อนุญาต · ลงท้ายด้วย ต (ไม่ใช่ ติ)"},
+  {parts:["สัง","เกต"],heart:[1],m:"สังเกต · ไม่มีสระ ◌ุ ที่ ต"},
+  {parts:["สะ","อา","ด"],heart:[2],m:"สะอาด · สะกดด้วย ด"},
+  {parts:["โทร","ศัพท์"],heart:[1],m:"โทรศัพท์ · มี พ การันต์"},
+  {parts:["ปรา","รถ","นา"],heart:[1],m:"ปรารถนา · มี ร ที่ไม่ออกเสียงชัด"},
+  {parts:["ก","ระ","เพรา"],heart:[2],m:"กะเพรา/กระเพรา · จำรูปให้ดี"},
+];
+const $=id=>document.getElementById(id);
+let i=0,score=0,sel=new Set();
+function load(){
+  const q=WORDS[i]; sel=new Set();
+  $("meaning").textContent=q.m;
+  $("word").innerHTML="";
+  q.parts.forEach((p,idx)=>{ const b=document.createElement("button"); b.className="part"; b.textContent=p; b.dataset.i=idx;
+    b.onclick=()=>{ if(b.classList.contains("right")||b.classList.contains("miss"))return; if(sel.has(idx)){sel.delete(idx);b.classList.remove("heart");} else {sel.add(idx);b.classList.add("heart");} };
+    $("word").appendChild(b); });
+  $("feedback").textContent=""; $("feedback").className="feedback"; $("nextBtn").disabled=true; $("checkBtn").disabled=false;
+  $("prog").innerHTML="ข้อ <b>"+(i+1)+"</b> / "+WORDS.length+" · ถูก "+score;
+}
+$("checkBtn").onclick=()=>{
+  const q=WORDS[i]; const want=new Set(q.heart);
+  const ok = sel.size===want.size && [...want].every(x=>sel.has(x));
+  [...$("word").children].forEach((el,idx)=>{ if(want.has(idx)) el.classList.add(sel.has(idx)?"right":"miss"); });
+  if(ok){ $("feedback").textContent="✓ ถูกต้อง! จำส่วนนี้ให้ดี ♥"; $("feedback").className="feedback good"; score++; }
+  else { $("feedback").textContent="ส่วนที่ต้องจำคือช่องที่มีกรอบ — ลองสังเกตอีกครั้ง"; $("feedback").className="feedback bad"; }
+  $("nextBtn").disabled=false; $("checkBtn").disabled=true;
+  $("prog").innerHTML="ข้อ <b>"+(i+1)+"</b> / "+WORDS.length+" · ถูก "+score;
+};
+$("clearBtn").onclick=()=>{ sel.clear(); [...$("word").children].forEach(el=>el.classList.remove("heart")); };
+$("nextBtn").onclick=()=>{ i++; if(i>=WORDS.length){ $("game").style.display="none"; $("done").style.display=""; $("dt").textContent="ทำครบแล้ว! ได้ "+score+" / "+WORDS.length; $("ds").textContent="นำคำเหล่านี้ไปจดใน Heart Words notebook ของหนู"; } else load(); };
+$("again").onclick=()=>{ i=0;score=0;$("done").style.display="none";$("game").style.display="";load(); };
+load();
+</script>
+</body>
+</html>

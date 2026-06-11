@@ -322,6 +322,10 @@ const COMP_PHASES = [
   { en: "Writing", th: "การเขียนและนำเสนอ", range: "C29–C36", page: 18 },
   { en: "Writing Workshop", th: "การเขียนเชิงโครงสร้าง", range: "Y4–Y6", page: 1, file: "activity-writing-workshop.html" },
   { en: "Sentence Builder", th: "เรียงประโยค (เกมโต้ตอบ)", range: "🎮 Interactive", file: "interactive-sentence-scramble.html", interactive: true },
+  { en: "Word Builder", th: "สร้างคำ (ประสม–ลดรูปสระ)", range: "🎮 Interactive", file: "interactive-word-builder.html", interactive: true },
+  { en: "Word Map", th: "จัดกลุ่มคำตามมาตรา", range: "🎮 Interactive", file: "interactive-mindmap.html", interactive: true },
+  { en: "Heart Words", th: "คำที่ต้องจำ", range: "🎮 Interactive", file: "interactive-heart-words.html", interactive: true },
+  { en: "Connected Text", th: "อ่านจับใจความ + คำถาม", range: "🎮 Interactive", file: "interactive-reading.html", interactive: true },
 ];
 function LessonsPage({ grade }) {
   const [lvl, setLvl] = React.useState(() => lessonGradeLevel(grade));

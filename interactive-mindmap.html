@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · Word Map · จัดกลุ่มคำ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="interactive.css" />
+<style>
+  .bankzone{display:flex;flex-wrap:wrap;gap:9px;min-height:60px;border:2px dashed var(--line-2);border-radius:14px;background:#fff;padding:12px;margin:6px 0 16px;}
+  .branches{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
+  .branch{border:1.7px solid var(--line);border-radius:14px;background:var(--surface);padding:10px;min-height:130px;cursor:pointer;}
+  .branch.aim{outline:3px solid rgba(91,122,75,.35);}
+  .branch .bh{font-family:var(--thai);font-weight:700;color:var(--earth-d);font-size:.95rem;border-bottom:1.5px solid var(--line);padding-bottom:6px;margin-bottom:8px;text-align:center;}
+  .branch .drop{display:flex;flex-wrap:wrap;gap:8px;}
+  .w.small{font-size:1.2rem;padding:7px 12px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <span class="logo">P</span>
+    <div><div class="bn">PANYA</div><div class="bs">Word Map · จัดกลุ่มคำ</div></div>
+    <span class="spacer"></span><a class="home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก</a>
+  </div>
+  <div class="eyebrow">Interactive · จัดกลุ่มตามมาตราตัวสะกด</div>
+  <h1>ลากคำเข้ากิ่งให้ถูกมาตรา</h1>
+  <p class="sub">แตะคำในกล่อง แล้วแตะกิ่งที่ถูกต้อง · แตะคำในกิ่งเพื่อเอาออก แล้วกด “ตรวจ”</p>
+  <div class="bar"><div class="prog" id="prog"></div></div>
+
+  <div id="game">
+    <div class="card">
+      <div class="bankzone" id="bank"></div>
+      <div class="branches" id="branches"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="actions">
+        <button class="btn check" id="checkBtn">✓ ตรวจ</button>
+        <button class="btn ghost" id="resetBtn">เริ่มใหม่</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SET = {
+  branches:[
+    {id:"kong",name:"แม่กง (–ง)"},{id:"kon",name:"แม่กน (–น)"},
+    {id:"kom",name:"แม่กม (–ม)"},{id:"kok",name:"แม่กก (–ก)"},
+  ],
+  words:[
+    {w:"กาง",c:"kong"},{w:"ลิง",c:"kong"},
+    {w:"จาน",c:"kon"},{w:"ปีน",c:"kon"},
+    {w:"ตาม",c:"kom"},{w:"ยาม",c:"kom"},
+    {w:"ปาก",c:"kok"},{w:"มาก",c:"kok"},
+  ],
+};
+const $=id=>document.getElementById(id);
+const shuffle=a=>{a=a.slice();for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]];}return a;};
+let place={}, sel=null; // place[word]=branchId
+
+function render(){
+  const placedWords=Object.keys(place);
+  // bank
+  $("bank").innerHTML="";
+  shuffle(SET.words.map(x=>x.w)).filter(w=>!placedWords.includes(w)).forEach(w=>{
+    const b=mk(w,()=>{ sel=(sel===w?null:w); paint(); });
+    $("bank").appendChild(b);
+  });
+  // branches
+  $("branches").innerHTML="";
+  SET.branches.forEach(br=>{
+    const d=document.createElement("div"); d.className="branch"; d.dataset.id=br.id;
+    d.innerHTML='<div class="bh">'+br.name+'</div>';
+    const drop=document.createElement("div"); drop.className="drop";
+    placedWords.filter(w=>place[w]===br.id).forEach(w=>{ const b=mk(w,()=>{ delete place[w]; sel=null; render(); }); drop.appendChild(b); });
+    d.appendChild(drop);
+    d.onclick=(e)=>{ if(e.target.classList.contains("w"))return; if(sel){ place[sel]=br.id; sel=null; render(); } };
+    $("branches").appendChild(d);
+  });
+  paint();
+  $("prog").innerHTML="วางแล้ว <b>"+placedWords.length+"</b> / "+SET.words.length;
+}
+function mk(w,fn){ const b=document.createElement("button"); b.className="w small"; b.textContent=w; b.onclick=(e)=>{e.stopPropagation();fn();}; return b; }
+function paint(){ [...$("bank").children].forEach(c=>c.classList.toggle("sel",c.textContent===sel)); [...document.querySelectorAll(".branch")].forEach(b=>b.classList.toggle("aim",!!sel)); }
+
+$("checkBtn").onclick=()=>{
+  const placed=Object.keys(place); if(placed.length<SET.words.length){ $("feedback").textContent="วางให้ครบทุกคำก่อนนะ"; $("feedback").className="feedback bad"; return; }
+  let correct=0; document.querySelectorAll(".branch .drop .w").forEach(()=>{});
+  SET.words.forEach(x=>{ if(place[x.w]===x.c) correct++; });
+  // colour
+  document.querySelectorAll(".branch").forEach(br=>{ [...br.querySelectorAll(".w")].forEach(el=>{ const w=el.textContent; const ok=SET.words.find(x=>x.w===w).c===br.dataset.id; el.classList.add(ok?"right":"wrong"); }); });
+  if(correct===SET.words.length){ $("feedback").textContent="✓ ถูกทั้งหมด เก่งมาก! 🎉"; $("feedback").className="feedback good"; }
+  else { $("feedback").textContent="ถูก "+correct+" / "+SET.words.length+" — คำสีแดงอยู่ผิดกิ่ง แตะออกแล้วย้ายใหม่"; $("feedback").className="feedback bad"; }
+};
+$("resetBtn").onclick=()=>{ place={}; sel=null; $("feedback").textContent=""; render(); };
+render();
+</script>
+</body>
+</html>
