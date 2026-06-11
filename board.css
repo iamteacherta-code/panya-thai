@@ -440,3 +440,7 @@
   .tiles.cons { grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); }
   .otr { margin-left: 0; }
 }
+
+/* ===== Fullscreen: stack vertically — keypad panel moves below, fills the screen ===== */
+body.is-fs .board-cols { grid-template-columns: 1fr; max-width: 1000px; margin: 0 auto; }
+body.is-fs .board-stage { position: static; top: auto; }

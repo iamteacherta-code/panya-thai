@@ -134,6 +134,8 @@ function FocusControls({ go }) {
     document.addEventListener("webkitfullscreenchange", h);
     return () => { document.removeEventListener("fullscreenchange", h); document.removeEventListener("webkitfullscreenchange", h); };
   }, []);
+  // mark <body> while in fullscreen so the board can re-flow (panel → bottom)
+  useEffect(() => { document.body.classList.toggle("is-fs", full); return () => document.body.classList.remove("is-fs"); }, [full]);
   const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
   const exit = () => { const x = document.exitFullscreen || document.webkitExitFullscreen; if (fsEl() && x) try { x.call(document); } catch (e) {} };
   const toggleFull = () => {
