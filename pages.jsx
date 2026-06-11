@@ -304,15 +304,22 @@ const LESSONS_BY_GRADE = {
 };
 
 // Lessons grade items for the "Lessons ▾" nav dropdown (one per grade).
+// K2–Y3 come from THAI.GRADES; Y4–Y6 open the Comprehension (read-to-learn) strand.
 const LESSON_ITEMS = THAI.GRADE_ORDER.map((id) => ({
   id: "lesson-" + id,
   en: "Lessons · " + THAI.GRADES[id].en,
   th: "",   // English grade code only (avoid Thai grade-name confusion for int'l schools)
   icon: "lesson",
   grade: id,
-}));
+})).concat(["y4", "y5", "y6"].map((id) => ({
+  id: "lesson-" + id,
+  en: "Lessons · " + id.toUpperCase(),
+  th: "",
+  icon: "lesson",
+  grade: id,
+})));
 
-const LESSON_LEVELS = { beginner: ["k2", "k3", "y1"], intermediate: ["y2"], advanced: ["y3"] };
+const LESSON_LEVELS = { beginner: ["k2", "k3", "y1"], intermediate: ["y2"], advanced: ["y3"], comprehension: ["y4", "y5", "y6"] };
 const lessonGradeLevel = (gg) => Object.keys(LESSON_LEVELS).find((L) => LESSON_LEVELS[L].includes(gg)) || "beginner";
 // Comprehension (Y4–6) "read-to-learn" phases — link to the Reading & Writing pack + full curriculum.
 const COMP_PHASES = [
