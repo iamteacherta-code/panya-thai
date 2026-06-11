@@ -334,6 +334,70 @@ const COMP_PHASES = [
   { en: "Heart Words", th: "คำที่ต้องจำ", range: "🎮 Interactive", file: "interactive-heart-words.html", interactive: true },
   { en: "Connected Text", th: "อ่านจับใจความ + คำถาม", range: "🎮 Interactive", file: "interactive-reading.html", interactive: true },
 ];
+// Comprehension (Y4–Y6) full per-lesson breakdown (C1–C36), grouped Y4/Y5/Y6 → unit → lessons.
+const YEAR_FOCUS = {
+  Y4: "อ่านคล่อง & อ่านคำยาก (C1–C12)",
+  Y5: "สร้างคำ สำนวน & จับใจความ (C13–C22)",
+  Y6: "คิดวิเคราะห์ & การเขียน (C23–C36)",
+};
+const COMP_UNITS = [
+  { year: "Y4", n: "C1–C4", en: "Reading fluency & accuracy", th: "อ่านคล่องและถูกต้อง", lessons: [
+    { no: "C1", name: "อ่านซ้ำเพื่อความคล่อง", ex: "อ่านนิทานสั้น ซ้ำ 3 รอบ จับเวลา" },
+    { no: "C2", name: "อ่านเป็นวลี ไม่อ่านทีละคำ", ex: "“เด็ก ๆ วิ่งเล่น | ในสนาม”" },
+    { no: "C3", name: "การเว้นวรรคและอ่านตามเครื่องหมาย", ex: "ประโยคยาวที่มีวรรคตอน" },
+    { no: "C4", name: "อ่านทำนองเสนาะ (ร้อยกรองง่าย)", ex: "กาพย์ยานี / กลอนสี่บทสั้น" },
+  ] },
+  { year: "Y4", n: "C5–C8", en: "Multisyllabic words & leading consonants", th: "คำหลายพยางค์ & อักษรนำ/ควบไม่แท้", lessons: [
+    { no: "C5", name: "แบ่งพยางค์คำหลายพยางค์", ex: "มะ-ละ-กอ · โรง-เรียน · สวน-สัตว์" },
+    { no: "C6", name: "อักษรควบไม่แท้ (ทร → ซ)", ex: "ทราย ทรง จริง เศร้า สร้าง" },
+    { no: "C7", name: "อักษรนำ อ นำ ย", ex: "อย่า อยู่ อย่าง อยาก" },
+    { no: "C8", name: "อักษรนำ (อ่านสองพยางค์)", ex: "ขนม สนาม ตลาด ฉลาด" },
+  ] },
+  { year: "Y4", n: "C9–C12", en: "Homonyms & commonly-confused words", th: "คำพ้องและคำที่มักเขียนผิด", lessons: [
+    { no: "C9", name: "คำพ้องเสียง", ex: "การ–กาล · ใต้–ไต้ · พาน–พาล" },
+    { no: "C10", name: "คำพ้องรูป", ex: "เพลา · สระ · แหน" },
+    { no: "C11", name: "คำที่มักเขียน/อ่านผิด", ex: "อนุญาต กะเพรา สังเกต" },
+    { no: "C12", name: "คำยืม/คำทับศัพท์", ex: "ฟุตบอล คอมพิวเตอร์ เทคโนโลยี" },
+  ] },
+  { year: "Y5", n: "C13–C15", en: "Word formation", th: "การสร้างคำ", lessons: [
+    { no: "C13", name: "คำมูล–คำประสม", ex: "แม่น้ำ พ่อครัว รถไฟ น้ำตา" },
+    { no: "C14", name: "คำซ้ำ–คำซ้อน", ex: "เด็ก ๆ · บ้านเรือน เสื้อผ้า" },
+    { no: "C15", name: "คำสมาส (เบื้องต้น)", ex: "วิทยาศาสตร์ ประวัติศาสตร์ ราชการ" },
+  ] },
+  { year: "Y5", n: "C16–C18", en: "Register, idioms & proverbs", th: "ราชาศัพท์ สำนวน สุภาษิต", lessons: [
+    { no: "C16", name: "คำสุภาพและราชาศัพท์เบื้องต้น", ex: "รับประทาน · บรรทม · พระเนตร" },
+    { no: "C17", name: "สำนวนไทย", ex: "น้ำขึ้นให้รีบตัก · ชักแม่น้ำทั้งห้า" },
+    { no: "C18", name: "สุภาษิต–คำพังเพย", ex: "รักวัวให้ผูก รักลูกให้ตี" },
+  ] },
+  { year: "Y5", n: "C19–C22", en: "Main idea & summarizing", th: "ใจความสำคัญและการสรุป", lessons: [
+    { no: "C19", name: "ใจความสำคัญของย่อหน้า", ex: "หาประโยคใจความหลัก" },
+    { no: "C20", name: "ใจความสำคัญ vs รายละเอียด", ex: "ประโยคหลัก vs ประโยคขยาย" },
+    { no: "C21", name: "ตั้งชื่อเรื่อง/หัวข้อ", ex: "อ่านเรื่องสั้นแล้วตั้งชื่อ" },
+    { no: "C22", name: "สรุปความเป็นประโยคเดียว", ex: "สรุปนิทานเป็น 1 ประโยค" },
+  ] },
+  { year: "Y6", n: "C23–C25", en: "Sequence & cause–effect", th: "ลำดับเหตุการณ์และเหตุผล", lessons: [
+    { no: "C23", name: "เรียงลำดับเหตุการณ์", ex: "ก่อน · จากนั้น · สุดท้าย" },
+    { no: "C24", name: "เหตุและผล", ex: "“ฝนตก จึง ถนนเปียก”" },
+    { no: "C25", name: "คาดเดาเรื่องจากเบาะแส", ex: "อ่านครึ่งเรื่องแล้วเดาตอนจบ" },
+  ] },
+  { year: "Y6", n: "C26–C28", en: "Critical reading & real-world texts", th: "คิดวิเคราะห์และอ่านข้อมูลจริง", lessons: [
+    { no: "C26", name: "ข้อเท็จจริง vs ข้อคิดเห็น", ex: "คัดแยกประโยค 2 ประเภท" },
+    { no: "C27", name: "จุดประสงค์ของผู้เขียน", ex: "ข่าว · โฆษณา · นิทาน" },
+    { no: "C28", name: "อ่านข้อมูลจริง (ตาราง/ป้าย)", ex: "ตารางเวร · เมนู · ป้ายราคา" },
+  ] },
+  { year: "Y6", n: "C29–C32", en: "Précis & essay writing", th: "ย่อความและเรียงความ", lessons: [
+    { no: "C29", name: "ย่อความ", ex: "ย่อย่อหน้าให้เหลือ 2–3 บรรทัด" },
+    { no: "C30", name: "โครงเรื่องเรียงความ", ex: "ผังคำนำ–เนื้อเรื่อง–สรุป" },
+    { no: "C31", name: "เขียนคำนำและสรุป", ex: "คำนำ 1 ย่อหน้า + สรุป 1 ย่อหน้า" },
+    { no: "C32", name: "เขียนเรียงความสั้น", ex: "หัวข้อ: ครอบครัวของฉัน" },
+  ] },
+  { year: "Y6", n: "C33–C36", en: "Creative writing & presenting", th: "เขียนสร้างสรรค์และนำเสนอ", lessons: [
+    { no: "C33", name: "เขียนเล่าเรื่องจากภาพ/ประสบการณ์", ex: "เล่าวันหยุดของฉัน" },
+    { no: "C34", name: "เขียนจดหมาย/บันทึก", ex: "จดหมายถึงเพื่อน" },
+    { no: "C35", name: "ใช้พจนานุกรม & มารยาทการอ่าน", ex: "ค้นคำ 5 คำที่ไม่รู้ความหมาย" },
+    { no: "C36", name: "โครงงานรักการอ่าน (Capstone)", ex: "อ่าน 1 เล่ม + นำเสนอหน้าชั้น" },
+  ] },
+];
 function LessonsPage({ grade }) {
   const [lvl, setLvl] = React.useState(() => lessonGradeLevel(grade));
   const grades = (LESSON_LEVELS[lvl] || []).filter((id) => LESSONS_BY_GRADE[id]);
@@ -353,8 +417,33 @@ function LessonsPage({ grade }) {
         <div>
           <h3 className="page-title" style={{ fontSize: 18, marginTop: 20, marginBottom: 2 }}>Comprehension<span className="th"> · Read to Learn (Y4–6)</span></h3>
           <p className="lv-goal" style={{ fontSize: 14, color: "var(--ink-3)", margin: "4px 0 14px" }}>
-            เมื่อถอดรหัสได้คล่องแล้ว เน้นความเข้าใจ คลังคำ และการเขียน · ดูบทเรียนเต็ม (C1–C36) ได้ในหลักสูตร แล้วฝึกด้วยใบงาน
+            เมื่อถอดรหัสได้คล่องแล้ว เน้นความเข้าใจ คลังคำ และการเขียน · บทเรียนทั้งหมด 36 บท แบ่งตามชั้น Y4–Y6 ด้านล่าง แล้วฝึกด้วยใบงาน/เกม
           </p>
+          {["Y4", "Y5", "Y6"].map((yr) => (
+            <div key={yr}>
+              <h3 className="page-title" style={{ fontSize: 16, marginTop: 18, marginBottom: 2, color: "var(--leaf-d)" }}>
+                {yr}<span className="th"> · {YEAR_FOCUS[yr]}</span>
+              </h3>
+              {COMP_UNITS.filter((u) => u.year === yr).map((u) => (
+                <div className="unit" key={u.n}>
+                  <div className="unit-head">
+                    <span className="u-num">{u.n}</span>
+                    <span className="u-title">{u.en}<span className="th">{u.th}</span></span>
+                  </div>
+                  <div className="lesson-chips">
+                    {u.lessons.map((l) => (
+                      <button key={l.no} className="lchip">
+                        <span className="l-no">{l.no}</span>
+                        <span className="l-name">{l.name}</span>
+                        <span className="l-ex">{l.ex}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+          <h3 className="page-title" style={{ fontSize: 16, marginTop: 24, marginBottom: 6 }}>ฝึกและใบงาน<span className="th"> · Practice, worksheets &amp; games</span></h3>
           <div className="grid-3">
             {COMP_PHASES.map((ph) => {
               const href = ph.file ? (ph.page ? ph.file + "#s" + ph.page : ph.file) : "activity-reading-comprehension.html#s" + ph.page;
