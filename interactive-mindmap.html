@@ -37,64 +37,99 @@
       <div class="feedback" id="feedback"></div>
       <div class="actions">
         <button class="btn check" id="checkBtn">✓ ตรวจ</button>
-        <button class="btn ghost" id="resetBtn">เริ่มใหม่</button>
+        <button class="btn ghost" id="resetBtn">เริ่มชุดนี้ใหม่</button>
+        <button class="btn next" id="nextBtn" disabled>ชุดต่อไป →</button>
       </div>
     </div>
+  </div>
+  <div class="card done" id="done" style="display:none">
+    <div class="big">🗺️</div><h2 id="dt"></h2><p class="sub" id="ds"></p>
+    <div class="actions"><button class="btn check" id="again">เล่นอีกครั้ง</button></div>
   </div>
 </div>
 
 <script>
-const SET = {
-  branches:[
-    {id:"kong",name:"แม่กง (–ง)"},{id:"kon",name:"แม่กน (–น)"},
-    {id:"kom",name:"แม่กม (–ม)"},{id:"kok",name:"แม่กก (–ก)"},
-  ],
-  words:[
-    {w:"กาง",c:"kong"},{w:"ลิง",c:"kong"},
-    {w:"จาน",c:"kon"},{w:"ปีน",c:"kon"},
-    {w:"ตาม",c:"kom"},{w:"ยาม",c:"kom"},
-    {w:"ปาก",c:"kok"},{w:"มาก",c:"kok"},
-  ],
-};
+const SETS = [
+  { branches:[
+      {id:"kong",name:"แม่กง (–ง)"},{id:"kon",name:"แม่กน (–น)"},
+      {id:"kom",name:"แม่กม (–ม)"},{id:"koei",name:"แม่เกย (–ย)"},
+    ],
+    words:[
+      {w:"ลิง",c:"kong"},{w:"ทอง",c:"kong"},
+      {w:"จาน",c:"kon"},{w:"ปีน",c:"kon"},
+      {w:"ตาม",c:"kom"},{w:"ลม",c:"kom"},
+      {w:"สาย",c:"koei"},{w:"โรย",c:"koei"},
+    ] },
+  { branches:[
+      {id:"kok",name:"แม่กก (–ก)"},{id:"kot",name:"แม่กด (–ด)"},
+      {id:"kop",name:"แม่กบ (–บ)"},{id:"keow",name:"แม่เกอว (–ว)"},
+    ],
+    words:[
+      {w:"ปาก",c:"kok"},{w:"นก",c:"kok"},
+      {w:"ปิด",c:"kot"},{w:"มืด",c:"kot"},
+      {w:"จับ",c:"kop"},{w:"ดิบ",c:"kop"},
+      {w:"ดาว",c:"keow"},{w:"แมว",c:"keow"},
+    ] },
+  { branches:[
+      {id:"kong",name:"แม่กง (–ง)"},{id:"kon",name:"แม่กน (–น)"},
+      {id:"kok",name:"แม่กก (–ก)"},{id:"kot",name:"แม่กด (–ด)"},
+    ],
+    words:[
+      {w:"ฟัง",c:"kong"},{w:"แรง",c:"kong"},
+      {w:"กิน",c:"kon"},{w:"นอน",c:"kon"},
+      {w:"สุก",c:"kok"},{w:"เลข",c:"kok"},
+      {w:"รถ",c:"kot"},{w:"จืด",c:"kot"},
+    ] },
+];
 const $=id=>document.getElementById(id);
 const shuffle=a=>{a=a.slice();for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]];}return a;};
-let place={}, sel=null; // place[word]=branchId
+let r=0, place={}, sel=null, solved=false; // place[word]=branchId
+const SET=()=>SETS[r];
 
 function render(){
-  const placedWords=Object.keys(place);
+  const set=SET(), placedWords=Object.keys(place);
   // bank
   $("bank").innerHTML="";
-  shuffle(SET.words.map(x=>x.w)).filter(w=>!placedWords.includes(w)).forEach(w=>{
-    const b=mk(w,()=>{ sel=(sel===w?null:w); paint(); });
+  shuffle(set.words.map(x=>x.w)).filter(w=>!placedWords.includes(w)).forEach(w=>{
+    const b=mk(w,()=>{ if(solved)return; sel=(sel===w?null:w); paint(); });
     $("bank").appendChild(b);
   });
   // branches
   $("branches").innerHTML="";
-  SET.branches.forEach(br=>{
+  set.branches.forEach(br=>{
     const d=document.createElement("div"); d.className="branch"; d.dataset.id=br.id;
     d.innerHTML='<div class="bh">'+br.name+'</div>';
     const drop=document.createElement("div"); drop.className="drop";
-    placedWords.filter(w=>place[w]===br.id).forEach(w=>{ const b=mk(w,()=>{ delete place[w]; sel=null; render(); }); drop.appendChild(b); });
+    placedWords.filter(w=>place[w]===br.id).forEach(w=>{ const b=mk(w,()=>{ if(solved)return; delete place[w]; sel=null; render(); }); drop.appendChild(b); });
     d.appendChild(drop);
-    d.onclick=(e)=>{ if(e.target.classList.contains("w"))return; if(sel){ place[sel]=br.id; sel=null; render(); } };
+    d.onclick=(e)=>{ if(solved||e.target.classList.contains("w"))return; if(sel){ place[sel]=br.id; sel=null; render(); } };
     $("branches").appendChild(d);
   });
   paint();
-  $("prog").innerHTML="วางแล้ว <b>"+placedWords.length+"</b> / "+SET.words.length;
+  $("prog").innerHTML="ชุด <b>"+(r+1)+"</b> / "+SETS.length+" · วางแล้ว "+placedWords.length+" / "+set.words.length;
 }
 function mk(w,fn){ const b=document.createElement("button"); b.className="w small"; b.textContent=w; b.onclick=(e)=>{e.stopPropagation();fn();}; return b; }
-function paint(){ [...$("bank").children].forEach(c=>c.classList.toggle("sel",c.textContent===sel)); [...document.querySelectorAll(".branch")].forEach(b=>b.classList.toggle("aim",!!sel)); }
+function paint(){ [...$("bank").children].forEach(c=>c.classList.toggle("sel",c.textContent===sel)); [...document.querySelectorAll(".branch")].forEach(b=>b.classList.toggle("aim",!!sel&&!solved)); }
 
 $("checkBtn").onclick=()=>{
-  const placed=Object.keys(place); if(placed.length<SET.words.length){ $("feedback").textContent="วางให้ครบทุกคำก่อนนะ"; $("feedback").className="feedback bad"; return; }
-  let correct=0; document.querySelectorAll(".branch .drop .w").forEach(()=>{});
-  SET.words.forEach(x=>{ if(place[x.w]===x.c) correct++; });
-  // colour
-  document.querySelectorAll(".branch").forEach(br=>{ [...br.querySelectorAll(".w")].forEach(el=>{ const w=el.textContent; const ok=SET.words.find(x=>x.w===w).c===br.dataset.id; el.classList.add(ok?"right":"wrong"); }); });
-  if(correct===SET.words.length){ $("feedback").textContent="✓ ถูกทั้งหมด เก่งมาก! 🎉"; $("feedback").className="feedback good"; }
-  else { $("feedback").textContent="ถูก "+correct+" / "+SET.words.length+" — คำสีแดงอยู่ผิดกิ่ง แตะออกแล้วย้ายใหม่"; $("feedback").className="feedback bad"; }
+  const set=SET(), placed=Object.keys(place);
+  if(placed.length<set.words.length){ $("feedback").textContent="วางให้ครบทุกคำก่อนนะ"; $("feedback").className="feedback bad"; return; }
+  let correct=0; set.words.forEach(x=>{ if(place[x.w]===x.c) correct++; });
+  document.querySelectorAll(".branch").forEach(br=>{ [...br.querySelectorAll(".w")].forEach(el=>{ const ok=set.words.find(x=>x.w===el.textContent).c===br.dataset.id; el.classList.add(ok?"right":"wrong"); }); });
+  if(correct===set.words.length){
+    $("feedback").textContent="✓ ถูกทั้งหมด เก่งมาก! 🎉"; $("feedback").className="feedback good";
+    solved=true; $("checkBtn").disabled=true; $("nextBtn").disabled=false;
+    $("nextBtn").textContent = r<SETS.length-1 ? "ชุดต่อไป →" : "ดูสรุป";
+  } else { $("feedback").textContent="ถูก "+correct+" / "+set.words.length+" — คำสีแดงอยู่ผิดกิ่ง แตะออกแล้วย้ายใหม่"; $("feedback").className="feedback bad"; }
 };
-$("resetBtn").onclick=()=>{ place={}; sel=null; $("feedback").textContent=""; render(); };
+$("resetBtn").onclick=()=>{ place={}; sel=null; solved=false; $("checkBtn").disabled=false; $("nextBtn").disabled=true; $("feedback").textContent=""; $("feedback").className="feedback"; render(); };
+$("nextBtn").onclick=()=>{
+  r++;
+  if(r>=SETS.length){ $("game").style.display="none"; $("done").style.display="";
+    $("dt").textContent="จัดกลุ่มครบทุกชุดแล้ว! 🎉"; $("ds").textContent="หนูจัดคำตามมาตราตัวสะกดได้ครบทั้ง 8 มาตราแล้ว"; return; }
+  place={}; sel=null; solved=false; $("checkBtn").disabled=false; $("nextBtn").disabled=true; $("feedback").textContent=""; $("feedback").className="feedback"; render();
+};
+$("again").onclick=()=>{ r=0; place={}; sel=null; solved=false; $("done").style.display="none"; $("game").style.display=""; $("checkBtn").disabled=false; $("nextBtn").disabled=true; $("feedback").textContent=""; $("feedback").className="feedback"; render(); };
 render();
 </script>
 </body>
