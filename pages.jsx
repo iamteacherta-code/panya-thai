@@ -44,43 +44,56 @@ function PageHead({ eyebrow, en, th, sub }) {
 /* ---------------- HOME ---------------- */
 /* ---- hand-drawn line-art for a warm, friendly HOME ---- */
 const HERO_ART = `
-<svg viewBox="0 0 320 300" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ภาพวาดลายเส้นแมวกำลังอ่านหนังสือพร้อมพยัญชนะไทย">
+<svg viewBox="0 0 320 300" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ภาพวาดลายเส้นเด็กใส่แว่นกำลังนั่งอ่านหนังสือพร้อมพยัญชนะไทย">
   <defs>
     <filter id="hpaw" x="-7%" y="-7%" width="114%" height="114%">
       <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="5" result="n"/>
       <feDisplacementMap in="SourceGraphic" in2="n" scale="2.3"/>
     </filter>
   </defs>
-  <ellipse cx="158" cy="278" rx="100" ry="12" fill="#8a7e66" opacity=".16"/>
+  <ellipse cx="160" cy="280" rx="96" ry="12" fill="#8a7e66" opacity=".16"/>
   <g filter="url(#hpaw)" stroke="var(--ink,#2f2a20)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M214 244 c44 2 54 -38 26 -54 c-16 -9 -30 6 -18 18" fill="var(--earth-l,#f6e8d2)"/>
-    <path d="M92 258 c-4 -60 32 -100 66 -100 c34 0 70 40 66 100 z" fill="#fff"/>
-    <circle cx="158" cy="118" r="46" fill="#fff"/>
-    <path d="M124 88 l-8 -32 l36 18 z" fill="#fff"/>
-    <path d="M192 88 l8 -32 l-36 18 z" fill="#fff"/>
-    <path d="M126 84 l-3 -16 l16 9 z" fill="var(--earth-l,#f6e8d2)" stroke="none"/>
-    <path d="M190 84 l3 -16 l-16 9 z" fill="var(--earth-l,#f6e8d2)" stroke="none"/>
-    <ellipse cx="128" cy="131" rx="9" ry="6" fill="var(--earth-l,#f6e8d2)" stroke="none"/>
-    <ellipse cx="188" cy="131" rx="9" ry="6" fill="var(--earth-l,#f6e8d2)" stroke="none"/>
-    <path d="M137 116 q7 9 14 0"/>
-    <path d="M165 116 q7 9 14 0"/>
-    <path d="M154 126 h8 l-4 5 z" fill="var(--earth,#c98a3b)"/>
-    <path d="M158 131 v4 M158 135 q-7 6 -13 1 M158 135 q7 6 13 1"/>
-    <path d="M118 124 l-18 -4 M118 132 l-18 3"/>
-    <path d="M198 124 l18 -4 M198 132 l18 3"/>
-    <path d="M158 210 c-24 -12 -48 -12 -66 -5 l0 56 c18 -7 42 -7 66 5 z" fill="#fff"/>
-    <path d="M158 210 c24 -12 48 -12 66 -5 l0 56 c-18 -7 -42 -7 -66 5 z" fill="#fff"/>
-    <path d="M158 210 v56"/>
-    <path d="M104 224 h34 M104 234 h28 M104 246 h32" stroke="#8a7e66" stroke-width="2.4"/>
-    <path d="M120 252 q10 -12 24 -6" fill="#fff"/>
-    <path d="M196 252 q-10 -12 -24 -6" fill="#fff"/>
+    <!-- hair bun -->
+    <circle cx="197" cy="92" r="15" fill="#6b4f2e"/>
+    <!-- sweater body -->
+    <path d="M116 254 c-6 -54 18 -92 44 -92 c26 0 50 38 44 92 z" fill="var(--leaf-l,#e6eddf)"/>
+    <!-- sleeves -->
+    <path d="M126 202 c-10 14 -3 27 15 24" fill="var(--leaf-l,#e6eddf)"/>
+    <path d="M194 202 c10 14 3 27 -15 24" fill="var(--leaf-l,#e6eddf)"/>
+    <!-- neck -->
+    <path d="M150 150 q10 10 20 0"/>
+    <!-- head -->
+    <circle cx="160" cy="112" r="40" fill="#fff"/>
+    <!-- hair / bangs -->
+    <path d="M121 116 c-2 -44 28 -62 39 -62 c11 0 41 18 39 62 c-13 -7 -26 -9 -39 -9 c-13 0 -26 2 -39 9 z" fill="#6b4f2e"/>
+    <!-- cheeks -->
+    <ellipse cx="135" cy="127" rx="7" ry="4.5" fill="var(--earth-l,#f6e8d2)" stroke="none"/>
+    <ellipse cx="185" cy="127" rx="7" ry="4.5" fill="var(--earth-l,#f6e8d2)" stroke="none"/>
+    <!-- glasses -->
+    <circle cx="146" cy="117" r="13" fill="none"/>
+    <circle cx="174" cy="117" r="13" fill="none"/>
+    <path d="M159 116 h2 M133 114 l-10 -3 M187 114 l10 -3"/>
+    <!-- happy eyes -->
+    <path d="M141 118 q5 5 10 0"/>
+    <path d="M169 118 q5 5 10 0"/>
+    <!-- nose + smile -->
+    <path d="M159 124 q2 3 3 0"/>
+    <path d="M151 134 q9 8 18 0"/>
+    <!-- open book -->
+    <path d="M160 214 c-24 -12 -48 -12 -66 -5 l0 54 c18 -7 42 -7 66 5 z" fill="#fff"/>
+    <path d="M160 214 c24 -12 48 -12 66 -5 l0 54 c-18 -7 -42 -7 -66 5 z" fill="#fff"/>
+    <path d="M160 214 v54"/>
+    <path d="M106 228 h32 M106 238 h26 M106 250 h30" stroke="#8a7e66" stroke-width="2.4"/>
+    <!-- hands -->
+    <circle cx="140" cy="216" r="8" fill="#fff"/>
+    <circle cx="180" cy="216" r="8" fill="#fff"/>
   </g>
-  <text x="190" y="247" font-family="'Sarabun',sans-serif" font-weight="800" font-size="26" fill="var(--leaf,#5b7a4b)">ก</text>
-  <path d="M243 70 c-7 -11 -24 -6 -24 7 c0 11 16 20 24 26 c8 -6 24 -15 24 -26 c0 -13 -17 -18 -24 -7 z" fill="var(--earth,#c98a3b)" stroke="var(--ink,#2f2a20)" stroke-width="2.6" stroke-linejoin="round"/>
-  <path d="M64 56 l4 13 l13 4 l-13 4 l-4 13 l-4 -13 l-13 -4 l13 -4 z" fill="var(--earth,#c98a3b)"/>
-  <path d="M288 152 l3 9 l9 3 l-9 3 l-3 9 l-3 -9 l-9 -3 l9 -3 z" fill="var(--leaf,#5b7a4b)"/>
-  <text x="38" y="150" font-family="'Sarabun',sans-serif" font-weight="700" font-size="22" fill="#8a7e66" opacity=".8">ข</text>
-  <text x="272" y="250" font-family="'Sarabun',sans-serif" font-weight="700" font-size="22" fill="#8a7e66" opacity=".8">ค</text>
+  <text x="188" y="247" font-family="'Sarabun',sans-serif" font-weight="800" font-size="24" fill="var(--leaf,#5b7a4b)">ก</text>
+  <path d="M251 64 c-7 -11 -24 -6 -24 7 c0 11 16 20 24 26 c8 -6 24 -15 24 -26 c0 -13 -17 -18 -24 -7 z" fill="var(--earth,#c98a3b)" stroke="var(--ink,#2f2a20)" stroke-width="2.6" stroke-linejoin="round"/>
+  <path d="M60 70 l4 13 l13 4 l-13 4 l-4 13 l-4 -13 l-13 -4 l13 -4 z" fill="var(--earth,#c98a3b)"/>
+  <path d="M290 158 l3 9 l9 3 l-9 3 l-3 9 l-3 -9 l-9 -3 l9 -3 z" fill="var(--leaf,#5b7a4b)"/>
+  <text x="34" y="150" font-family="'Sarabun',sans-serif" font-weight="700" font-size="22" fill="#8a7e66" opacity=".8">ข</text>
+  <text x="276" y="252" font-family="'Sarabun',sans-serif" font-weight="700" font-size="22" fill="#8a7e66" opacity=".8">ค</text>
 </svg>`;
 const SQUIGGLE = `<svg viewBox="0 0 230 12" fill="none" preserveAspectRatio="none"><path d="M3 7 q14 -8 28 0 t28 0 t28 0 t28 0 t28 0 t28 0 t28 0" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>`;
 const SUN_DOODLE = `<svg viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="30" cy="30" r="12"/><path d="M30 5 v8 M30 47 v8 M5 30 h8 M47 30 h8 M12 12 l6 6 M42 42 l6 6 M48 12 l-6 6 M18 42 l-6 6"/></svg>`;
