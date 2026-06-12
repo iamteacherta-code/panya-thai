@@ -21,15 +21,19 @@
   <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 
-  <!-- data (plain JS) -->
-  <script src="thai-data.js"></script>
-
-  <!-- components (Babel) -->
-  <script type="text/babel" src="ui.jsx"></script>
-  <script type="text/babel" src="tweaks-panel.jsx"></script>
-  <script type="text/babel" src="board.jsx"></script>
-  <script type="text/babel" src="wordmat.jsx"></script>
-  <script type="text/babel" src="pages.jsx"></script>
-  <script type="text/babel" src="app.jsx"></script>
+  <!-- Local data + components, loaded fresh each visit.
+       A per-load ?v= cache-buster avoids stale GitHub Pages / browser caching
+       so updates always show without a manual hard refresh. Order is preserved
+       because document.write runs synchronously during parsing; Babel transforms
+       the text/babel scripts on DOMContentLoaded after thai-data.js has executed. -->
+  <script>
+    (function () {
+      var v = "?v=" + Date.now();
+      document.write('<script src="thai-data.js' + v + '"><\/script>');
+      ["ui", "tweaks-panel", "board", "wordmat", "pages", "app"].forEach(function (f) {
+        document.write('<script type="text/babel" src="' + f + '.jsx' + v + '"><\/script>');
+      });
+    })();
+  </script>
 </body>
 </html>
