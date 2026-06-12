@@ -125,7 +125,7 @@ function HomePage({ go }) {
             </div>
           </div>
           <div className="hero-photo">
-            <img src="images/kid-paint.jpg" alt="เด็กยิ้มสดใสชูมือเปื้อนสีในห้องเรียนศิลปะ" loading="eager" />
+            <img src="images/kids-tablet.jpg" alt="เด็กหญิงและเด็กชายยิ้มขณะฝึกทักษะภาษากับแท็บเล็ตด้วยกัน" loading="eager" />
           </div>
         </div>
       </div>

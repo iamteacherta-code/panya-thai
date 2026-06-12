@@ -40,10 +40,15 @@
 .hero--photo .hero-inner { align-items: stretch; gap: 0; }
 .hero--photo .hero-copy { flex: 1 1 52%; padding: 36px 32px; align-self: center; }
 .hero-photo { flex: 1 1 48%; position: relative; min-height: 390px; align-self: stretch; }
-.hero-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
-/* soft fade so the photo blends into the warm card on its left edge */
+.hero-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;
+  /* warm colour grade so the photo harmonises with the cream/earth palette */
+  filter: saturate(.88) sepia(.14) brightness(1.03) contrast(.97); }
+/* soft cream fade on the left edge so the photo blends into the warm card */
 .hero-photo::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background: linear-gradient(90deg, var(--surface) 0%, rgba(251,248,241,0) 14%); }
+  background: linear-gradient(90deg, var(--surface) 1%, rgba(251,248,241,.55) 16%, rgba(251,248,241,0) 34%); }
+/* gentle warm wash over the whole photo to tie the tones together */
+.hero-photo::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; mix-blend-mode: multiply;
+  background: linear-gradient(135deg, rgba(201,138,59,.14), rgba(91,122,75,.12)); }
 @media (max-width: 860px) {
   .hero--photo .hero-inner { flex-direction: column; }
   .hero--photo .hero-copy { flex-basis: auto; padding: 26px 22px 18px; }
