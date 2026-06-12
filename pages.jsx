@@ -102,8 +102,7 @@ const STAR_DOODLE = `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" 
 function HomePage({ go }) {
   return (
     <div>
-      <div className="hero">
-        <span className="hero-doodle d-sun" dangerouslySetInnerHTML={{ __html: SUN_DOODLE }} />
+      <div className="hero hero--photo">
         <span className="hero-doodle d-star" dangerouslySetInnerHTML={{ __html: STAR_DOODLE }} />
         <div className="hero-inner">
           <div className="hero-copy">
@@ -125,7 +124,9 @@ function HomePage({ go }) {
               <a className="btn btn-ghost" href="share.html">📱 แชร์ · Share</a>
             </div>
           </div>
-          <div className="hero-art" dangerouslySetInnerHTML={{ __html: HERO_ART }} />
+          <div className="hero-photo">
+            <img src="images/panyaden-campus.jpg" alt="อาคารดินและไผ่อันเป็นเอกลักษณ์ของโรงเรียนปัญญาเด่น พร้อมป้ายชื่อ PANYADEN และสนามหญ้าเขียว" loading="eager" />
+          </div>
         </div>
       </div>
 

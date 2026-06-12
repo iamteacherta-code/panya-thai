@@ -14,6 +14,22 @@
 .hero-copy { flex: 1 1 56%; min-width: 0; }
 .hero-art { flex: 0 0 290px; width: 290px; }
 .hero-art svg { width: 100%; height: auto; display: block; }
+
+/* photo hero — real image bleeds to the right edge of the card */
+.hero.hero--photo { padding: 0; overflow: hidden; }
+.hero--photo .hero-inner { align-items: stretch; gap: 0; }
+.hero--photo .hero-copy { flex: 1 1 52%; padding: 36px 32px; align-self: center; }
+.hero-photo { flex: 1 1 48%; position: relative; min-height: 390px; align-self: stretch; }
+.hero-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+/* soft fade so the photo blends into the warm card on its left edge */
+.hero-photo::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(90deg, var(--surface) 0%, rgba(251,248,241,0) 14%); }
+@media (max-width: 860px) {
+  .hero--photo .hero-inner { flex-direction: column; }
+  .hero--photo .hero-copy { flex-basis: auto; padding: 26px 22px 18px; }
+  .hero-photo { flex-basis: auto; width: 100%; min-height: 210px; }
+  .hero-photo::before { background: linear-gradient(0deg, rgba(251,248,241,0) 78%, var(--surface) 100%); }
+}
 .hero h1 { font-size: 40px; font-weight: 800; margin: 12px 0 4px; letter-spacing: -.015em; max-width: 20ch; }
 .hero h1 .th { display: block; font-family: var(--font-thai); font-weight: 500; font-size: 24px; color: var(--ink-2); margin-top: 4px; }
 .hero .squiggle { display: block; width: 220px; max-width: 70%; height: 12px; margin: 2px 0 16px; }
