@@ -102,8 +102,11 @@ const STAR_DOODLE = `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" 
 function HomePage({ go }) {
   return (
     <div>
-      <div className="hero hero--photo">
-        <span className="hero-doodle d-star" dangerouslySetInnerHTML={{ __html: STAR_DOODLE }} />
+      <div className="hero hero--bg">
+        <div className="hero-bg-img">
+          <img src="images/panyaden-students.jpg" alt="นักเรียนโรงเรียนปัญญาเด่นทำกิจกรรมการอ่านเขียนภาษาไทย" loading="eager" />
+        </div>
+        <div className="hero-tint" aria-hidden="true"></div>
         <div className="hero-inner">
           <div className="hero-copy">
             <span className="eyebrow"><Ico name="leaf" style={{ width: 16, height: 16 }} /> Thai Literacy Studio</span>
@@ -123,9 +126,6 @@ function HomePage({ go }) {
               <button className="btn btn-ghost" onClick={() => go("lesson")}>View the lesson sequence</button>
               <a className="btn btn-ghost" href="share.html">📱 แชร์ · Share</a>
             </div>
-          </div>
-          <div className="hero-photo">
-            <img src="images/panyaden-students.jpg" alt="นักเรียนโรงเรียนปัญญาเด่นยิ้มอย่างมีความสุขขณะเล่นกิจกรรมกลางแจ้งหน้าอาคารไผ่" loading="eager" />
           </div>
         </div>
       </div>
