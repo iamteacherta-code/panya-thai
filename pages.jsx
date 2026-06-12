@@ -125,7 +125,7 @@ function HomePage({ go }) {
             </div>
           </div>
           <div className="hero-photo">
-            <img src="images/panyaden-campus.jpg" alt="อาคารดินและไผ่อันเป็นเอกลักษณ์ของโรงเรียนปัญญาเด่น พร้อมป้ายชื่อ PANYADEN และสนามหญ้าเขียว" loading="eager" />
+            <img src="images/panyaden-students.jpg" alt="นักเรียนโรงเรียนปัญญาเด่นยิ้มอย่างมีความสุขขณะเล่นกิจกรรมกลางแจ้งหน้าอาคารไผ่" loading="eager" />
           </div>
         </div>
       </div>
