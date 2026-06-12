@@ -102,11 +102,9 @@ const STAR_DOODLE = `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" 
 function HomePage({ go }) {
   return (
     <div>
-      <div className="hero hero--bg">
-        <div className="hero-bg-img">
-          <img src="images/panyaden-students.jpg" alt="นักเรียนโรงเรียนปัญญาเด่นทำกิจกรรมการอ่านเขียนภาษาไทย" loading="eager" />
-        </div>
-        <div className="hero-tint" aria-hidden="true"></div>
+      <div className="hero">
+        <span className="hero-doodle d-sun" dangerouslySetInnerHTML={{ __html: SUN_DOODLE }} />
+        <span className="hero-doodle d-star" dangerouslySetInnerHTML={{ __html: STAR_DOODLE }} />
         <div className="hero-inner">
           <div className="hero-copy">
             <span className="eyebrow"><Ico name="leaf" style={{ width: 16, height: 16 }} /> Thai Literacy Studio</span>
@@ -127,6 +125,7 @@ function HomePage({ go }) {
               <a className="btn btn-ghost" href="share.html">📱 แชร์ · Share</a>
             </div>
           </div>
+          <div className="hero-art" dangerouslySetInnerHTML={{ __html: HERO_ART }} />
         </div>
       </div>
 
