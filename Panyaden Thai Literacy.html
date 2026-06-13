@@ -9,9 +9,17 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="board.css" />
-  <link rel="stylesheet" href="pages.css" />
+  <!-- Local stylesheets, cache-busted per load (same ?v= trick as the JS below)
+       so CSS edits always show without a manual hard refresh. document.write keeps
+       them render-blocking and preserves order during parse. -->
+  <script>
+    (function () {
+      var v = "?v=" + Date.now();
+      ["styles", "board", "pages"].forEach(function (f) {
+        document.write('<link rel="stylesheet" href="' + f + '.css' + v + '">');
+      });
+    })();
+  </script>
 </head>
 <body>
   <div id="root"></div>
