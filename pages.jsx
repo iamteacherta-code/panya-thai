@@ -98,51 +98,6 @@ const HERO_ART = `
 const SQUIGGLE = `<svg viewBox="0 0 230 12" fill="none" preserveAspectRatio="none"><path d="M3 7 q14 -8 28 0 t28 0 t28 0 t28 0 t28 0 t28 0 t28 0" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>`;
 const SUN_DOODLE = `<svg viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="30" cy="30" r="12"/><path d="M30 5 v8 M30 47 v8 M5 30 h8 M47 30 h8 M12 12 l6 6 M42 42 l6 6 M48 12 l-6 6 M18 42 l-6 6"/></svg>`;
 const STAR_DOODLE = `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"><path d="M16 3 c2 8 5 11 13 13 c-8 2 -11 5 -13 13 c-2 -8 -5 -11 -13 -13 c8 -2 11 -5 13 -13 z" fill="currentColor"/></svg>`;
-/* child's crayon drawing — bold wobbly pencil outlines + waxy crayon fills, warm palette to blend with the cream page */
-const CRAYON_ART = `
-<svg viewBox="0 0 320 300" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ภาพวาดสไตล์เด็กระบายสีเทียน เด็กยืนยิ้มกับต้นไม้ พระอาทิตย์ และพยัญชนะ ก">
-  <defs>
-    <filter id="cray" x="-8%" y="-8%" width="116%" height="116%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="6" result="w"/>
-      <feDisplacementMap in="SourceGraphic" in2="w" scale="3.4" result="d"/>
-      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="2" result="g"/>
-      <feColorMatrix in="g" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.16 0.86" result="ga"/>
-      <feComposite in="d" in2="ga" operator="in"/>
-    </filter>
-  </defs>
-  <g filter="url(#cray)" stroke="#3a2e1f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M-6 254 Q44 246 86 254 T170 252 T252 254 T326 252 L326 306 L-6 306 Z" fill="#86a85f"/>
-    <g stroke="#e0a233"><path d="M276 20 V8 M276 92 V80 M240 50 H228 M324 50 H312 M250 26 L242 18 M310 82 L302 74 M302 26 L310 18 M250 74 L242 82"/></g>
-    <circle cx="276" cy="50" r="20" fill="#ecb748"/>
-    <path d="M40 254 L45 198 L61 198 L66 254 Z" fill="#9c6a3c"/>
-    <circle cx="30" cy="196" r="18" fill="#6f9152"/>
-    <circle cx="74" cy="194" r="18" fill="#6f9152"/>
-    <circle cx="52" cy="178" r="28" fill="#7aa05c"/>
-    <path d="M104 252 V234" stroke="#6f9152"/>
-    <circle cx="104" cy="228" r="8" fill="#cf6b45" stroke-width="3.4"/>
-    <circle cx="104" cy="228" r="3" fill="#ecb748" stroke="none"/>
-    <path d="M220 252 V236" stroke="#6f9152"/>
-    <circle cx="220" cy="230" r="7" fill="#6f9bb0" stroke-width="3.4"/>
-    <circle cx="220" cy="230" r="3" fill="#ecb748" stroke="none"/>
-    <rect x="196" y="150" width="60" height="44" rx="4" fill="#fbf6ea"/>
-    <path d="M226 150 V194" stroke-width="3"/>
-    <path d="M138 216 L136 240 M162 216 L164 240"/>
-    <ellipse cx="134" cy="242" rx="8" ry="4.5" fill="#3a2e1f" stroke="none"/>
-    <ellipse cx="166" cy="242" rx="8" ry="4.5" fill="#3a2e1f" stroke="none"/>
-    <path d="M150 150 L122 216 L178 216 Z" fill="#cf7350"/>
-    <path d="M130 172 L110 150 M170 172 L190 152"/>
-    <circle cx="108" cy="148" r="6" fill="#f1d2a6"/>
-    <circle cx="192" cy="150" r="6" fill="#f1d2a6"/>
-    <circle cx="150" cy="116" r="30" fill="#f1d2a6"/>
-    <path d="M120 116 Q118 82 150 82 Q182 82 180 116 Q166 100 150 100 Q134 100 120 116 Z" fill="#6b4f2e"/>
-    <circle cx="141" cy="115" r="3" fill="#3a2e1f" stroke="none"/>
-    <circle cx="159" cy="115" r="3" fill="#3a2e1f" stroke="none"/>
-    <path d="M139 124 Q150 134 161 124" fill="none"/>
-    <ellipse cx="132" cy="123" rx="5" ry="3.2" fill="#e69a7a" stroke="none"/>
-    <ellipse cx="168" cy="123" rx="5" ry="3.2" fill="#e69a7a" stroke="none"/>
-  </g>
-  <text x="214" y="184" font-family="'Sarabun',sans-serif" font-weight="800" font-size="30" fill="#5b7a4b">ก</text>
-</svg>`;
 
 function HomePage({ go }) {
   return (
@@ -168,7 +123,9 @@ function HomePage({ go }) {
               <a className="btn btn-ghost" href="share.html">📱 แชร์ · Share</a>
             </div>
           </div>
-          <div className="hero-art" dangerouslySetInnerHTML={{ __html: CRAYON_ART }} />
+          <div className="hero-art">
+            <img src="images/cvbook.png" alt="เด็กยิ้มถือหนังสือเปิดอ่าน คำว่า CV — ฝึกออกเสียงประสมคำภาษาไทย" />
+          </div>
         </div>
       </div>
 
