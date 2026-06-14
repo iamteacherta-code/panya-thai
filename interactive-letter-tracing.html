@@ -21,6 +21,8 @@
   .chips .lvchip{font-family:var(--thai);font-size:1.5rem;min-width:54px;text-align:center;padding:6px 12px;}
   .chips .lvchip.done{background:var(--leaf-l);color:var(--leaf-d);border-color:var(--leaf);}
   .chips .lvchip.done::after{content:" ✓";font-size:1rem;}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+  .btn.pulse{animation:pulse 1s ease-in-out infinite;}
 </style>
 </head>
 <body>
@@ -56,6 +58,7 @@
       <div class="actions">
         <button class="btn ghost" id="clearBtn">↺ ทำใหม่</button>
         <button class="btn check" id="soundBtn">🔊 เสียง</button>
+        <button class="btn ghost" id="fsBtn">⛶ เต็มจอ</button>
         <button class="btn next" id="nextBtn">ตัวถัดไป →</button>
       </div>
     </div>
@@ -77,7 +80,7 @@ const LETTERS=[
   {c:"ป",f:"images/trace/p.png",name:"ปอ ปลา",audio:"audio/mid-po-pla.mp3"},
   {c:"อ",f:"images/trace/o.png",name:"ออ อ่าง",audio:"audio/mid-o-ang.mp3"},
 ];
-const W=432, H=576, STEP=7, THRESH=0.50;
+const W=432, H=576, STEP=7, THRESH=0.50, THRESH2=0.42;
 const COVERW=72, PEN_FINGER=9, PEN_PENCIL=6, PENCOLOR="#2b5d8a";
 const $=id=>document.getElementById(id);
 const pad=$("pad"), ctx=pad.getContext("2d");
@@ -85,7 +88,7 @@ const guide=document.createElement("canvas"); guide.width=W; guide.height=H; con
 const ink=document.createElement("canvas"); ink.width=W; ink.height=H; const ictx=ink.getContext("2d");
 const cov=document.createElement("canvas"); cov.width=W; cov.height=H; const cctx=cov.getContext("2d");
 
-let idx=0, pen=PEN_FINGER, drawing=false, last=null, cells=[], done=new Array(LETTERS.length).fill(false);
+let idx=0, pen=PEN_FINGER, drawing=false, last=null, cells=[], phase=1, bbox={x:40,y:40,w:W-80,h:H-80}, done=new Array(LETTERS.length).fill(false);
 const imgs={};
 
 function buildPicker(){
@@ -99,10 +102,10 @@ function buildPicker(){
 }
 // Fit the worksheet image fully inside the canvas (contain), centred.
 function fitRect(iw,ih){ const s=Math.min(W/iw,H/ih), w=iw*s, h=ih*s; return {x:(W-w)/2,y:(H-h)/2,w,h}; }
-function drawGuide(){
+function drawGuide(alpha){
   const im=imgs[LETTERS[idx].c];
   gctx.clearRect(0,0,W,H);
-  if(im && im.naturalWidth){ const r=fitRect(im.naturalWidth,im.naturalHeight); gctx.drawImage(im,r.x,r.y,r.w,r.h); }
+  if(im && im.naturalWidth){ const r=fitRect(im.naturalWidth,im.naturalHeight); gctx.globalAlpha=alpha; gctx.drawImage(im,r.x,r.y,r.w,r.h); gctx.globalAlpha=1; }
 }
 // Road = the writable band of the letter: the largest WHITE region that is
 // enclosed by the black outline (i.e. not reachable from the border). Counters
@@ -127,11 +130,22 @@ function buildRoad(){
   }
   const road=new Uint8Array(N); cells=[];
   if(best) for(const j of best) road[j]=1;
-  for(let y=0;y<H;y+=STEP) for(let x=0;x<W;x+=STEP){ if(road[y*W+x]) cells.push([x,y]); }
+  let mnX=W,mnY=H,mxX=0,mxY=0;
+  for(let y=0;y<H;y+=STEP) for(let x=0;x<W;x+=STEP){ if(road[y*W+x]){ cells.push([x,y]); if(x<mnX)mnX=x; if(x>mxX)mxX=x; if(y<mnY)mnY=y; if(y>mxY)mxY=y; } }
+  if(cells.length) bbox={x:mnX,y:mnY,w:mxX-mnX,h:mxY-mnY};
+}
+function drawBox(){
+  const p=24, x=Math.max(6,bbox.x-p), y=Math.max(6,bbox.y-p);
+  const w=Math.min(W-12-x, bbox.w+2*p), h=Math.min(H-12-y, bbox.h+2*p);
+  ctx.save(); ctx.strokeStyle="#cdbf9f"; ctx.lineWidth=3; ctx.fillStyle="#fcfaf4";
+  if(ctx.roundRect){ ctx.beginPath(); ctx.roundRect(x,y,w,h,20); ctx.fill(); ctx.stroke(); }
+  else { ctx.fillRect(x,y,w,h); ctx.strokeRect(x,y,w,h); }
+  ctx.restore();
 }
 function render(){
   ctx.clearRect(0,0,W,H);
-  ctx.drawImage(guide,0,0);   // the worksheet letter (road + dashed centre + arrows + start dot)
+  if(phase===2) drawBox();    // empty "write it yourself" box
+  ctx.drawImage(guide,0,0);   // worksheet letter (full in phase 1, faint memory hint in phase 2)
   ctx.drawImage(ink,0,0);     // thin free-hand pen line, shown as written
 }
 function coverage(){
@@ -141,12 +155,23 @@ function coverage(){
   return hit/cells.length;
 }
 function updateCover(){
-  const c=coverage(); $("coverFill").style.width=Math.round(c*100)+"%";
-  if(c>=THRESH && !done[idx]) win();
+  const c=coverage(), t=phase===1?THRESH:THRESH2;
+  $("coverFill").style.width=Math.round(c*100)+"%";
+  if(c>=t){ if(phase===1) goPhase2(); else if(!done[idx]) win(); }
+}
+// Phase 2 (Matific-style): the guide fades to a faint memory hint and the child
+// writes the letter themselves inside a box.
+function goPhase2(){
+  phase=2; ictx.clearRect(0,0,W,H); cctx.clearRect(0,0,W,H);
+  drawGuide(0.12); render(); $("coverFill").style.width="0%";
+  $("lethint").textContent="เฟส 2 · เขียน “"+LETTERS[idx].c+"” เองในกรอบ (เส้นจางไว้ช่วยจำ)";
+  $("feedback").textContent="ลากตามรอยเก่งมาก! ✍️ ตอนนี้ลองเขียนเอง"; $("feedback").className="feedback good";
+  playSound();
 }
 function win(){
   done[idx]=true; buildPicker();
-  $("feedback").textContent="เก่งมาก! เขียน "+LETTERS[idx].c+" สำเร็จ ⭐"; $("feedback").className="feedback good";
+  $("feedback").textContent="เยี่ยมมาก! เขียน "+LETTERS[idx].c+" ได้เองแล้ว 👑⭐"; $("feedback").className="feedback good";
+  $("nextBtn").classList.add("pulse");
   playSound();
   const n=done.filter(Boolean).length;
   $("prog").innerHTML="ผ่าน <b>"+n+"</b> / "+LETTERS.length;
@@ -155,10 +180,11 @@ function win(){
 }
 function setup(){
   pen=$("tPencil").classList.contains("on")?PEN_PENCIL:PEN_FINGER;
+  phase=1; $("nextBtn").classList.remove("pulse");
   ictx.clearRect(0,0,W,H); cctx.clearRect(0,0,W,H);
-  drawGuide(); buildRoad(); buildPicker(); render();
+  drawGuide(1); buildRoad(); buildPicker(); render();
   $("coverFill").style.width="0%";
-  $("lethint").textContent=LETTERS[idx].name+" · เริ่มที่จุด ● แล้วลากตามลูกศร";
+  $("lethint").textContent="เฟส 1 · "+LETTERS[idx].name+" · ลากตามรอย เริ่มที่จุด ● ตามลูกศร";
   $("feedback").textContent=""; $("feedback").className="feedback";
   const n=done.filter(Boolean).length; $("prog").innerHTML="ผ่าน <b>"+n+"</b> / "+LETTERS.length;
 }
@@ -186,6 +212,8 @@ $("tFinger").onclick=()=>{ $("tFinger").classList.add("on"); $("tPencil").classL
 $("tPencil").onclick=()=>{ $("tPencil").classList.add("on"); $("tFinger").classList.remove("on"); pen=PEN_PENCIL; };
 $("clearBtn").onclick=()=>{ ictx.clearRect(0,0,W,H); cctx.clearRect(0,0,W,H); render(); $("coverFill").style.width="0%"; $("feedback").textContent=""; $("feedback").className="feedback"; };
 $("soundBtn").onclick=()=>playSound();
+$("fsBtn").onclick=()=>{ const el=document.querySelector("#game .card");
+  try{ if(!document.fullscreenElement){ (el.requestFullscreen||el.webkitRequestFullscreen).call(el); } else { document.exitFullscreen(); } }catch(e){} };
 $("nextBtn").onclick=()=>{ idx=(idx+1)%LETTERS.length; setup(); };
 $("again").onclick=()=>{ done.fill(false); idx=0; $("done").style.display="none"; $("game").style.display=""; setup(); };
 
