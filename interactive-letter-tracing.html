@@ -24,6 +24,11 @@
   .chips .lvchip{font-family:var(--thai);font-size:1.5rem;min-width:54px;text-align:center;padding:6px 12px;}
   .chips .lvchip.done{background:var(--leaf-l);color:var(--leaf-d);border-color:var(--leaf);}
   .chips .lvchip.done::after{content:" ✓";font-size:1rem;}
+  /* compact single-column letter picker beside the canvas */
+  .pickcol{flex-direction:column;flex-wrap:nowrap;gap:7px;align-self:flex-start;}
+  .pickcol .lvchip{min-width:0;width:42px;height:42px;padding:0;font-size:1.15rem;display:grid;place-items:center;border-radius:12px;border-width:1.6px;}
+  .pickcol .lvchip.done::after{content:"";}
+  @media(max-width:560px){ .pickcol{flex-direction:row;flex-wrap:wrap;justify-content:center;} }
   .actions{display:flex;gap:14px;justify-content:center;margin-top:10px;}
   .iconbtn{width:54px;height:54px;border-radius:999px;border:2px solid var(--line-2);background:var(--surface);color:var(--ink-2);font-size:24px;cursor:pointer;display:grid;place-items:center;-webkit-tap-highlight-color:transparent;transition:transform .08s,background .12s;}
   .iconbtn:hover{background:var(--earth-l);}
@@ -45,7 +50,6 @@
   <p class="sub">ฝึก 3 ขั้น: ① ลากตามเส้น 3 ครั้ง → ② เขียนเองในกรอบ 3 ครั้ง → ③ เลือกตัวที่ชอบ แล้วรับมงกุฎ 👑</p>
 
   <div class="bar">
-    <div class="chips" id="picker"></div>
     <div class="prog" id="prog"></div>
   </div>
 
@@ -59,6 +63,7 @@
         <div class="padwrap">
           <canvas class="pad" id="pad" width="432" height="576"></canvas>
         </div>
+        <div class="chips pickcol" id="picker"></div>
       </div>
       <div class="reps" id="reps"></div>
       <div class="cover"><i id="coverFill"></i></div>
