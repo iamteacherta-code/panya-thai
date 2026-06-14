@@ -386,18 +386,15 @@ const LESSON_ITEMS = THAI.GRADE_ORDER.map((id) => ({
 
 const LESSON_LEVELS = { beginner: ["k2", "k3", "y1"], intermediate: ["y2"], advanced: ["y3"], comprehension: ["y4", "y5", "y6"] };
 const lessonGradeLevel = (gg) => Object.keys(LESSON_LEVELS).find((L) => LESSON_LEVELS[L].includes(gg)) || "beginner";
-// On-screen games for the Materials "Game" page — blend / build / sort / read.
-// Lower levels reuse the interactive activity pages; Comprehension (Y4–6) games
-// are the read-to-learn set moved out of the Lessons comprehension grid.
+// On-screen games for the Materials "Game" page — only genuinely interactive
+// (tap/drag, play-on-screen) builds. The printable activity sheets live on the
+// Activity Sheets page, not here. Beginner blending is done live on the
+// Blending Board / Word Work Mat (Digital Apps), so there is no Beginner game.
 const GAMES = [
-  { en: "Picture & Word Match", th: "จับคู่ภาพกับคำ", level: "beginner", file: "activity-picture-word-match.html" },
-  { en: "Build-a-Word", th: "ต่อคำจากพยางค์", level: "intermediate", file: "activity-build-a-word.html" },
-  { en: "Tone Mark Hunt", th: "ตามหาวรรณยุกต์", level: "advanced", file: "activity-tone-mark-hunt.html" },
-  { en: "Read & Color", th: "อ่านแล้วระบายสี", level: "advanced", file: "activity-read-and-color.html" },
+  { en: "Word Builder", th: "สร้างคำตามเป้าหมาย (ประสม–ลดรูปสระ)", level: "intermediate", file: "interactive-word-builder.html" },
+  { en: "Word Map", th: "ลากคำเข้ากิ่งให้ถูกมาตรา", level: "advanced", file: "interactive-mindmap.html" },
   { en: "Sentence Builder", th: "เรียงประโยค (เกมโต้ตอบ)", level: "comprehension", file: "interactive-sentence-scramble.html" },
-  { en: "Word Builder", th: "สร้างคำ (ประสม–ลดรูปสระ)", level: "comprehension", file: "interactive-word-builder.html" },
-  { en: "Word Map", th: "จัดกลุ่มคำตามมาตรา", level: "comprehension", file: "interactive-mindmap.html" },
-  { en: "Heart Words", th: "คำที่ต้องจำ", level: "comprehension", file: "interactive-heart-words.html" },
+  { en: "Heart Words", th: "คำที่ต้องจำ (แตะส่วนที่ต้องจำ)", level: "comprehension", file: "interactive-heart-words.html" },
   { en: "Connected Text", th: "อ่านจับใจความ + คำถาม", level: "comprehension", file: "interactive-reading.html" },
 ];
 // Comprehension (Y4–Y6) full per-lesson breakdown (C1–C36), grouped Y4/Y5/Y6 → unit → lessons.
@@ -912,20 +909,27 @@ function GamesPage() {
         sub="On-screen games — blend, build, sort and read. Pick a level, then play." />
       <FwNote />
       <LevelBar value={lvl} onChange={setLvl} withAll extra={[{ key: "comprehension", n: "4", en: "Comprehension", th: "Y4–6" }]} />
-      <div className="grid-3">
-        {shown.map((g, i) => (
-          <div className="item-card" key={i}>
-            <h3>{g.en}<span className="th">{g.th}</span></h3>
-            <div className="item-meta">
-              <span className="tag">{levelTag(g.level)}</span>
-              <span className="tag earth">🎮 Interactive</span>
+      {shown.length === 0 ? (
+        <p className="lv-goal" style={{ fontSize: 14, color: "var(--ink-3)", margin: "16px 0" }}>
+          ระดับนี้ยังไม่มีเกมบนจอ — ผู้เริ่มต้นฝึกประสมคำแบบโต้ตอบได้ที่ <b>Blending Board</b> และ <b>Word Work Mat</b>
+          <span className="th"> · Beginner learners blend live on the Blending Board / Word Work Mat</span>
+        </p>
+      ) : (
+        <div className="grid-3">
+          {shown.map((g, i) => (
+            <div className="item-card" key={i}>
+              <h3>{g.en}<span className="th">{g.th}</span></h3>
+              <div className="item-meta">
+                <span className="tag">{levelTag(g.level)}</span>
+                <span className="tag earth">🎮 Interactive</span>
+              </div>
+              <div className="item-actions">
+                <a className="btn btn-sm btn-leaf" href={g.file}><Ico name="play" style={{ width: 15, height: 15 }} /> เล่นเกม · Play</a>
+              </div>
             </div>
-            <div className="item-actions">
-              <a className="btn btn-sm btn-leaf" href={g.file}><Ico name="play" style={{ width: 15, height: 15 }} /> เล่นเกม · Play</a>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
