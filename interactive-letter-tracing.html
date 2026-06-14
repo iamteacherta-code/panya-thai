@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · Letter Tracing · เขียนพยัญชนะ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="interactive.css" />
+<style>
+  .stage{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;justify-content:center;}
+  .padwrap{position:relative;width:380px;max-width:86vw;}
+  .pad{width:100%;aspect-ratio:1/1;border:2px solid var(--line-2);border-radius:20px;background:#fff;touch-action:none;cursor:crosshair;display:block;}
+  .tools{display:flex;flex-direction:column;gap:10px;}
+  .tool{width:50px;height:50px;border-radius:14px;border:2px solid var(--line-2);background:var(--surface);color:var(--ink-2);font-size:22px;cursor:pointer;display:grid;place-items:center;-webkit-tap-highlight-color:transparent;}
+  .tool.on{background:var(--leaf);color:#fff;border-color:transparent;}
+  .lethint{font-family:var(--thai);color:var(--ink-3);font-size:.95rem;text-align:center;margin:10px 0 0;}
+  .cover{height:12px;border-radius:999px;background:var(--leaf-l);overflow:hidden;margin:12px 0 2px;}
+  .cover>i{display:block;height:100%;width:0;background:var(--leaf);transition:width .15s;}
+  .chips .lvchip{font-family:var(--thai);font-size:1.5rem;min-width:54px;text-align:center;padding:6px 12px;}
+  .chips .lvchip.done{background:var(--leaf-l);color:var(--leaf-d);border-color:var(--leaf);}
+  .chips .lvchip.done::after{content:" ✓";font-size:1rem;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <span class="logo">P</span>
+    <div><div class="bn">PANYA</div><div class="bs">Letter Tracing · เขียนพยัญชนะ</div></div>
+    <span class="spacer"></span><a class="home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก</a>
+  </div>
+  <div class="eyebrow">Interactive · Beginner · อักษรกลางชุดแรก</div>
+  <h1>ลากตามรอยพยัญชนะ</h1>
+  <p class="sub">แตะค้างแล้วลากนิ้ว/เมาส์ระบายให้เต็มตัวอักษร · อยู่ในเส้นก็ถือว่าถูก แล้วกด “เสียง” เพื่อฟังชื่อพยัญชนะ</p>
+
+  <div class="bar">
+    <div class="chips" id="picker"></div>
+    <div class="prog" id="prog"></div>
+  </div>
+
+  <div id="game">
+    <div class="card">
+      <div class="stage">
+        <div class="tools">
+          <button class="tool on" id="tFinger" title="นิ้ว · finger">🖐️</button>
+          <button class="tool" id="tPencil" title="ดินสอ · pencil">✏️</button>
+        </div>
+        <div class="padwrap">
+          <canvas class="pad" id="pad" width="400" height="400"></canvas>
+        </div>
+      </div>
+      <div class="cover"><i id="coverFill"></i></div>
+      <p class="lethint" id="lethint"></p>
+      <div class="feedback" id="feedback"></div>
+      <div class="actions">
+        <button class="btn ghost" id="clearBtn">↺ ทำใหม่</button>
+        <button class="btn check" id="soundBtn">🔊 เสียง</button>
+        <button class="btn next" id="nextBtn">ตัวถัดไป →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card done" id="done" style="display:none">
+    <div class="big">⭐</div><h2 id="dt"></h2><p class="sub" id="ds"></p>
+    <div class="actions"><button class="btn check" id="again">เริ่มใหม่</button></div>
+  </div>
+</div>
+
+<script>
+const LETTERS=[
+  {c:"ก",name:"กอ ไก่",hint:"ก ไม่มีหัว — เริ่มล่างซ้าย ขึ้นก้าน โค้งหลังคา ลงก้านขวา"},
+  {c:"จ",name:"จอ จาน",hint:"เริ่มที่หัวด้านบน วนแล้วลากโค้งลงหาง"},
+  {c:"ด",name:"ดอ เด็ก",hint:"เริ่มที่หัว วนเป็นวง แล้วลากเส้นตัว"},
+  {c:"ต",name:"ตอ เต่า",hint:"เริ่มที่หัว แล้วลากเส้นตามรูป"},
+  {c:"บ",name:"บอ ใบไม้",hint:"เริ่มที่หัว ลากลงแล้ววนท้อง"},
+  {c:"ป",name:"ปอ ปลา",hint:"เริ่มที่หัว ลากขึ้นยอดธง แล้วลงตัว"},
+  {c:"อ",name:"ออ อ่าง",hint:"เริ่มที่หัว วนเป็นวงเดียว"},
+];
+const SIZE=400, STEP=7, THRESH=0.80;
+const $=id=>document.getElementById(id);
+const pad=$("pad"), ctx=pad.getContext("2d");
+const mask=document.createElement("canvas"); mask.width=mask.height=SIZE; const mctx=mask.getContext("2d");
+const ink=document.createElement("canvas"); ink.width=ink.height=SIZE; const ictx=ink.getContext("2d");
+const scratch=document.createElement("canvas"); scratch.width=scratch.height=SIZE; const sctx=scratch.getContext("2d");
+
+let idx=0, brush=26, drawing=false, last=null, cells=[], done=new Array(LETTERS.length).fill(false);
+
+function buildPicker(){
+  const p=$("picker"); p.innerHTML="";
+  LETTERS.forEach((L,i)=>{
+    const b=document.createElement("button");
+    b.className="lvchip"+(i===idx?" on":"")+(done[i]?" done":"");
+    b.textContent=L.c; b.onclick=()=>{ idx=i; setup(); };
+    p.appendChild(b);
+  });
+}
+function glyphFont(){ return "800 270px Sarabun, sans-serif"; }
+function drawGlyphTo(c,fill,dash,lw){
+  c.clearRect(0,0,SIZE,SIZE);
+  c.font=glyphFont(); c.textAlign="center"; c.textBaseline="middle";
+  c.fillStyle=fill; c.fillText(LETTERS[idx].c, SIZE/2, SIZE/2+14);
+  if(dash){ c.save(); c.setLineDash([7,9]); c.lineWidth=lw||3; c.strokeStyle="#b9ac8e"; c.lineJoin="round";
+    c.strokeText(LETTERS[idx].c, SIZE/2, SIZE/2+14); c.restore(); }
+}
+function buildMask(){
+  drawGlyphTo(mctx,"#000",false,0);
+  const d=mctx.getImageData(0,0,SIZE,SIZE).data; cells=[];
+  for(let y=0;y<SIZE;y+=STEP) for(let x=0;x<SIZE;x+=STEP){ if(d[(y*SIZE+x)*4+3]>128) cells.push([x,y]); }
+}
+function compositeInk(){
+  sctx.clearRect(0,0,SIZE,SIZE);
+  sctx.drawImage(ink,0,0);
+  sctx.globalCompositeOperation="destination-in"; sctx.drawImage(mask,0,0);
+  sctx.globalCompositeOperation="source-over";
+}
+function render(){
+  ctx.clearRect(0,0,SIZE,SIZE);
+  drawGlyphTo(ctx,"#f0ead9",true,3);   // ghost fill + dashed outline guide
+  compositeInk(); ctx.drawImage(scratch,0,0);   // coloured ink, clipped inside the glyph
+}
+function coverage(){
+  if(!cells.length) return 0;
+  compositeInk();
+  const d=sctx.getImageData(0,0,SIZE,SIZE).data; let hit=0;
+  for(const [x,y] of cells){ if(d[(y*SIZE+x)*4+3]>40) hit++; }
+  return hit/cells.length;
+}
+function updateCover(){
+  const c=coverage(); $("coverFill").style.width=Math.round(c*100)+"%";
+  if(c>=THRESH && !done[idx]) win();
+}
+function win(){
+  done[idx]=true; buildPicker();
+  $("feedback").textContent="เก่งมาก! เขียน "+LETTERS[idx].c+" สำเร็จ ⭐"; $("feedback").className="feedback good";
+  speak(LETTERS[idx].name);
+  const n=done.filter(Boolean).length;
+  $("prog").innerHTML="ผ่าน <b>"+n+"</b> / "+LETTERS.length;
+  if(n===LETTERS.length){ setTimeout(()=>{ $("game").style.display="none"; $("done").style.display="";
+    $("dt").textContent="เขียนครบทั้ง 7 ตัวแล้ว!"; $("ds").textContent="เยี่ยมมาก หนูเขียนอักษรกลางชุดแรกได้ครบ ก จ ด ต บ ป อ"; }, 900); }
+}
+function setup(){
+  brush=$("tPencil").classList.contains("on")?16:26;
+  ictx.clearRect(0,0,SIZE,SIZE);
+  buildMask(); buildPicker(); render();
+  $("coverFill").style.width="0%";
+  $("lethint").textContent=LETTERS[idx].hint;
+  $("feedback").textContent=""; $("feedback").className="feedback";
+  const n=done.filter(Boolean).length; $("prog").innerHTML="ผ่าน <b>"+n+"</b> / "+LETTERS.length;
+}
+function pos(e){
+  const r=pad.getBoundingClientRect();
+  return { x:(e.clientX-r.left)/r.width*SIZE, y:(e.clientY-r.top)/r.height*SIZE };
+}
+function strokeTo(p){
+  ictx.strokeStyle="#5b7a4b"; ictx.lineWidth=brush; ictx.lineCap="round"; ictx.lineJoin="round";
+  ictx.beginPath(); ictx.moveTo(last.x,last.y); ictx.lineTo(p.x,p.y); ictx.stroke();
+  last=p; render();
+}
+pad.addEventListener("pointerdown",e=>{ pad.setPointerCapture(e.pointerId); drawing=true; last=pos(e);
+  ictx.fillStyle="#5b7a4b"; ictx.beginPath(); ictx.arc(last.x,last.y,brush/2,0,7); ictx.fill(); render(); });
+pad.addEventListener("pointermove",e=>{ if(drawing) strokeTo(pos(e)); });
+pad.addEventListener("pointerup",()=>{ if(!drawing)return; drawing=false; updateCover(); });
+pad.addEventListener("pointercancel",()=>{ drawing=false; updateCover(); });
+
+$("tFinger").onclick=()=>{ $("tFinger").classList.add("on"); $("tPencil").classList.remove("on"); brush=26; };
+$("tPencil").onclick=()=>{ $("tPencil").classList.add("on"); $("tFinger").classList.remove("on"); brush=16; };
+$("clearBtn").onclick=()=>{ ictx.clearRect(0,0,SIZE,SIZE); render(); $("coverFill").style.width="0%"; $("feedback").textContent=""; $("feedback").className="feedback"; };
+$("soundBtn").onclick=()=>speak(LETTERS[idx].name);
+$("nextBtn").onclick=()=>{ idx=(idx+1)%LETTERS.length; setup(); };
+$("again").onclick=()=>{ done.fill(false); idx=0; $("done").style.display="none"; $("game").style.display=""; setup(); };
+
+function speak(txt){
+  try{ const u=new SpeechSynthesisUtterance(txt); u.lang="th-TH"; u.rate=.85; speechSynthesis.cancel(); speechSynthesis.speak(u); }catch(e){}
+}
+(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>setup());
+</script>
+</body>
+</html>
