@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="interactive.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
   .stage{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;justify-content:center;}
   .padwrap{position:relative;width:340px;max-width:84vw;}
@@ -36,6 +37,25 @@
   .iconbtn img{width:30px;height:30px;object-fit:contain;display:block;}
   @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
   .iconbtn.pulse{animation:pulse 1s ease-in-out infinite;background:var(--leaf);color:#fff;border-color:transparent;}
+  .setname{font-size:.62em;font-weight:700;color:var(--earth-d);}
+  #game .card{position:relative;}
+  #game .card:fullscreen{display:flex;flex-direction:column;justify-content:center;background:var(--bg);}
+  .fs-back{display:none;position:absolute;top:14px;left:14px;z-index:6;border:2px solid var(--line-2);background:var(--surface);
+    color:var(--ink-2);font-family:var(--thai);font-weight:800;border-radius:999px;padding:9px 18px;font-size:1rem;cursor:pointer;}
+  #game .card:fullscreen .fs-back{display:block;}
+  .qr-corner{position:absolute;right:12px;bottom:12px;z-index:5;display:flex;flex-direction:column;align-items:center;gap:1px;
+    cursor:pointer;background:#fff;border:1.5px solid var(--line-2);border-radius:12px;padding:6px;box-shadow:0 1px 5px rgba(60,48,28,.12);}
+  .qr-corner #qrSmall canvas,.qr-corner #qrSmall img{display:block;width:54px;height:54px;}
+  .qr-corner span{font-family:var(--thai);font-size:.66rem;color:var(--ink-3);font-weight:700;line-height:1;}
+  .qr-pop{display:none;position:absolute;inset:0;z-index:20;background:rgba(40,32,20,.55);align-items:center;justify-content:center;padding:16px;}
+  .qr-pop.show{display:flex;}
+  .qr-pop-inner{background:#fff;border-radius:22px;padding:26px 24px;text-align:center;max-width:90%;}
+  .qr-pop-inner h3{font-family:var(--thai);margin:0 0 4px;color:var(--ink);font-size:1.15rem;}
+  .qr-pop-inner #qrBig canvas,.qr-pop-inner #qrBig img{display:block;width:236px;height:236px;margin:14px auto 0;}
+  .qr-url{font-family:var(--font);font-size:.82rem;color:var(--ink-2);margin:12px 0 16px;word-break:break-all;}
+  .qr-acts{display:flex;gap:10px;justify-content:center;}
+  .qr-acts button{border:none;border-radius:11px;font-family:var(--thai);font-weight:800;font-size:.95rem;padding:11px 20px;cursor:pointer;color:#fff;background:var(--leaf);box-shadow:inset 0 -3px 0 rgba(0,0,0,.13);}
+  .qr-acts button.ghost{background:var(--surface);color:var(--ink-2);border:1.6px solid var(--line-2);box-shadow:none;}
 </style>
 </head>
 <body>
@@ -46,7 +66,7 @@
     <span class="spacer"></span><a class="home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก</a>
   </div>
   <div class="eyebrow">Interactive · Beginner · อักษรกลางชุดแรก</div>
-  <h1>ลากตามรอยพยัญชนะ</h1>
+  <h1>ลากตามรอยพยัญชนะ <span class="setname">· ชุดที่ 1 อักษรกลาง</span></h1>
   <p class="sub">ฝึก 3 ขั้น: ① ลากตามเส้น 3 ครั้ง → ② เขียนเองในกรอบ 3 ครั้ง → ③ เลือกตัวที่ชอบ แล้วรับมงกุฎ 👑</p>
 
   <div class="bar">
@@ -55,6 +75,7 @@
 
   <div id="game">
     <div class="card">
+      <button class="fs-back" id="fsBack">← ออกจากเต็มจอ</button>
       <div class="stage">
         <div class="tools">
           <button class="tool on" id="tFinger" title="นิ้ว">🖐️</button>
@@ -73,6 +94,18 @@
         <button class="iconbtn" id="soundBtn" title="ฟังเสียง" aria-label="ฟังเสียง"><img src="images/icons/sound.png" alt="เสียง"></button>
         <button class="iconbtn" id="fsBtn" title="เต็มจอ" aria-label="เต็มจอ">⛶</button>
         <button class="iconbtn" id="nextBtn" title="ตัวถัดไป" aria-label="ตัวถัดไป">⏭</button>
+      </div>
+      <div class="qr-corner" id="qrCorner" title="แชร์กระดานนี้"><div id="qrSmall"></div><span>แชร์</span></div>
+      <div class="qr-pop" id="qrPop">
+        <div class="qr-pop-inner">
+          <h3>แชร์กระดานนี้ · ชุดที่ 1 อักษรกลาง</h3>
+          <div id="qrBig"></div>
+          <div class="qr-url" id="qrUrl"></div>
+          <div class="qr-acts">
+            <button id="qrCopy">คัดลอกลิงก์</button>
+            <button class="ghost" id="qrClose">ปิด</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -315,6 +348,18 @@ $("clearBtn").onclick=()=>{ if(phase===3){ startPhase3(); return; } if(busy)retu
 $("soundBtn").onclick=()=>{ if(curCmd) playCmd(curCmd); };
 $("fsBtn").onclick=()=>{ const el=document.querySelector("#game .card");
   try{ if(!document.fullscreenElement){ (el.requestFullscreen||el.webkitRequestFullscreen).call(el); } else { document.exitFullscreen(); } }catch(e){} };
+$("fsBack").onclick=()=>{ try{ document.exitFullscreen(); }catch(e){} };
+
+/* ---- share this board as a QR code ---- */
+const BOARD_URL="https://iamteacherta-code.github.io/panya-thai/interactive-letter-tracing.html";
+function makeQR(el,size){ if(!window.QRCode||!el)return; el.innerHTML="";
+  try{ new QRCode(el,{text:BOARD_URL,width:size,height:size,colorDark:"#2f2a20",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M}); }catch(e){} }
+makeQR($("qrSmall"),54);
+$("qrCorner").onclick=()=>{ makeQR($("qrBig"),236); $("qrUrl").textContent=BOARD_URL; $("qrPop").classList.add("show"); };
+$("qrClose").onclick=()=>$("qrPop").classList.remove("show");
+$("qrPop").onclick=(e)=>{ if(e.target===$("qrPop")) $("qrPop").classList.remove("show"); };
+$("qrCopy").onclick=async()=>{ try{ await navigator.clipboard.writeText(BOARD_URL); $("qrCopy").textContent="✓ คัดลอกแล้ว"; setTimeout(()=>$("qrCopy").textContent="คัดลอกลิงก์",1500);}catch(e){ $("qrCopy").textContent=BOARD_URL; } };
+if(!window.QRCode && $("qrCorner")) $("qrCorner").style.display="none";   // hide if the QR lib failed to load
 $("nextBtn").onclick=()=>{ idx=(idx+1)%LETTERS.length; setup(); };
 $("again").onclick=()=>{ done.fill(false); idx=0; $("done").style.display="none"; $("game").style.display=""; setup(); };
 
