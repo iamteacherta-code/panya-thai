@@ -462,10 +462,24 @@ const COMP_UNITS = [
     { no: "C36", name: "โครงงานรักการอ่าน (Capstone)", ex: "อ่าน 1 เล่ม + นำเสนอหน้าชั้น" },
   ] },
 ];
+const LEVEL_KEYS = ["beginner", "intermediate", "advanced", "comprehension"];
 function LessonsPage({ grade }) {
-  const [lvl, setLvl] = React.useState(() => lessonGradeLevel(grade));
+  // `sel` drives the view: a specific grade room (e.g. "k2") shows ONLY that
+  // room, while a level key (e.g. "beginner") shows the whole band. Picking a
+  // room from the Lessons ▾ menu narrows to that one room. We sync to the
+  // `grade` prop on change because the page component is reused (not remounted)
+  // when navigating between grades, so a useState initializer alone goes stale.
+  const [sel, setSel] = React.useState(grade);
   const [compYear, setCompYear] = React.useState(() => (["y4", "y5", "y6"].includes(grade) ? grade.toUpperCase() : "Y4"));
-  const grades = (LESSON_LEVELS[lvl] || []).filter((id) => LESSONS_BY_GRADE[id]);
+  React.useEffect(() => {
+    setSel(grade);
+    if (["y4", "y5", "y6"].includes(grade)) setCompYear(grade.toUpperCase());
+  }, [grade]);
+  const isLevelKey = LEVEL_KEYS.includes(sel);
+  const lvl = isLevelKey ? sel : lessonGradeLevel(sel);
+  const grades = isLevelKey
+    ? (LESSON_LEVELS[lvl] || []).filter((id) => LESSONS_BY_GRADE[id])  // whole band
+    : (LESSONS_BY_GRADE[sel] ? [sel] : []);                            // single room
   return (
     <div>
       <PageHead eyebrow="Scope & Sequence" en="Lessons" th="บทเรียน"
@@ -477,7 +491,7 @@ function LessonsPage({ grade }) {
         </span>
         <a className="btn btn-sm btn-leaf" href="curriculum.html">📚 Full Scope &amp; Sequence →</a>
       </div>
-      <LevelBar value={lvl} onChange={setLvl} extra={[{ key: "comprehension", n: "4", en: "Comprehension", th: "Y4–6" }]} />
+      <LevelBar value={lvl} onChange={(key) => { setSel(key); if (key === "comprehension") setCompYear("all"); }} extra={[{ key: "comprehension", n: "4", en: "Comprehension", th: "Y4–6" }]} />
       {lvl === "comprehension" ? (
         <div>
           <h3 className="page-title" style={{ fontSize: 18, marginTop: 20, marginBottom: 2 }}>Comprehension<span className="th"> · Read to Learn (Y4–6)</span></h3>
