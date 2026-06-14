@@ -119,6 +119,7 @@
 <script>
 const LETTERS=[
   {c:"ค",f:"images/trace/kho-khwai.png",name:"คอ ควาย",audio:"audio/lo-kho-khwai.mp3"},
+  {c:"ฆ",f:"images/trace/kho-rakhang.png",name:"ฆอ ระฆัง",audio:"audio/lo-kho-rakhang.mp3"},
   {c:"ง",f:"images/trace/ngo-ngu.png",name:"งอ งู",audio:"audio/lo-ngo-ngu.mp3"},
   {c:"ช",f:"images/trace/cho-chang.png",name:"ชอ ช้าง",audio:"audio/lo-cho-chang.mp3"},
   {c:"ซ",f:"images/trace/so-so.png",name:"ซอ โซ่",audio:"audio/lo-so-so.mp3"},
@@ -310,7 +311,7 @@ function chooseFavourite(i){
   $("nextBtn").classList.add("pulse");
   playSound();
   if(n===LETTERS.length){ setTimeout(()=>{ $("game").style.display="none"; $("done").style.display="";
-    $("dt").textContent="เขียนครบทั้ง 22 ตัวแล้ว!"; $("ds").textContent="เยี่ยมมาก หนูเขียนอักษรต่ำชุดที่ 3 ได้ครบ 👑"; }, 1800); }
+    $("dt").textContent="เขียนครบทั้ง 23 ตัวแล้ว!"; $("ds").textContent="เยี่ยมมาก หนูเขียนอักษรต่ำชุดที่ 3 ได้ครบ 👑"; }, 1800); }
 }
 function fireworks(i){
   const r=p3rects[i], cx=r.x+r.w/2, cy=r.y, cols=["#e6533c","#e8b54a","#5b7a4b","#6f9bb0","#b05c3c","#c98a3b"];

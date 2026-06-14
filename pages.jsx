@@ -393,7 +393,7 @@ const lessonGradeLevel = (gg) => Object.keys(LESSON_LEVELS).find((L) => LESSON_L
 const GAMES = [
   { en: "Letter Tracing · Set 1", th: "ลากตามรอยพยัญชนะ · ชุดที่ 1 อักษรกลาง (ก จ ด ต บ ป อ)", level: "beginner", file: "interactive-letter-tracing.html" },
   { en: "Letter Tracing · Set 2", th: "ลากตามรอยพยัญชนะ · ชุดที่ 2 อักษรสูง (ข ฉ ฐ ถ ผ ฝ ศ ษ ส ห)", level: "beginner", file: "interactive-letter-tracing-2.html" },
-  { en: "Letter Tracing · Set 3", th: "ลากตามรอยพยัญชนะ · ชุดที่ 3 อักษรต่ำ (ค ง ช ซ ฌ ญ ฑ ฒ ณ ท ธ น พ ฟ ภ ม ย ร ล ว ฬ ฮ)", level: "beginner", file: "interactive-letter-tracing-3.html" },
+  { en: "Letter Tracing · Set 3", th: "ลากตามรอยพยัญชนะ · ชุดที่ 3 อักษรต่ำ (ค ฆ ง ช ซ ฌ ญ ฑ ฒ ณ ท ธ น พ ฟ ภ ม ย ร ล ว ฬ ฮ)", level: "beginner", file: "interactive-letter-tracing-3.html" },
   { en: "Word Builder", th: "สร้างคำตามเป้าหมาย (ประสม–ลดรูปสระ)", level: "intermediate", file: "interactive-word-builder.html" },
   { en: "Word Map", th: "ลากคำเข้ากิ่งให้ถูกมาตรา", level: "advanced", file: "interactive-mindmap.html" },
   { en: "Sentence Builder", th: "เรียงประโยค (เกมโต้ตอบ)", level: "comprehension", file: "interactive-sentence-scramble.html" },
