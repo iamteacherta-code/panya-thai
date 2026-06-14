@@ -28,6 +28,7 @@
   .iconbtn{width:54px;height:54px;border-radius:999px;border:2px solid var(--line-2);background:var(--surface);color:var(--ink-2);font-size:24px;cursor:pointer;display:grid;place-items:center;-webkit-tap-highlight-color:transparent;transition:transform .08s,background .12s;}
   .iconbtn:hover{background:var(--earth-l);}
   .iconbtn:active{transform:translateY(1px);}
+  .iconbtn img{width:30px;height:30px;object-fit:contain;display:block;}
   @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
   .iconbtn.pulse{animation:pulse 1s ease-in-out infinite;background:var(--leaf);color:#fff;border-color:transparent;}
 </style>
@@ -64,7 +65,7 @@
       <p class="lethint" id="lethint"></p>
       <div class="actions">
         <button class="iconbtn" id="clearBtn" title="ทำใหม่" aria-label="ทำใหม่">↺</button>
-        <button class="iconbtn" id="soundBtn" title="ฟังเสียง" aria-label="ฟังเสียง">🔊</button>
+        <button class="iconbtn" id="soundBtn" title="ฟังเสียง" aria-label="ฟังเสียง"><img src="images/icons/sound.png" alt="เสียง"></button>
         <button class="iconbtn" id="fsBtn" title="เต็มจอ" aria-label="เต็มจอ">⛶</button>
         <button class="iconbtn" id="nextBtn" title="ตัวถัดไป" aria-label="ตัวถัดไป">⏭</button>
       </div>
@@ -89,6 +90,9 @@ const LETTERS=[
 ];
 const W=432, H=576, STEP=7, THRESH=0.50, THRESH2=0.42, REPS=3;
 const COVERW=72, PEN_FINGER=9, PEN_PENCIL=6, PENCOLOR="#2b5d8a";
+// Recorded Thai voice commands, one per phase (replace TTS).
+const CMD={1:"audio/cmd1-trace.mp3",2:"audio/cmd2-box.mp3",3:"audio/cmd3-choose.mp3"};
+const crownImg=new Image(); crownImg.src="images/icons/crown.png";
 const $=id=>document.getElementById(id);
 const pad=$("pad"), ctx=pad.getContext("2d");
 const guide=document.createElement("canvas"); guide.width=W; guide.height=H; const gctx=guide.getContext("2d");
@@ -96,7 +100,7 @@ const ink=document.createElement("canvas"); ink.width=W; ink.height=H; const ict
 const cov=document.createElement("canvas"); cov.width=W; cov.height=H; const cctx=cov.getContext("2d");
 
 let idx=0, pen=PEN_FINGER, drawing=false, last=null, cells=[], bbox={x:40,y:40,w:W-80,h:H-80};
-let phase=1, reps=0, busy=false, writings=[], p3rects=[], chosen=-1, curPrompt="";
+let phase=1, reps=0, busy=false, writings=[], p3rects=[], chosen=-1, curText="", curCmd=null;
 let done=new Array(LETTERS.length).fill(false);
 const imgs={};
 
@@ -161,18 +165,18 @@ function startPhase1(){
   drawGuide(1); buildRoad(); clearInk(); setReps(0);
   prompt1();
 }
-function prompt1(){ setPrompt("เขียน "+LETTERS[idx].name+" ตามเส้นประ"); }
+function prompt1(){ setPrompt("เขียนพยัญชนะตามรอยประ", 1); }
 function traceRepDone(){
-  reps++; setReps(reps); busy=true;
+  reps++; setReps(reps); busy=true; playSound();   // read the letter aloud right after the line is traced
   $("lethint").textContent="เก่งมาก! ✓ ("+reps+"/"+REPS+")";
-  setTimeout(()=>{ busy=false; if(reps>=REPS){ startPhase2(); } else { clearInk(); $("lethint").textContent=curPrompt+" · ครั้งที่ "+(reps+1)+"/"+REPS; } }, 750);
+  setTimeout(()=>{ busy=false; if(reps>=REPS){ startPhase2(); } else { clearInk(); $("lethint").textContent=curText+" · ครั้งที่ "+(reps+1)+"/"+REPS; } }, 850);
 }
 
 /* ---- phase 2: free-hand in a box, 3 times ---- */
 function startPhase2(){
   phase=2; reps=0; writings=[];
   drawGuide(0.12); clearInk(); setReps(0);
-  setPrompt("เขียน "+LETTERS[idx].name+" ในช่องสี่เหลี่ยม");
+  setPrompt("เขียนพยัญชนะในช่องสี่เหลี่ยม", 2);
 }
 function captureWriting(){
   const r=boxRect(); const c=document.createElement("canvas"); c.width=r.w; c.height=r.h;
@@ -182,7 +186,7 @@ function captureWriting(){
 function writeRepDone(){
   captureWriting(); reps++; setReps(reps); busy=true;
   $("lethint").textContent="สวยมาก! ✓ ("+reps+"/"+REPS+")";
-  setTimeout(()=>{ busy=false; if(reps>=REPS){ startPhase3(); } else { clearInk(); $("lethint").textContent=curPrompt+" · ครั้งที่ "+(reps+1)+"/"+REPS; } }, 750);
+  setTimeout(()=>{ busy=false; if(reps>=REPS){ startPhase3(); } else { clearInk(); $("lethint").textContent=curText+" · ครั้งที่ "+(reps+1)+"/"+REPS; } }, 750);
 }
 
 /* ---- phase 3: pick the favourite -> crown + fireworks ---- */
@@ -195,7 +199,7 @@ function startPhase3(){
     p3rects.push({x:cx-dw/2,y:cy-dh/2,w:dw,h:dh,wr}); }
   $("coverFill").style.width="100%"; setReps(REPS);
   render();
-  setPrompt("ชอบตัวไหน ลองเลือกดูคะ");
+  setPrompt("ไหนลองเลือกดู ว่าชอบตัวไหนที่สุด", 3);
 }
 function renderPhase3(){
   ctx.clearRect(0,0,W,H);
@@ -205,7 +209,9 @@ function renderPhase3(){
     else { ctx.fillRect(r.x-12,r.y-12,r.w+24,r.h+24); ctx.strokeRect(r.x-12,r.y-12,r.w+24,r.h+24); }
     ctx.restore();
     ctx.drawImage(r.wr.canvas, r.x, r.y, r.w, r.h);
-    if(i===chosen){ ctx.font="46px serif"; ctx.textAlign="center"; ctx.textBaseline="alphabetic"; ctx.fillText("👑", r.x+r.w/2, r.y-18); }
+    if(i===chosen){ const cw=64, ch=crownImg.naturalWidth?crownImg.naturalHeight/crownImg.naturalWidth*cw:54;
+      if(crownImg.complete && crownImg.naturalWidth) ctx.drawImage(crownImg, r.x+r.w/2-cw/2, r.y-ch-2, cw, ch);
+      else { ctx.font="46px serif"; ctx.textAlign="center"; ctx.fillText("👑", r.x+r.w/2, r.y-18); } }
   });
 }
 function chooseFavourite(i){
@@ -230,7 +236,7 @@ function fireworks(i){
   requestAnimationFrame(step);
 }
 
-function setPrompt(txt){ curPrompt=txt; $("lethint").textContent=txt; speakPrompt(txt); }
+function setPrompt(txt,cmdN){ curText=txt; curCmd=cmdN; $("lethint").textContent=txt; playCmd(cmdN); }
 function setup(){
   pen=$("tPencil").classList.contains("on")?PEN_PENCIL:PEN_FINGER;
   $("nextBtn").classList.remove("pulse"); buildPicker();
@@ -267,19 +273,20 @@ pad.addEventListener("pointercancel",endStroke);
 $("tFinger").onclick=()=>{ $("tFinger").classList.add("on"); $("tPencil").classList.remove("on"); pen=PEN_FINGER; };
 $("tPencil").onclick=()=>{ $("tPencil").classList.add("on"); $("tFinger").classList.remove("on"); pen=PEN_PENCIL; };
 $("clearBtn").onclick=()=>{ if(phase===3){ startPhase3(); return; } if(busy)return; clearInk(); };
-$("soundBtn").onclick=()=>{ if(curPrompt) speakPrompt(curPrompt); };
+$("soundBtn").onclick=()=>{ if(curCmd) playCmd(curCmd); };
 $("fsBtn").onclick=()=>{ const el=document.querySelector("#game .card");
   try{ if(!document.fullscreenElement){ (el.requestFullscreen||el.webkitRequestFullscreen).call(el); } else { document.exitFullscreen(); } }catch(e){} };
 $("nextBtn").onclick=()=>{ idx=(idx+1)%LETTERS.length; setup(); };
 $("again").onclick=()=>{ done.fill(false); idx=0; $("done").style.display="none"; $("game").style.display=""; setup(); };
 
-let audioEl=null;
-function playSound(){
+let audioEl=null, cmdEl=null;
+function playSound(){   // the letter's recorded name (กอ ไก่ …)
   const L=LETTERS[idx];
-  if(L.audio){ try{ if(audioEl){ audioEl.pause(); } audioEl=new Audio(L.audio); audioEl.play().catch(()=>{}); return; }catch(e){} }
+  if(L.audio){ try{ if(audioEl){ audioEl.pause(); } audioEl=new Audio(L.audio); audioEl.play().catch(()=>{}); }catch(e){} }
 }
-function speakPrompt(txt){
-  try{ const u=new SpeechSynthesisUtterance(txt); u.lang="th-TH"; u.rate=.7; u.pitch=1; u.volume=1; speechSynthesis.cancel(); speechSynthesis.speak(u); }catch(e){}
+function playCmd(n){   // the recorded voice command for the phase
+  const url=CMD[n]; if(!url) return;
+  try{ if(cmdEl){ cmdEl.pause(); } cmdEl=new Audio(url); cmdEl.play().catch(()=>{}); }catch(e){}
 }
 function loadImg(src){ return new Promise(res=>{ const im=new Image(); im.onload=()=>res(im); im.onerror=()=>res(im); im.src=src; }); }
 (async()=>{ for(const L of LETTERS){ imgs[L.c]=await loadImg(L.f); } setup(); })();
