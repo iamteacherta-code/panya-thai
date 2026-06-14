@@ -11,6 +11,7 @@ const RESOURCES = [
   { id: "reading", en: "Reading Passages", th: "บทอ่าน", icon: "reading", color: "var(--sky)", desc: "Decodable passages matched to the sounds taught in each lesson." },
   { id: "activity", en: "Activity Sheets", th: "แผ่นกิจกรรม", icon: "worksheet", color: "#8a6f3a", desc: "Hands-on practice for letter forms, sound sorts and matching." },
   { id: "worksheet", en: "Worksheets", th: "ใบงาน", icon: "worksheet", color: "#7a5fb0", desc: "Printable worksheets, dictation and quick checks for mastery." },
+  { id: "game", en: "Game", th: "เกม", icon: "play", color: "var(--leaf)", desc: "Play-on-screen blending, word-building, sorting and reading games." },
 ];
 const TOOLS = DIGITAL_APPS.concat(RESOURCES);
 
@@ -385,18 +386,19 @@ const LESSON_ITEMS = THAI.GRADE_ORDER.map((id) => ({
 
 const LESSON_LEVELS = { beginner: ["k2", "k3", "y1"], intermediate: ["y2"], advanced: ["y3"], comprehension: ["y4", "y5", "y6"] };
 const lessonGradeLevel = (gg) => Object.keys(LESSON_LEVELS).find((L) => LESSON_LEVELS[L].includes(gg)) || "beginner";
-// Comprehension (Y4–6) "read-to-learn" phases — link to the Reading & Writing pack + full curriculum.
-const COMP_PHASES = [
-  { en: "Fluency", th: "อ่านคล่อง", range: "C1–C8", page: 1 },
-  { en: "Vocabulary", th: "คลังคำและคำศัพท์", range: "C9–C18", page: 6 },
-  { en: "Comprehension", th: "อ่านจับใจความ", range: "C19–C28", page: 12 },
-  { en: "Writing", th: "การเขียนและนำเสนอ", range: "C29–C36", page: 18 },
-  { en: "Writing Workshop", th: "การเขียนเชิงโครงสร้าง", range: "Y4–Y6", page: 1, file: "activity-writing-workshop.html" },
-  { en: "Sentence Builder", th: "เรียงประโยค (เกมโต้ตอบ)", range: "🎮 Interactive", file: "interactive-sentence-scramble.html", interactive: true },
-  { en: "Word Builder", th: "สร้างคำ (ประสม–ลดรูปสระ)", range: "🎮 Interactive", file: "interactive-word-builder.html", interactive: true },
-  { en: "Word Map", th: "จัดกลุ่มคำตามมาตรา", range: "🎮 Interactive", file: "interactive-mindmap.html", interactive: true },
-  { en: "Heart Words", th: "คำที่ต้องจำ", range: "🎮 Interactive", file: "interactive-heart-words.html", interactive: true },
-  { en: "Connected Text", th: "อ่านจับใจความ + คำถาม", range: "🎮 Interactive", file: "interactive-reading.html", interactive: true },
+// On-screen games for the Materials "Game" page — blend / build / sort / read.
+// Lower levels reuse the interactive activity pages; Comprehension (Y4–6) games
+// are the read-to-learn set moved out of the Lessons comprehension grid.
+const GAMES = [
+  { en: "Picture & Word Match", th: "จับคู่ภาพกับคำ", level: "beginner", file: "activity-picture-word-match.html" },
+  { en: "Build-a-Word", th: "ต่อคำจากพยางค์", level: "intermediate", file: "activity-build-a-word.html" },
+  { en: "Tone Mark Hunt", th: "ตามหาวรรณยุกต์", level: "advanced", file: "activity-tone-mark-hunt.html" },
+  { en: "Read & Color", th: "อ่านแล้วระบายสี", level: "advanced", file: "activity-read-and-color.html" },
+  { en: "Sentence Builder", th: "เรียงประโยค (เกมโต้ตอบ)", level: "comprehension", file: "interactive-sentence-scramble.html" },
+  { en: "Word Builder", th: "สร้างคำ (ประสม–ลดรูปสระ)", level: "comprehension", file: "interactive-word-builder.html" },
+  { en: "Word Map", th: "จัดกลุ่มคำตามมาตรา", level: "comprehension", file: "interactive-mindmap.html" },
+  { en: "Heart Words", th: "คำที่ต้องจำ", level: "comprehension", file: "interactive-heart-words.html" },
+  { en: "Connected Text", th: "อ่านจับใจความ + คำถาม", level: "comprehension", file: "interactive-reading.html" },
 ];
 // Comprehension (Y4–Y6) full per-lesson breakdown (C1–C36), grouped Y4/Y5/Y6 → unit → lessons.
 const YEAR_FOCUS = {
@@ -533,21 +535,12 @@ function LessonsPage({ grade }) {
               ))}
             </div>
           ))}
-          <h3 className="page-title" style={{ fontSize: 16, marginTop: 24, marginBottom: 6 }}>ฝึกและใบงาน<span className="th"> · Practice, worksheets &amp; games</span></h3>
-          <div className="grid-3">
-            {COMP_PHASES.map((ph) => {
-              const href = ph.file ? (ph.page ? ph.file + "#s" + ph.page : ph.file) : "activity-reading-comprehension.html#s" + ph.page;
-              return (
-                <div className="item-card" key={ph.en}>
-                  <h3>{ph.en}<span className="th">{ph.th}</span></h3>
-                  <div className="item-meta"><span className="tag">Y4–6</span><span className="tag earth">{ph.range}</span></div>
-                  <div className="item-actions">
-                    <a className="btn btn-sm btn-leaf" href={href}><Ico name={ph.interactive ? "play" : "worksheet"} style={{ width: 15, height: 15 }} /> {ph.interactive ? "เล่นเกม · Play" : "ใบงาน · Worksheet"}</a>
-                    {!ph.interactive && <a className="btn btn-sm btn-ghost" href="curriculum.html">บทเรียน</a>}
-                  </div>
-                </div>
-              );
-            })}
+          <div className="lessons-cta" style={{ marginTop: 18 }}>
+            <span className="lc-txt">
+              ฝึกและเกมของ Y4–6 ย้ายไปที่หมวด <b>Materials</b> แล้ว — เปิดเมนู <b>Lessons ▾</b> เลือก
+              <b> Worksheets</b> หรือ <b>Game</b> แล้วกดแท็บ <b>Comprehension</b>
+              <span className="th"> · Practice &amp; games now live under Materials</span>
+            </span>
           </div>
         </div>
       ) : grades.map((gid) => {
@@ -636,6 +629,13 @@ function ReadingMode({ passage, onClose }) {
   );
 }
 
+// Comprehension (Y4–6) "read to learn" texts — link into the Reading & Writing pack.
+const READING_COMP = [
+  { en: "Fluency · อ่านคล่อง", th: "อ่านซ้ำ จับจังหวะ (C1–C8)", file: "activity-reading-comprehension.html#s1" },
+  { en: "Vocabulary · คลังคำ", th: "คำพ้อง คำยาก (C9–C18)", file: "activity-reading-comprehension.html#s6" },
+  { en: "Comprehension · จับใจความ", th: "ใจความสำคัญ สรุป (C19–C28)", file: "activity-reading-comprehension.html#s12" },
+  { en: "Writing · การเขียน", th: "ย่อความ เรียงความ (C29–C36)", file: "activity-reading-comprehension.html#s18" },
+];
 function ReadingPage() {
   const [lvl, setLvl] = React.useState("beginner");
   const [reader, setReader] = React.useState(null);
@@ -721,32 +721,39 @@ function ReadingPage() {
       <PageHead eyebrow="Decodable Texts" en="Reading Passages" th="บทอ่าน"
         sub="Short passages built only from sounds students have already learned — so they can read every word with success." />
       <FwNote />
-      <div className="lessons-cta">
-        <span className="lc-txt">
-          ระดับ <b>Y4–6</b> เน้นอ่านจับใจความและเขียน — ดูบทอ่านยาวขึ้นและกิจกรรมในชุด “อ่านเพื่อเรียนรู้”
-          <span className="th"> · Reading &amp; Writing pack</span>
-        </span>
-        <a className="btn btn-sm btn-leaf" href="activity-reading-comprehension.html#s12">📖 Y4–6 Reading &amp; Writing →</a>
-      </div>
-      <LevelBar value={lvl} onChange={setLvl} />
-      <div className="grid-2">
-        {shown.map((p, i) => (
-          <div className="item-card" key={i}>
-            <div className="item-meta">
-              <span className="tag">{p.level === "beginner" ? "Beginner" : p.level === "intermediate" ? "Intermediate" : "Advanced"}</span>
-              <span className="tag earth">{p.level === "beginner" ? (/Vowel/.test(p.en) ? "Phonics" : /word/i.test(p.en) ? "Words" : "Decodable") : "Decodable"}</span>
+      <LevelBar value={lvl} onChange={setLvl} extra={[{ key: "comprehension", n: "4", en: "Comprehension", th: "Y4–6" }]} />
+      {lvl === "comprehension" ? (
+        <div className="grid-2">
+          {READING_COMP.map((r, i) => (
+            <div className="item-card" key={i}>
+              <div className="item-meta"><span className="tag">Y4–6</span><span className="tag earth">Read to Learn</span></div>
+              <h3>{r.en}<span className="th">{r.th}</span></h3>
+              <div className="item-actions">
+                <a className="btn btn-sm btn-leaf" href={r.file}><Ico name="reading" style={{ width: 15, height: 15 }} /> อ่าน · Read</a>
+              </div>
             </div>
-            <h3>{(p.level === "advanced" ? "A" : p.level === "intermediate" ? "I" : "B") + (i + 1) + " · " + p.en.replace(/^[ABI]\d+\s*·\s*/, "")}<span className="th">{p.th}</span></h3>
-            <div className="passage-thai">
-              {p.lines.map((ln, j) => <div key={j}>{ln}</div>)}
+          ))}
+        </div>
+      ) : (
+        <div className="grid-2">
+          {shown.map((p, i) => (
+            <div className="item-card" key={i}>
+              <div className="item-meta">
+                <span className="tag">{p.level === "beginner" ? "Beginner" : p.level === "intermediate" ? "Intermediate" : "Advanced"}</span>
+                <span className="tag earth">{p.level === "beginner" ? (/Vowel/.test(p.en) ? "Phonics" : /word/i.test(p.en) ? "Words" : "Decodable") : "Decodable"}</span>
+              </div>
+              <h3>{(p.level === "advanced" ? "A" : p.level === "intermediate" ? "I" : "B") + (i + 1) + " · " + p.en.replace(/^[ABI]\d+\s*·\s*/, "")}<span className="th">{p.th}</span></h3>
+              <div className="passage-thai">
+                {p.lines.map((ln, j) => <div key={j}>{ln}</div>)}
+              </div>
+              <div className="item-actions">
+                <button className="btn btn-sm btn-leaf" onClick={() => setReader(p)}><Ico name="play" style={{ width: 15, height: 15 }} /> Read</button>
+                <button className="btn btn-sm btn-ghost"><Ico name="print" style={{ width: 15, height: 15 }} /> Print</button>
+              </div>
             </div>
-            <div className="item-actions">
-              <button className="btn btn-sm btn-leaf" onClick={() => setReader(p)}><Ico name="play" style={{ width: 15, height: 15 }} /> Read</button>
-              <button className="btn btn-sm btn-ghost"><Ico name="print" style={{ width: 15, height: 15 }} /> Print</button>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
       {reader && <ReadingMode passage={reader} onClose={() => setReader(null)} />}
     </div>
   );
@@ -866,7 +873,7 @@ function WorksheetsPage() {
       <PageHead eyebrow="Print & Assess" en="Worksheets" th="ใบงาน"
         sub="Ready-to-print worksheets and quick checks, organised by skill so you can pull exactly what today's lesson needs." />
       <FwNote />
-      <LevelBar value={lvl} onChange={setLvl} withAll />
+      <LevelBar value={lvl} onChange={setLvl} withAll extra={[{ key: "comprehension", n: "4", en: "Comprehension", th: "Y4–6" }]} />
       <div className="level-tabs">
         {filters.map((f) => (
           <button key={f} className={"level-tab" + (filter === f ? " on" : "")} onClick={() => setFilter(f)}>{f}</button>
@@ -895,6 +902,34 @@ function WorksheetsPage() {
   );
 }
 
+function GamesPage() {
+  const [lvl, setLvl] = React.useState("all");
+  const shown = GAMES.filter((g) => lvl === "all" || g.level === lvl);
+  const levelTag = (l) => l === "beginner" ? "Beginner" : l === "intermediate" ? "Intermediate" : l === "comprehension" ? "Y4–6" : "Advanced";
+  return (
+    <div>
+      <PageHead eyebrow="Play & Practise" en="Game" th="เกม"
+        sub="On-screen games — blend, build, sort and read. Pick a level, then play." />
+      <FwNote />
+      <LevelBar value={lvl} onChange={setLvl} withAll extra={[{ key: "comprehension", n: "4", en: "Comprehension", th: "Y4–6" }]} />
+      <div className="grid-3">
+        {shown.map((g, i) => (
+          <div className="item-card" key={i}>
+            <h3>{g.en}<span className="th">{g.th}</span></h3>
+            <div className="item-meta">
+              <span className="tag">{levelTag(g.level)}</span>
+              <span className="tag earth">🎮 Interactive</span>
+            </div>
+            <div className="item-actions">
+              <a className="btn btn-sm btn-leaf" href={g.file}><Ico name="play" style={{ width: 15, height: 15 }} /> เล่นเกม · Play</a>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // Word Work Mat level items for the "Word Work Mat ▾" nav dropdown (one per level).
 const MAT_ITEMS = THAI.MAT_LEVELS.map((id) => ({
   id: "mat-" + id,
@@ -909,5 +944,5 @@ window.DIGITAL_APPS = DIGITAL_APPS;
 window.RESOURCES = RESOURCES;
 window.LESSON_ITEMS = LESSON_ITEMS;
 window.MAT_ITEMS = MAT_ITEMS;
-window.Pages = { HomePage, ActivityPage, LessonsPage, ReadingPage, WorksheetsPage };
+window.Pages = { HomePage, ActivityPage, LessonsPage, ReadingPage, WorksheetsPage, GamesPage };
 window.Ico = Ico;

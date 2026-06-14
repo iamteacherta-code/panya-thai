@@ -1,6 +1,6 @@
 /* global React, ReactDOM */
 const { useState, useEffect, useRef } = React;
-const { HomePage, ActivityPage, LessonsPage, ReadingPage, WorksheetsPage } = window.Pages;
+const { HomePage, ActivityPage, LessonsPage, ReadingPage, WorksheetsPage, GamesPage } = window.Pages;
 const TOOLS = window.TOOLS;
 const Ico = window.Ico;
 const BlendingBoard = window.BlendingBoard;
@@ -211,6 +211,7 @@ function App() {
   }
   else if (page === "reading") body = <ReadingPage />;
   else if (page === "worksheet") body = <WorksheetsPage />;
+  else if (page === "game") body = <GamesPage />;
   else body = <HomePage go={go} />;
 
   const isBoard = page === "board" || page.indexOf("mat") === 0;
