@@ -101,7 +101,7 @@ const cov=document.createElement("canvas"); cov.width=W; cov.height=H; const cct
 
 let idx=0, pen=PEN_FINGER, drawing=false, last=null, cells=[], bbox={x:40,y:40,w:W-80,h:H-80};
 let phase=1, reps=0, busy=false, writings=[], p3rects=[], chosen=-1, curText="", curCmd=null;
-let boxes=[], boxIdx=0, appearT=1;
+let boxIdx=0, sliding=false, slideT=0, prevWriting=null;
 let done=new Array(LETTERS.length).fill(false);
 const imgs={};
 
@@ -145,9 +145,13 @@ function buildRoad(){
   if(cells.length) bbox={x:mnX,y:mnY,w:mxX-mnX,h:mxY-mnY};
 }
 function rrect(c,x,y,w,h,r){ if(c.roundRect){ c.beginPath(); c.roundRect(x,y,w,h,r); } else { c.beginPath(); c.rect(x,y,w,h); } }
-function computeBoxes(){
-  const n=REPS, gap=12, bw=(W-gap*(n+1))/n, bh=H*0.6, by=(H-bh)/2;
-  boxes=[]; for(let i=0;i<n;i++) boxes.push({x:gap+i*(bw+gap), y:by, w:bw, h:bh});
+// One box, the same size/place as the traced (dashed) letter from phase 1.
+function letterBox(){ const p=20; const x=Math.max(8,bbox.x-p), y=Math.max(8,bbox.y-p);
+  return {x,y,w:Math.min(W-16-x,bbox.w+2*p), h:Math.min(H-16-y,bbox.h+2*p)}; }
+function drawBoxAt(x,y,w,h,writing){
+  ctx.save(); ctx.fillStyle="#fcfaf4"; ctx.strokeStyle="#cdbf9f"; ctx.lineWidth=2.5;
+  rrect(ctx,x,y,w,h,16); ctx.fill(); ctx.stroke(); ctx.restore();
+  if(writing) ctx.drawImage(writing.canvas, x, y, w, h);
 }
 function render(){
   ctx.clearRect(0,0,W,H);
@@ -158,15 +162,14 @@ function render(){
 }
 function renderPhase2(){
   ctx.clearRect(0,0,W,H);
-  for(let i=0;i<=boxIdx && i<boxes.length;i++){
-    const b=boxes[i]; let oy=0, al=1;
-    if(i===boxIdx && appearT<1){ oy=(1-appearT)*70; al=appearT; }   // slide in from below
-    ctx.save(); ctx.globalAlpha=al; ctx.fillStyle="#fcfaf4"; ctx.strokeStyle="#cdbf9f"; ctx.lineWidth=2.5;
-    rrect(ctx,b.x,b.y+oy,b.w,b.h,16); ctx.fill(); ctx.stroke(); ctx.restore();
-    if(i<boxIdx && writings[i]) ctx.drawImage(writings[i].canvas, b.x, b.y+oy, b.w, b.h);
+  const b=letterBox(), D=W*1.15;
+  if(sliding){
+    if(prevWriting) drawBoxAt(b.x - slideT*D, b.y, b.w, b.h, prevWriting);   // finished box leaves left
+    if(boxIdx<REPS) drawBoxAt(b.x + (1-slideT)*D, b.y, b.w, b.h, null);       // next empty box enters from right
+  } else {
+    drawBoxAt(b.x, b.y, b.w, b.h, null);
+    ctx.save(); rrect(ctx,b.x,b.y,b.w,b.h,16); ctx.clip(); ctx.drawImage(ink,0,0); ctx.restore();
   }
-  const b=boxes[boxIdx];
-  if(b){ ctx.save(); rrect(ctx,b.x,b.y,b.w,b.h,16); ctx.clip(); ctx.drawImage(ink,0,0); ctx.restore(); }
 }
 function coverage(){
   if(!cells.length) return 0;
@@ -189,16 +192,19 @@ function traceRepDone(){
   setTimeout(()=>{ busy=false; if(reps>=REPS){ startPhase2(); } else { clearInk(); $("lethint").textContent=curText+" · ครั้งที่ "+(reps+1)+"/"+REPS; } }, 850);
 }
 
-/* ---- phase 2: empty boxes slide in one at a time; write free-hand in each ---- */
+/* ---- phase 2: ONE letter-sized box at a time; finished box slides out left,
+        the next empty box slides in from the right, until 3 are written ---- */
 function startPhase2(){
-  phase=2; writings=[]; boxIdx=0; computeBoxes();
+  phase=2; writings=[]; boxIdx=0; prevWriting=null;
   clearInk(); setReps(0);
   setPrompt("เขียนพยัญชนะในช่องสี่เหลี่ยม", 2);
-  slideInBox();
+  slide(null);   // first empty box slides in
 }
-function slideInBox(){
-  busy=true; appearT=0;
-  const step=()=>{ appearT=Math.min(1,appearT+0.09); render(); if(appearT<1) requestAnimationFrame(step); else busy=false; };
+function slide(after){
+  sliding=true; busy=true; slideT=0;
+  const step=()=>{ slideT=Math.min(1,slideT+0.07); render();
+    if(slideT<1) requestAnimationFrame(step);
+    else { sliding=false; busy=false; prevWriting=null; render(); if(after) after(); } };
   requestAnimationFrame(step);
 }
 function inkInBox(b){
@@ -209,25 +215,27 @@ function inkInBox(b){
   for(let yy=0;yy<hh;yy++)for(let xx=0;xx<ww;xx++){ if(d[(yy*ww+xx)*4+3]>40){ count++; if(xx<mnx)mnx=xx; if(xx>mxx)mxx=xx; if(yy<mny)mny=yy; if(yy>mxy)mxy=yy; } }
   return {count, w:count?mxx-mnx:0, h:count?mxy-mny:0};
 }
-function captureBox(i){
-  const b=boxes[i], c=document.createElement("canvas"); c.width=b.w; c.height=b.h;
+function captureBox(){
+  const b=letterBox(), c=document.createElement("canvas"); c.width=b.w|0; c.height=b.h|0;
   c.getContext("2d").drawImage(ink, b.x, b.y, b.w, b.h, 0, 0, b.w, b.h);
-  writings[i]={canvas:c,w:b.w,h:b.h};
+  writings[boxIdx]={canvas:c,w:b.w,h:b.h};
 }
 function checkWrite(){
-  const b=boxes[boxIdx]; if(!b) return;
-  const info=inkInBox(b);
-  if(info.count>250 && info.w>=b.w*0.26 && info.h>=b.h*0.30){
-    captureBox(boxIdx); boxIdx++; setReps(boxIdx); busy=true;
+  if(sliding) return;
+  const b=letterBox(), info=inkInBox(b);
+  if(info.count>250 && info.w>=b.w*0.24 && info.h>=b.h*0.28){
+    captureBox(); prevWriting=writings[boxIdx]; boxIdx++; setReps(boxIdx); busy=true;
     $("lethint").textContent="สวยมาก! ✓ ("+boxIdx+"/"+REPS+")";
-    setTimeout(()=>{ if(boxIdx>=REPS){ busy=false; startPhase3(); } else { clearInk(); $("lethint").textContent=curText; slideInBox(); } }, 600);
+    setTimeout(()=>{ clearInk(); if(boxIdx>=REPS) slide(()=>startPhase3()); else slide(null); }, 450);
   }
 }
 
 /* ---- phase 3: boxes vanish, only the 3 written letters remain -> pick -> crown ---- */
 function startPhase3(){
   phase=3; chosen=-1;
-  p3rects=boxes.map((b,i)=>({x:b.x,y:b.y,w:b.w,h:b.h,wr:writings[i]}));
+  const n=writings.length, cellW=W/n;
+  p3rects=writings.map((wr,i)=>{ const s=Math.min((cellW-18)/wr.w,(H*0.52)/wr.h), dw=wr.w*s, dh=wr.h*s;
+    return {x:i*cellW+cellW/2-dw/2, y:H*0.5-dh/2, w:dw, h:dh, wr}; });
   $("coverFill").style.width="100%"; setReps(REPS);
   render();
   setPrompt("ไหนลองเลือกดู ว่าชอบตัวไหนที่สุด", 3);
