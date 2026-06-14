@@ -141,16 +141,9 @@ function buildRoad(){
 }
 function boxRect(){ const p=24; const x=Math.max(6,bbox.x-p), y=Math.max(6,bbox.y-p);
   return {x,y,w:Math.min(W-12-x,bbox.w+2*p),h:Math.min(H-12-y,bbox.h+2*p)}; }
-function drawBox(){
-  const r=boxRect(); ctx.save(); ctx.strokeStyle="#cdbf9f"; ctx.lineWidth=3; ctx.fillStyle="#fcfaf4";
-  if(ctx.roundRect){ ctx.beginPath(); ctx.roundRect(r.x,r.y,r.w,r.h,20); ctx.fill(); ctx.stroke(); }
-  else { ctx.fillRect(r.x,r.y,r.w,r.h); ctx.strokeRect(r.x,r.y,r.w,r.h); }
-  ctx.restore();
-}
 function render(){
   ctx.clearRect(0,0,W,H);
   if(phase===3){ renderPhase3(); return; }
-  if(phase===2) drawBox();
   ctx.drawImage(guide,0,0);
   ctx.drawImage(ink,0,0);
 }
@@ -286,7 +279,7 @@ function playSound(){
   if(L.audio){ try{ if(audioEl){ audioEl.pause(); } audioEl=new Audio(L.audio); audioEl.play().catch(()=>{}); return; }catch(e){} }
 }
 function speakPrompt(txt){
-  try{ const u=new SpeechSynthesisUtterance(txt); u.lang="th-TH"; u.rate=.92; speechSynthesis.cancel(); speechSynthesis.speak(u); }catch(e){}
+  try{ const u=new SpeechSynthesisUtterance(txt); u.lang="th-TH"; u.rate=.7; u.pitch=1; u.volume=1; speechSynthesis.cancel(); speechSynthesis.speak(u); }catch(e){}
 }
 function loadImg(src){ return new Promise(res=>{ const im=new Image(); im.onload=()=>res(im); im.onerror=()=>res(im); im.src=src; }); }
 (async()=>{ for(const L of LETTERS){ imgs[L.c]=await loadImg(L.f); } setup(); })();
