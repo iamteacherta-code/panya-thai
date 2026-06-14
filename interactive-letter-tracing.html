@@ -286,7 +286,7 @@ function playSound(){   // the letter's recorded name (กอ ไก่ …)
 }
 function playCmd(n){   // the recorded voice command for the phase
   const url=CMD[n]; if(!url) return;
-  try{ if(cmdEl){ cmdEl.pause(); } cmdEl=new Audio(url); cmdEl.play().catch(()=>{}); }catch(e){}
+  try{ if(cmdEl){ cmdEl.pause(); } cmdEl=new Audio(url); cmdEl.playbackRate=1.15; cmdEl.play().catch(()=>{}); }catch(e){}
 }
 function loadImg(src){ return new Promise(res=>{ const im=new Image(); im.onload=()=>res(im); im.onerror=()=>res(im); im.src=src; }); }
 (async()=>{ for(const L of LETTERS){ imgs[L.c]=await loadImg(L.f); } setup(); })();
