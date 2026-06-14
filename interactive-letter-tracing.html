@@ -10,8 +10,8 @@
 <link rel="stylesheet" href="interactive.css" />
 <style>
   .stage{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;justify-content:center;}
-  .padwrap{position:relative;width:380px;max-width:86vw;}
-  .pad{width:100%;aspect-ratio:1/1;border:2px solid var(--line-2);border-radius:20px;background:#fff;touch-action:none;cursor:crosshair;display:block;}
+  .padwrap{position:relative;width:340px;max-width:84vw;}
+  .pad{width:100%;aspect-ratio:3/4;border:2px solid var(--line-2);border-radius:20px;background:#fff;touch-action:none;cursor:crosshair;display:block;}
   .tools{display:flex;flex-direction:column;gap:10px;}
   .tool{width:50px;height:50px;border-radius:14px;border:2px solid var(--line-2);background:var(--surface);color:var(--ink-2);font-size:22px;cursor:pointer;display:grid;place-items:center;-webkit-tap-highlight-color:transparent;}
   .tool.on{background:var(--leaf);color:#fff;border-color:transparent;}
@@ -32,7 +32,7 @@
   </div>
   <div class="eyebrow">Interactive · Beginner · อักษรกลางชุดแรก</div>
   <h1>ลากตามรอยพยัญชนะ</h1>
-  <p class="sub">เขียนตามรอยตัวอักษรแบบอิสระ (free-hand) ด้วยนิ้ว/เมาส์ · ให้เส้นอยู่ในกรอบตัวอักษรก็พอ แล้วกด “เสียง” เพื่อฟังชื่อพยัญชนะ</p>
+  <p class="sub">เขียนตามรอยตัวอักษรแบบอิสระ (free-hand) ด้วยนิ้ว/เมาส์ · เริ่มที่จุด ● แล้วลากตามลูกศรในภาพ ให้เส้นอยู่ในกรอบก็พอ แล้วกด “เสียง” เพื่อฟังชื่อพยัญชนะ</p>
 
   <div class="bar">
     <div class="chips" id="picker"></div>
@@ -47,7 +47,7 @@
           <button class="tool" id="tPencil" title="ดินสอ · pencil">✏️</button>
         </div>
         <div class="padwrap">
-          <canvas class="pad" id="pad" width="400" height="400"></canvas>
+          <canvas class="pad" id="pad" width="432" height="576"></canvas>
         </div>
       </div>
       <div class="cover"><i id="coverFill"></i></div>
@@ -69,39 +69,24 @@
 
 <script>
 const LETTERS=[
-  {c:"ก",name:"กอ ไก่",audio:"audio/mid-ko-kai.mp3",hint:"ก ไม่มีหัว — เริ่มล่างซ้าย ขึ้นก้าน โค้งหลังคา ลงก้านขวา"},
-  {c:"จ",name:"จอ จาน",audio:"audio/mid-jo-jan.mp3",hint:"เริ่มที่หัวด้านบน วนแล้วลากโค้งลงหาง"},
-  {c:"ด",name:"ดอ เด็ก",audio:"audio/mid-do-dek.mp3",hint:"เริ่มที่หัว วนเป็นวง แล้วลากเส้นตัว"},
-  {c:"ต",name:"ตอ เต่า",audio:"audio/mid-to-tao.mp3",hint:"เริ่มที่หัว แล้วลากเส้นตามรูป"},
-  {c:"บ",name:"บอ ใบไม้",audio:"audio/mid-bo-baimai.mp3",hint:"เริ่มที่หัว ลากลงแล้ววนท้อง"},
-  {c:"ป",name:"ปอ ปลา",audio:"audio/mid-po-pla.mp3",hint:"เริ่มที่หัว ลากขึ้นยอดธง แล้วลงตัว"},
-  {c:"อ",name:"ออ อ่าง",audio:"audio/mid-o-ang.mp3",hint:"เริ่มที่หัว วนเป็นวงเดียว"},
+  {c:"ก",f:"images/trace/k.png",name:"กอ ไก่",audio:"audio/mid-ko-kai.mp3"},
+  {c:"จ",f:"images/trace/j.png",name:"จอ จาน",audio:"audio/mid-jo-jan.mp3"},
+  {c:"ด",f:"images/trace/d.png",name:"ดอ เด็ก",audio:"audio/mid-do-dek.mp3"},
+  {c:"ต",f:"images/trace/t.png",name:"ตอ เต่า",audio:"audio/mid-to-tao.mp3"},
+  {c:"บ",f:"images/trace/b.png",name:"บอ ใบไม้",audio:"audio/mid-bo-baimai.mp3"},
+  {c:"ป",f:"images/trace/p.png",name:"ปอ ปลา",audio:"audio/mid-po-pla.mp3"},
+  {c:"อ",f:"images/trace/o.png",name:"ออ อ่าง",audio:"audio/mid-o-ang.mp3"},
 ];
-// Writing guide per letter: start dot ● + direction arrows, positioned as
-// fractions of the glyph bounding box. deg: 0=→ 90=↓ 180=← 270=↑.
-// ก follows the teacher's reference image; the rest use standard Thai stroke order.
-const GUIDES={
-  "ก":{s:[0.13,0.92],a:[[0.13,0.45,270],[0.5,0.06,0],[0.9,0.55,90]]},
-  "จ":{head:1,a:[[0.30,0.60,90],[0.55,0.93,0],[0.83,0.55,270],[0.45,0.06,180]]},
-  "ด":{head:1,a:[[0.30,0.26,270],[0.55,0.06,0],[0.86,0.55,90]]},
-  "ต":{head:1,a:[[0.22,0.30,270],[0.55,0.08,0],[0.86,0.45,90],[0.30,0.88,90]]},
-  "บ":{head:1,a:[[0.15,0.52,90],[0.5,0.9,0],[0.88,0.5,270]]},
-  "ป":{head:1,a:[[0.15,0.55,90],[0.5,0.9,0],[0.88,0.40,270]]},
-  "อ":{head:1,a:[[0.42,0.07,180],[0.11,0.5,90],[0.6,0.92,0],[0.9,0.5,270]]},
-};
-const SIZE=400, STEP=7, THRESH=0.55;
+const W=432, H=576, STEP=7, THRESH=0.50;
+const COVERW=72, PEN_FINGER=9, PEN_PENCIL=6, PENCOLOR="#2b5d8a";
 const $=id=>document.getElementById(id);
 const pad=$("pad"), ctx=pad.getContext("2d");
-const mask=document.createElement("canvas"); mask.width=mask.height=SIZE; const mctx=mask.getContext("2d");
-const ink=document.createElement("canvas"); ink.width=ink.height=SIZE; const ictx=ink.getContext("2d");
-const scratch=document.createElement("canvas"); scratch.width=scratch.height=SIZE; const sctx=scratch.getContext("2d");
-// `ink` = the thin freehand pen line that is shown; `cov` = a wider invisible
-// stroke along the same path used only to measure how much of the letter the
-// child's line has passed through (so a single centre trace counts as done).
-const cov=document.createElement("canvas"); cov.width=cov.height=SIZE; const cctx=cov.getContext("2d");
-const COVERW=46, PEN_FINGER=9, PEN_PENCIL=6, PENCOLOR="#2b5d8a";
+const guide=document.createElement("canvas"); guide.width=W; guide.height=H; const gctx=guide.getContext("2d");
+const ink=document.createElement("canvas"); ink.width=W; ink.height=H; const ictx=ink.getContext("2d");
+const cov=document.createElement("canvas"); cov.width=W; cov.height=H; const cctx=cov.getContext("2d");
 
 let idx=0, pen=PEN_FINGER, drawing=false, last=null, cells=[], done=new Array(LETTERS.length).fill(false);
+const imgs={};
 
 function buildPicker(){
   const p=$("picker"); p.innerHTML="";
@@ -112,77 +97,47 @@ function buildPicker(){
     p.appendChild(b);
   });
 }
-function glyphFont(){ return "800 270px Sarabun, sans-serif"; }
-function drawGlyphTo(c,fill,dash,lw){
-  c.clearRect(0,0,SIZE,SIZE);
-  c.font=glyphFont(); c.textAlign="center"; c.textBaseline="middle";
-  c.fillStyle=fill; c.fillText(LETTERS[idx].c, SIZE/2, SIZE/2+14);
-  if(dash){ c.save(); c.setLineDash([7,9]); c.lineWidth=lw||3; c.strokeStyle="#b9ac8e"; c.lineJoin="round";
-    c.strokeText(LETTERS[idx].c, SIZE/2, SIZE/2+14); c.restore(); }
+// Fit the worksheet image fully inside the canvas (contain), centred.
+function fitRect(iw,ih){ const s=Math.min(W/iw,H/ih), w=iw*s, h=ih*s; return {x:(W-w)/2,y:(H-h)/2,w,h}; }
+function drawGuide(){
+  const im=imgs[LETTERS[idx].c];
+  gctx.clearRect(0,0,W,H);
+  if(im && im.naturalWidth){ const r=fitRect(im.naturalWidth,im.naturalHeight); gctx.drawImage(im,r.x,r.y,r.w,r.h); }
 }
-let bbox={x:0,y:0,w:SIZE,h:SIZE}, headPt=null;
-function buildMask(){
-  drawGlyphTo(mctx,"#000",false,0);
-  const d=mctx.getImageData(0,0,SIZE,SIZE).data; cells=[];
-  let mnX=SIZE,mnY=SIZE,mxX=0,mxY=0;
-  for(let y=0;y<SIZE;y+=STEP) for(let x=0;x<SIZE;x+=STEP){
-    if(d[(y*SIZE+x)*4+3]>128){ cells.push([x,y]); if(x<mnX)mnX=x; if(x>mxX)mxX=x; if(y<mnY)mnY=y; if(y>mxY)mxY=y; }
-  }
-  bbox={x:mnX,y:mnY,w:Math.max(1,mxX-mnX),h:Math.max(1,mxY-mnY)};
-}
-// Detect the หัว (head): the largest enclosed counter inside the glyph, by
-// flood-filling background from the border and finding the biggest trapped hole.
-function detectHead(){
-  const d=mctx.getImageData(0,0,SIZE,SIZE).data, W=SIZE, H=SIZE;
-  const isBg=i=>d[i*4+3]<128;
-  const out=new Uint8Array(W*H), st=[];
-  const seed=(x,y)=>{ if(x<0||y<0||x>=W||y>=H)return; const i=y*W+x; if(out[i]||!isBg(i))return; out[i]=1; st.push(i); };
-  for(let x=0;x<W;x++){ seed(x,0); seed(x,H-1); } for(let y=0;y<H;y++){ seed(0,y); seed(W-1,y); }
-  while(st.length){ const i=st.pop(), x=i%W, y=(i/W)|0; seed(x-1,y); seed(x+1,y); seed(x,y-1); seed(x,y+1); }
-  const seen=new Uint8Array(W*H); let best=null,bestN=0;
-  for(let i=0;i<W*H;i++){
-    if(isBg(i)&&!out[i]&&!seen[i]){
-      let n=0,sx=0,sy=0; const q=[i]; seen[i]=1;
-      while(q.length){ const j=q.pop(), x=j%W, y=(j/W)|0; n++; sx+=x; sy+=y;
-        const nb=[j-1,j+1,j-W,j+W]; for(const k of nb){ if(k<0||k>=W*H)continue; if(isBg(k)&&!out[k]&&!seen[k]){ seen[k]=1; q.push(k); } } }
-      if(n>bestN){ bestN=n; best={x:sx/n,y:sy/n}; }
+// Road = the writable band of the letter: the largest WHITE region that is
+// enclosed by the black outline (i.e. not reachable from the border). Counters
+// (loop holes) and the outer background are excluded.
+function buildRoad(){
+  const d=gctx.getImageData(0,0,W,H).data, N=W*H;
+  const white=i=>{ const a=d[i*4+3]; return a<40 || (d[i*4]>205 && d[i*4+1]>205 && d[i*4+2]>205); };
+  const isWhitePix=i=>{ const a=d[i*4+3]; return a>40 && d[i*4]>205 && d[i*4+1]>205 && d[i*4+2]>205; };
+  const outer=new Uint8Array(N), st=[];
+  const seed=i=>{ if(i<0||i>=N||outer[i]||!white(i))return; outer[i]=1; st.push(i); };
+  for(let x=0;x<W;x++){ seed(x); seed((H-1)*W+x); } for(let y=0;y<H;y++){ seed(y*W); seed(y*W+W-1); }
+  while(st.length){ const i=st.pop(), x=i%W; if(x>0)seed(i-1); if(x<W-1)seed(i+1); seed(i-W); seed(i+W); }
+  const seen=new Uint8Array(N); let best=null,bestN=0;
+  for(let i=0;i<N;i++){
+    if(isWhitePix(i)&&!outer[i]&&!seen[i]){
+      const comp=[i]; seen[i]=1; let h=0;
+      while(h<comp.length){ const j=comp[h++], x=j%W;
+        const nb=[x>0?j-1:-1, x<W-1?j+1:-1, j-W, j+W];
+        for(const k of nb){ if(k<0||k>=N)continue; if(isWhitePix(k)&&!outer[k]&&!seen[k]){ seen[k]=1; comp.push(k); } } }
+      if(comp.length>bestN){ bestN=comp.length; best=comp; }
     }
   }
-  return bestN>40?best:null;
-}
-// Coverage = how much of the glyph the (wide) cov stroke has passed through.
-function covInsideGlyph(){
-  sctx.clearRect(0,0,SIZE,SIZE);
-  sctx.drawImage(cov,0,0);
-  sctx.globalCompositeOperation="destination-in"; sctx.drawImage(mask,0,0);
-  sctx.globalCompositeOperation="source-over";
-}
-function arrowMark(c,x,y,deg){
-  c.save(); c.translate(x,y); c.rotate(deg*Math.PI/180);
-  c.fillStyle="#5c5341";
-  c.beginPath(); c.moveTo(14,0); c.lineTo(-7,-10); c.lineTo(-7,10); c.closePath(); c.fill();
-  c.restore();
-}
-function drawGuide(c){
-  const g=GUIDES[LETTERS[idx].c]; if(!g) return;
-  const px=f=>bbox.x+f*bbox.w, py=f=>bbox.y+f*bbox.h;
-  (g.a||[]).forEach(([fx,fy,deg])=>arrowMark(c,px(fx),py(fy),deg));
-  let sx,sy;
-  if(g.head && headPt){ sx=headPt.x; sy=headPt.y; } else { sx=px(g.s[0]); sy=py(g.s[1]); }
-  c.beginPath(); c.arc(sx,sy,12,0,7); c.fillStyle="#c98a3b"; c.fill();
-  c.lineWidth=3.5; c.strokeStyle="#fff"; c.stroke();
+  const road=new Uint8Array(N); cells=[];
+  if(best) for(const j of best) road[j]=1;
+  for(let y=0;y<H;y+=STEP) for(let x=0;x<W;x+=STEP){ if(road[y*W+x]) cells.push([x,y]); }
 }
 function render(){
-  ctx.clearRect(0,0,SIZE,SIZE);
-  drawGlyphTo(ctx,"#f3ecdb",true,2.5);  // pale letter "road" + dashed outline guide
-  drawGuide(ctx);                       // start dot + direction arrows
-  ctx.drawImage(ink,0,0);               // thin freehand pen line, shown as the child wrote it
+  ctx.clearRect(0,0,W,H);
+  ctx.drawImage(guide,0,0);   // the worksheet letter (road + dashed centre + arrows + start dot)
+  ctx.drawImage(ink,0,0);     // thin free-hand pen line, shown as written
 }
 function coverage(){
   if(!cells.length) return 0;
-  covInsideGlyph();
-  const d=sctx.getImageData(0,0,SIZE,SIZE).data; let hit=0;
-  for(const [x,y] of cells){ if(d[(y*SIZE+x)*4+3]>40) hit++; }
+  const d=cctx.getImageData(0,0,W,H).data; let hit=0;
+  for(const [x,y] of cells){ if(d[(y*W+x)*4+3]>40) hit++; }
   return hit/cells.length;
 }
 function updateCover(){
@@ -200,18 +155,16 @@ function win(){
 }
 function setup(){
   pen=$("tPencil").classList.contains("on")?PEN_PENCIL:PEN_FINGER;
-  ictx.clearRect(0,0,SIZE,SIZE); cctx.clearRect(0,0,SIZE,SIZE);
-  buildMask();
-  headPt = (GUIDES[LETTERS[idx].c]||{}).head ? detectHead() : null;
-  buildPicker(); render();
+  ictx.clearRect(0,0,W,H); cctx.clearRect(0,0,W,H);
+  drawGuide(); buildRoad(); buildPicker(); render();
   $("coverFill").style.width="0%";
-  $("lethint").textContent=LETTERS[idx].hint;
+  $("lethint").textContent=LETTERS[idx].name+" · เริ่มที่จุด ● แล้วลากตามลูกศร";
   $("feedback").textContent=""; $("feedback").className="feedback";
   const n=done.filter(Boolean).length; $("prog").innerHTML="ผ่าน <b>"+n+"</b> / "+LETTERS.length;
 }
 function pos(e){
   const r=pad.getBoundingClientRect();
-  return { x:(e.clientX-r.left)/r.width*SIZE, y:(e.clientY-r.top)/r.height*SIZE };
+  return { x:(e.clientX-r.left)/r.width*W, y:(e.clientY-r.top)/r.height*H };
 }
 function inkSeg(c,col,w,a,b){
   c.strokeStyle=col; c.lineWidth=w; c.lineCap="round"; c.lineJoin="round";
@@ -231,7 +184,7 @@ pad.addEventListener("pointercancel",()=>{ drawing=false; updateCover(); });
 
 $("tFinger").onclick=()=>{ $("tFinger").classList.add("on"); $("tPencil").classList.remove("on"); pen=PEN_FINGER; };
 $("tPencil").onclick=()=>{ $("tPencil").classList.add("on"); $("tFinger").classList.remove("on"); pen=PEN_PENCIL; };
-$("clearBtn").onclick=()=>{ ictx.clearRect(0,0,SIZE,SIZE); cctx.clearRect(0,0,SIZE,SIZE); render(); $("coverFill").style.width="0%"; $("feedback").textContent=""; $("feedback").className="feedback"; };
+$("clearBtn").onclick=()=>{ ictx.clearRect(0,0,W,H); cctx.clearRect(0,0,W,H); render(); $("coverFill").style.width="0%"; $("feedback").textContent=""; $("feedback").className="feedback"; };
 $("soundBtn").onclick=()=>playSound();
 $("nextBtn").onclick=()=>{ idx=(idx+1)%LETTERS.length; setup(); };
 $("again").onclick=()=>{ done.fill(false); idx=0; $("done").style.display="none"; $("game").style.display=""; setup(); };
@@ -247,7 +200,8 @@ function playSound(){
 function speakTTS(txt){
   try{ const u=new SpeechSynthesisUtterance(txt); u.lang="th-TH"; u.rate=.85; speechSynthesis.cancel(); speechSynthesis.speak(u); }catch(e){}
 }
-(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>setup());
+function loadImg(src){ return new Promise(res=>{ const im=new Image(); im.onload=()=>res(im); im.onerror=()=>res(im); im.src=src; }); }
+(async()=>{ for(const L of LETTERS){ imgs[L.c]=await loadImg(L.f); } setup(); })();
 </script>
 </body>
 </html>
