@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · Letter Tracing · เขียนพยัญชนะ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="interactive.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  .stage{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;justify-content:center;}
+  .padwrap{position:relative;width:340px;max-width:84vw;}
+  .pad{width:100%;aspect-ratio:3/4;border:2px solid var(--line-2);border-radius:20px;background:#fff;touch-action:none;cursor:crosshair;display:block;}
+  .tools{display:flex;flex-direction:column;gap:10px;}
+  .tool{width:50px;height:50px;border-radius:14px;border:2px solid var(--line-2);background:var(--surface);color:var(--ink-2);font-size:22px;cursor:pointer;display:grid;place-items:center;-webkit-tap-highlight-color:transparent;}
+  .tool.on{background:var(--leaf);color:#fff;border-color:transparent;}
+  .lethint{font-family:var(--thai);color:var(--ink-2);font-size:1.05rem;font-weight:700;text-align:center;margin:10px 0 0;min-height:26px;}
+  .reps{display:flex;gap:8px;justify-content:center;margin:8px 0 0;}
+  .reps i{width:13px;height:13px;border-radius:999px;background:var(--line-2);display:block;}
+  .reps i.on{background:var(--leaf);}
+  .cover{height:12px;border-radius:999px;background:var(--leaf-l);overflow:hidden;margin:12px 0 2px;}
+  .cover>i{display:block;height:100%;width:0;background:var(--leaf);transition:width .15s;}
+  .chips .lvchip{font-family:var(--thai);font-size:1.5rem;min-width:54px;text-align:center;padding:6px 12px;}
+  .chips .lvchip.done{background:var(--leaf-l);color:var(--leaf-d);border-color:var(--leaf);}
+  .chips .lvchip.done::after{content:" ✓";font-size:1rem;}
+  /* compact single-column letter picker beside the canvas */
+  .pickcol{flex-direction:column;flex-wrap:nowrap;gap:7px;align-self:flex-start;}
+  .pickcol .lvchip{min-width:0;width:42px;height:42px;padding:0;font-size:1.15rem;display:grid;place-items:center;border-radius:12px;border-width:1.6px;}
+  .pickcol .lvchip.done::after{content:"";}
+  @media(max-width:560px){ .pickcol{flex-direction:row;flex-wrap:wrap;justify-content:center;} }
+  .actions{display:flex;gap:14px;justify-content:center;margin-top:10px;}
+  .iconbtn{width:54px;height:54px;border-radius:999px;border:2px solid var(--line-2);background:var(--surface);color:var(--ink-2);font-size:24px;cursor:pointer;display:grid;place-items:center;-webkit-tap-highlight-color:transparent;transition:transform .08s,background .12s;}
+  .iconbtn:hover{background:var(--earth-l);}
+  .iconbtn:active{transform:translateY(1px);}
+  .iconbtn img{width:30px;height:30px;object-fit:contain;display:block;}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+  .iconbtn.pulse{animation:pulse 1s ease-in-out infinite;background:var(--leaf);color:#fff;border-color:transparent;}
+  .setname{font-size:.62em;font-weight:700;color:var(--earth-d);}
+  #game .card{position:relative;}
+  #game .card:fullscreen{display:flex;flex-direction:column;justify-content:center;background:var(--bg);}
+  .fs-back{display:none;position:absolute;top:14px;left:14px;z-index:6;border:2px solid var(--line-2);background:var(--surface);
+    color:var(--ink-2);font-family:var(--thai);font-weight:800;border-radius:999px;padding:9px 18px;font-size:1rem;cursor:pointer;}
+  #game .card:fullscreen .fs-back{display:block;}
+  .qr-corner{position:absolute;right:12px;bottom:12px;z-index:5;display:flex;flex-direction:column;align-items:center;gap:1px;
+    cursor:pointer;background:#fff;border:1.5px solid var(--line-2);border-radius:12px;padding:6px;box-shadow:0 1px 5px rgba(60,48,28,.12);}
+  .qr-corner #qrSmall canvas,.qr-corner #qrSmall img{display:block;width:54px;height:54px;}
+  .qr-corner span{font-family:var(--thai);font-size:.66rem;color:var(--ink-3);font-weight:700;line-height:1;}
+  .qr-pop{display:none;position:absolute;inset:0;z-index:20;background:rgba(40,32,20,.55);align-items:center;justify-content:center;padding:16px;}
+  .qr-pop.show{display:flex;}
+  .qr-pop-inner{background:#fff;border-radius:22px;padding:26px 24px;text-align:center;max-width:90%;}
+  .qr-pop-inner h3{font-family:var(--thai);margin:0 0 4px;color:var(--ink);font-size:1.15rem;}
+  .qr-pop-inner #qrBig canvas,.qr-pop-inner #qrBig img{display:block;width:236px;height:236px;margin:14px auto 0;}
+  .qr-url{font-family:var(--font);font-size:.82rem;color:var(--ink-2);margin:12px 0 16px;word-break:break-all;}
+  .qr-acts{display:flex;gap:10px;justify-content:center;}
+  .qr-acts button{border:none;border-radius:11px;font-family:var(--thai);font-weight:800;font-size:.95rem;padding:11px 20px;cursor:pointer;color:#fff;background:var(--leaf);box-shadow:inset 0 -3px 0 rgba(0,0,0,.13);}
+  .qr-acts button.ghost{background:var(--surface);color:var(--ink-2);border:1.6px solid var(--line-2);box-shadow:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <span class="logo">P</span>
+    <div><div class="bn">PANYA</div><div class="bs">Letter Tracing · เขียนพยัญชนะ</div></div>
+    <span class="spacer"></span><a class="home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก</a>
+  </div>
+  <div class="eyebrow">Interactive · Beginner · อักษรสูงชุดที่ 2</div>
+  <h1>ลากตามรอยพยัญชนะ <span class="setname">· ชุดที่ 2 อักษรสูง</span></h1>
+  <p class="sub">ฝึก 3 ขั้น: ① ลากตามเส้น 3 ครั้ง → ② เขียนเองในกรอบ 3 ครั้ง → ③ เลือกตัวที่ชอบ แล้วรับมงกุฎ 👑</p>
+
+  <div class="bar">
+    <div class="prog" id="prog"></div>
+  </div>
+
+  <div id="game">
+    <div class="card">
+      <button class="fs-back" id="fsBack">← ออกจากเต็มจอ</button>
+      <div class="stage">
+        <div class="tools">
+          <button class="tool on" id="tFinger" title="นิ้ว">🖐️</button>
+          <button class="tool" id="tPencil" title="ดินสอ">✏️</button>
+        </div>
+        <div class="padwrap">
+          <canvas class="pad" id="pad" width="432" height="576"></canvas>
+        </div>
+        <div class="chips pickcol" id="picker"></div>
+      </div>
+      <div class="reps" id="reps"></div>
+      <div class="cover"><i id="coverFill"></i></div>
+      <p class="lethint" id="lethint"></p>
+      <div class="actions">
+        <button class="iconbtn" id="clearBtn" title="ทำใหม่" aria-label="ทำใหม่">↺</button>
+        <button class="iconbtn" id="soundBtn" title="ฟังเสียง" aria-label="ฟังเสียง"><img src="images/icons/sound.png" alt="เสียง"></button>
+        <button class="iconbtn" id="fsBtn" title="เต็มจอ" aria-label="เต็มจอ">⛶</button>
+        <button class="iconbtn" id="nextBtn" title="ตัวถัดไป" aria-label="ตัวถัดไป">⏭</button>
+      </div>
+      <div class="qr-corner" id="qrCorner" title="แชร์กระดานนี้"><div id="qrSmall"></div><span>แชร์</span></div>
+      <div class="qr-pop" id="qrPop">
+        <div class="qr-pop-inner">
+          <h3>แชร์กระดานนี้ · ชุดที่ 2 อักษรสูง</h3>
+          <div id="qrBig"></div>
+          <div class="qr-url" id="qrUrl"></div>
+          <div class="qr-acts">
+            <button id="qrCopy">คัดลอกลิงก์</button>
+            <button class="ghost" id="qrClose">ปิด</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card done" id="done" style="display:none">
+    <div class="big">👑</div><h2 id="dt"></h2><p class="sub" id="ds"></p>
+    <div class="actions"><button class="iconbtn pulse" id="again" title="เริ่มใหม่" aria-label="เริ่มใหม่">↻</button></div>
+  </div>
+</div>
+
+<script>
+const LETTERS=[
+  {c:"ข",f:"images/trace/kho-khai.png",name:"ขอ ไข่",audio:"audio/hi-kho-khai.mp3"},
+  {c:"ฉ",f:"images/trace/cho-ching.png",name:"ฉอ ฉิ่ง",audio:"audio/hi-cho-ching.mp3"},
+  {c:"ฐ",f:"images/trace/tho-than.png",name:"ฐอ ฐาน",audio:"audio/hi-tho-than.mp3"},
+  {c:"ถ",f:"images/trace/tho-thung.png",name:"ถอ ถุง",audio:"audio/hi-tho-thung.mp3"},
+  {c:"ผ",f:"images/trace/pho-phueng.png",name:"ผอ ผึ้ง",audio:"audio/hi-pho-phueng.mp3"},
+  {c:"ฝ",f:"images/trace/fo-fa.png",name:"ฝอ ฝา",audio:"audio/hi-fo-fa.mp3"},
+  {c:"ศ",f:"images/trace/so-sala.png",name:"ศอ ศาลา",audio:"audio/hi-so-sala.mp3"},
+  {c:"ษ",f:"images/trace/so-ruesi.png",name:"ษอ ฤๅษี",audio:"audio/hi-so-ruesi.mp3"},
+  {c:"ส",f:"images/trace/so-suea.png",name:"สอ เสือ",audio:"audio/hi-so-suea.mp3"},
+  {c:"ห",f:"images/trace/ho-hip.png",name:"หอ หีบ",audio:"audio/hi-ho-hip.mp3"},
+];
+const W=432, H=576, STEP=7, THRESH=0.50, THRESH2=0.42, REPS=3;
+const COVERW=72, PEN_FINGER=9, PEN_PENCIL=6, PENCOLOR="#2b5d8a";
+// Recorded Thai voice commands, one per phase (replace TTS).
+const CMD={1:"audio/cmd1-trace.mp3",2:"audio/cmd2-box.mp3",3:"audio/cmd3-choose.mp3"};
+const crownImg=new Image(); crownImg.src="images/icons/crown.png";
+const $=id=>document.getElementById(id);
+const pad=$("pad"), ctx=pad.getContext("2d");
+const guide=document.createElement("canvas"); guide.width=W; guide.height=H; const gctx=guide.getContext("2d");
+const ink=document.createElement("canvas"); ink.width=W; ink.height=H; const ictx=ink.getContext("2d");
+const cov=document.createElement("canvas"); cov.width=W; cov.height=H; const cctx=cov.getContext("2d");
+
+let idx=0, pen=PEN_FINGER, drawing=false, last=null, cells=[], bbox={x:40,y:40,w:W-80,h:H-80};
+let phase=1, reps=0, busy=false, writings=[], p3rects=[], chosen=-1, curText="", curCmd=null;
+let boxIdx=0, sliding=false, slideT=0, prevWriting=null;
+let done=new Array(LETTERS.length).fill(false);
+const imgs={};
+
+function buildPicker(){
+  const p=$("picker"); p.innerHTML="";
+  LETTERS.forEach((L,i)=>{
+    const b=document.createElement("button");
+    b.className="lvchip"+(i===idx?" on":"")+(done[i]?" done":"");
+    b.textContent=L.c; b.onclick=()=>{ idx=i; setup(); };
+    p.appendChild(b);
+  });
+}
+function setReps(n){ const r=$("reps"); r.innerHTML=""; for(let i=0;i<REPS;i++){ const d=document.createElement("i"); if(i<n)d.className="on"; r.appendChild(d); } }
+function fitRect(iw,ih){ const s=Math.min(W/iw,H/ih), w=iw*s, h=ih*s; return {x:(W-w)/2,y:(H-h)/2,w,h}; }
+function drawGuide(alpha){
+  const im=imgs[LETTERS[idx].c];
+  gctx.clearRect(0,0,W,H);
+  if(im && im.naturalWidth){ const r=fitRect(im.naturalWidth,im.naturalHeight); gctx.globalAlpha=alpha; gctx.drawImage(im,r.x,r.y,r.w,r.h); gctx.globalAlpha=1; }
+}
+function buildRoad(){
+  const d=gctx.getImageData(0,0,W,H).data, N=W*H;
+  const white=i=>{ const a=d[i*4+3]; return a<40 || (d[i*4]>205 && d[i*4+1]>205 && d[i*4+2]>205); };
+  const isWhitePix=i=>{ const a=d[i*4+3]; return a>40 && d[i*4]>205 && d[i*4+1]>205 && d[i*4+2]>205; };
+  const outer=new Uint8Array(N), st=[];
+  const seed=i=>{ if(i<0||i>=N||outer[i]||!white(i))return; outer[i]=1; st.push(i); };
+  for(let x=0;x<W;x++){ seed(x); seed((H-1)*W+x); } for(let y=0;y<H;y++){ seed(y*W); seed(y*W+W-1); }
+  while(st.length){ const i=st.pop(), x=i%W; if(x>0)seed(i-1); if(x<W-1)seed(i+1); seed(i-W); seed(i+W); }
+  const seen=new Uint8Array(N); let best=null,bestN=0;
+  for(let i=0;i<N;i++){
+    if(isWhitePix(i)&&!outer[i]&&!seen[i]){
+      const comp=[i]; seen[i]=1; let h=0;
+      while(h<comp.length){ const j=comp[h++], x=j%W;
+        const nb=[x>0?j-1:-1, x<W-1?j+1:-1, j-W, j+W];
+        for(const k of nb){ if(k<0||k>=N)continue; if(isWhitePix(k)&&!outer[k]&&!seen[k]){ seen[k]=1; comp.push(k); } } }
+      if(comp.length>bestN){ bestN=comp.length; best=comp; }
+    }
+  }
+  const road=new Uint8Array(N); cells=[]; let mnX=W,mnY=H,mxX=0,mxY=0;
+  if(best) for(const j of best) road[j]=1;
+  for(let y=0;y<H;y+=STEP) for(let x=0;x<W;x+=STEP){ if(road[y*W+x]){ cells.push([x,y]); if(x<mnX)mnX=x; if(x>mxX)mxX=x; if(y<mnY)mnY=y; if(y>mxY)mxY=y; } }
+  if(cells.length) bbox={x:mnX,y:mnY,w:mxX-mnX,h:mxY-mnY};
+}
+function rrect(c,x,y,w,h,r){ if(c.roundRect){ c.beginPath(); c.roundRect(x,y,w,h,r); } else { c.beginPath(); c.rect(x,y,w,h); } }
+// One box, the same size/place as the traced (dashed) letter from phase 1.
+function letterBox(){ const p=20; const x=Math.max(8,bbox.x-p), y=Math.max(8,bbox.y-p);
+  return {x,y,w:Math.min(W-16-x,bbox.w+2*p), h:Math.min(H-16-y,bbox.h+2*p)}; }
+function drawBoxAt(x,y,w,h,writing){
+  ctx.save(); ctx.fillStyle="#fcfaf4"; ctx.strokeStyle="#cdbf9f"; ctx.lineWidth=2.5;
+  rrect(ctx,x,y,w,h,16); ctx.fill(); ctx.stroke(); ctx.restore();
+  if(writing) ctx.drawImage(writing.canvas, x, y, w, h);
+}
+function render(){
+  ctx.clearRect(0,0,W,H);
+  if(phase===3){ renderPhase3(); return; }
+  if(phase===2){ renderPhase2(); return; }
+  ctx.drawImage(guide,0,0);
+  ctx.drawImage(ink,0,0);
+}
+function renderPhase2(){
+  ctx.clearRect(0,0,W,H);
+  const b=letterBox(), D=W*1.15;
+  if(sliding){
+    if(prevWriting) drawBoxAt(b.x - slideT*D, b.y, b.w, b.h, prevWriting);   // finished box leaves left
+    if(boxIdx<REPS) drawBoxAt(b.x + (1-slideT)*D, b.y, b.w, b.h, null);       // next empty box enters from right
+  } else {
+    drawBoxAt(b.x, b.y, b.w, b.h, null);
+    ctx.save(); rrect(ctx,b.x,b.y,b.w,b.h,16); ctx.clip(); ctx.drawImage(ink,0,0); ctx.restore();
+  }
+}
+function coverage(){
+  if(!cells.length) return 0;
+  const d=cctx.getImageData(0,0,W,H).data; let hit=0;
+  for(const [x,y] of cells){ if(d[(y*W+x)*4+3]>40) hit++; }
+  return hit/cells.length;
+}
+function clearInk(){ ictx.clearRect(0,0,W,H); cctx.clearRect(0,0,W,H); $("coverFill").style.width="0%"; render(); }
+
+/* ---- phase 1: trace 3 times ---- */
+function startPhase1(){
+  phase=1; reps=0; writings=[]; chosen=-1;
+  drawGuide(1); buildRoad(); clearInk(); setReps(0);
+  prompt1();
+}
+function prompt1(){ setPrompt("เขียนพยัญชนะตามรอยประ", 1); }
+function traceRepDone(){
+  reps++; setReps(reps); busy=true; playSound();   // read the letter aloud right after the line is traced
+  $("lethint").textContent="เก่งมาก! ✓ ("+reps+"/"+REPS+")";
+  setTimeout(()=>{ busy=false; if(reps>=REPS){ startPhase2(); } else { clearInk(); $("lethint").textContent=curText+" · ครั้งที่ "+(reps+1)+"/"+REPS; } }, 850);
+}
+
+/* ---- phase 2: ONE letter-sized box at a time; finished box slides out left,
+        the next empty box slides in from the right, until 3 are written ---- */
+function startPhase2(){
+  phase=2; writings=[]; boxIdx=0; prevWriting=null;
+  clearInk(); setReps(0);
+  setPrompt("เขียนพยัญชนะในช่องสี่เหลี่ยม", 2);
+  slide(null);   // first empty box slides in
+}
+function slide(after){
+  sliding=true; busy=true; slideT=0;
+  const step=()=>{ slideT=Math.min(1,slideT+0.07); render();
+    if(slideT<1) requestAnimationFrame(step);
+    else { sliding=false; busy=false; prevWriting=null; render(); if(after) after(); } };
+  requestAnimationFrame(step);
+}
+function inkInBox(b){
+  const x0=Math.max(0,b.x|0), y0=Math.max(0,b.y|0), x1=Math.min(W,(b.x+b.w)|0), y1=Math.min(H,(b.y+b.h)|0);
+  const ww=x1-x0, hh=y1-y0; if(ww<=0||hh<=0) return {count:0,w:0,h:0};
+  const d=ictx.getImageData(x0,y0,ww,hh).data;
+  let count=0,mnx=ww,mny=hh,mxx=0,mxy=0;
+  for(let yy=0;yy<hh;yy++)for(let xx=0;xx<ww;xx++){ if(d[(yy*ww+xx)*4+3]>40){ count++; if(xx<mnx)mnx=xx; if(xx>mxx)mxx=xx; if(yy<mny)mny=yy; if(yy>mxy)mxy=yy; } }
+  return {count, w:count?mxx-mnx:0, h:count?mxy-mny:0};
+}
+function captureBox(){
+  const b=letterBox(), c=document.createElement("canvas"); c.width=b.w|0; c.height=b.h|0;
+  c.getContext("2d").drawImage(ink, b.x, b.y, b.w, b.h, 0, 0, b.w, b.h);
+  writings[boxIdx]={canvas:c,w:b.w,h:b.h};
+}
+function checkWrite(){
+  if(sliding) return;
+  const b=letterBox(), info=inkInBox(b);
+  if(info.count>250 && info.w>=b.w*0.24 && info.h>=b.h*0.28){
+    captureBox(); prevWriting=writings[boxIdx]; boxIdx++; setReps(boxIdx); busy=true;
+    $("lethint").textContent="สวยมาก! ✓ ("+boxIdx+"/"+REPS+")";
+    setTimeout(()=>{ clearInk(); if(boxIdx>=REPS) slide(()=>startPhase3()); else slide(null); }, 450);
+  }
+}
+
+/* ---- phase 3: boxes vanish, only the 3 written letters remain -> pick -> crown ---- */
+function startPhase3(){
+  phase=3; chosen=-1;
+  const n=writings.length, cellW=W/n;
+  p3rects=writings.map((wr,i)=>{ const s=Math.min((cellW-18)/wr.w,(H*0.52)/wr.h), dw=wr.w*s, dh=wr.h*s;
+    return {x:i*cellW+cellW/2-dw/2, y:H*0.5-dh/2, w:dw, h:dh, wr}; });
+  $("coverFill").style.width="100%"; setReps(REPS);
+  render();
+  setPrompt("ไหนลองเลือกดู ว่าชอบตัวไหนที่สุด", 3);
+}
+function renderPhase3(){
+  ctx.clearRect(0,0,W,H);
+  p3rects.forEach((r,i)=>{
+    if(r.wr) ctx.drawImage(r.wr.canvas, r.x, r.y, r.w, r.h);
+    if(i===chosen){ const cw=64, ch=crownImg.naturalWidth?crownImg.naturalHeight/crownImg.naturalWidth*cw:54;
+      if(crownImg.complete && crownImg.naturalWidth) ctx.drawImage(crownImg, r.x+r.w/2-cw/2, r.y-ch+8, cw, ch);
+      else { ctx.font="46px serif"; ctx.textAlign="center"; ctx.fillText("👑", r.x+r.w/2, r.y+24); } }
+  });
+}
+function chooseFavourite(i){
+  if(chosen>=0) return; chosen=i; renderPhase3(); fireworks(i);
+  done[idx]=true; buildPicker();
+  const n=done.filter(Boolean).length; $("prog").innerHTML="ผ่าน <b>"+n+"</b> / "+LETTERS.length;
+  $("lethint").textContent="เยี่ยมมาก! ได้มงกุฎแล้ว 👑";
+  $("nextBtn").classList.add("pulse");
+  playSound();
+  if(n===LETTERS.length){ setTimeout(()=>{ $("game").style.display="none"; $("done").style.display="";
+    $("dt").textContent="เขียนครบทั้ง 10 ตัวแล้ว!"; $("ds").textContent="เยี่ยมมาก หนูเขียนอักษรสูงชุดที่ 2 ได้ครบ ข ฉ ฐ ถ ผ ฝ ศ ษ ส ห 👑"; }, 1800); }
+}
+function fireworks(i){
+  const r=p3rects[i], cx=r.x+r.w/2, cy=r.y, cols=["#e6533c","#e8b54a","#5b7a4b","#6f9bb0","#b05c3c","#c98a3b"];
+  const parts=[]; for(let k=0;k<46;k++){ const a=(Math.PI*2*k/46)+Math.random()*0.3, sp=2.4+Math.random()*3.4;
+    parts.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-2.2,life:1,col:cols[k%cols.length]}); }
+  let t=0;
+  const step=()=>{ t++; renderPhase3();
+    parts.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.vy+=0.13; p.life-=0.018;
+      if(p.life>0){ ctx.save(); ctx.globalAlpha=Math.max(0,p.life); ctx.fillStyle=p.col; ctx.beginPath(); ctx.arc(p.x,p.y,3.4,0,7); ctx.fill(); ctx.restore(); } });
+    if(t<80) requestAnimationFrame(step); else renderPhase3(); };
+  requestAnimationFrame(step);
+}
+
+function setPrompt(txt,cmdN){ curText=txt; curCmd=cmdN; $("lethint").textContent=txt; playCmd(cmdN); }
+function setup(){
+  pen=$("tPencil").classList.contains("on")?PEN_PENCIL:PEN_FINGER;
+  $("nextBtn").classList.remove("pulse"); buildPicker();
+  const n=done.filter(Boolean).length; $("prog").innerHTML="ผ่าน <b>"+n+"</b> / "+LETTERS.length;
+  startPhase1();
+}
+function pos(e){ const r=pad.getBoundingClientRect();
+  return { x:(e.clientX-r.left)/r.width*W, y:(e.clientY-r.top)/r.height*H }; }
+function inkSeg(c,col,w,a,b){ c.strokeStyle=col; c.lineWidth=w; c.lineCap="round"; c.lineJoin="round";
+  c.beginPath(); c.moveTo(a.x,a.y); c.lineTo(b.x,b.y); c.stroke(); }
+function strokeTo(p){
+  inkSeg(ictx, PENCOLOR, pen, last, p);
+  inkSeg(cctx, "#000", COVERW, last, p);
+  last=p; render();
+}
+pad.addEventListener("pointerdown",e=>{
+  if(phase===3){ const p=pos(e); for(let i=0;i<p3rects.length;i++){ const r=p3rects[i];
+    if(p.x>=r.x-14&&p.x<=r.x+r.w+14&&p.y>=r.y-14&&p.y<=r.y+r.h+14){ chooseFavourite(i); break; } } return; }
+  if(busy) return;
+  try{ pad.setPointerCapture(e.pointerId); }catch(_){}
+  drawing=true; last=pos(e);
+  ictx.fillStyle=PENCOLOR; ictx.beginPath(); ictx.arc(last.x,last.y,pen/2,0,7); ictx.fill();
+  cctx.fillStyle="#000"; cctx.beginPath(); cctx.arc(last.x,last.y,COVERW/2,0,7); cctx.fill(); render();
+});
+pad.addEventListener("pointermove",e=>{ if(drawing) strokeTo(pos(e)); });
+function endStroke(){ if(!drawing)return; drawing=false;
+  if(phase===1){ const c=coverage(); $("coverFill").style.width=Math.round(c*100)+"%"; if(c>=THRESH) traceRepDone(); }
+  else if(phase===2){ checkWrite(); }
+}
+pad.addEventListener("pointerup",endStroke);
+pad.addEventListener("pointercancel",endStroke);
+
+$("tFinger").onclick=()=>{ $("tFinger").classList.add("on"); $("tPencil").classList.remove("on"); pen=PEN_FINGER; };
+$("tPencil").onclick=()=>{ $("tPencil").classList.add("on"); $("tFinger").classList.remove("on"); pen=PEN_PENCIL; };
+$("clearBtn").onclick=()=>{ if(phase===3){ startPhase3(); return; } if(busy)return; clearInk(); };
+$("soundBtn").onclick=()=>{ if(curCmd) playCmd(curCmd); };
+$("fsBtn").onclick=()=>{ const el=document.querySelector("#game .card");
+  try{ if(!document.fullscreenElement){ (el.requestFullscreen||el.webkitRequestFullscreen).call(el); } else { document.exitFullscreen(); } }catch(e){} };
+$("fsBack").onclick=()=>{ try{ document.exitFullscreen(); }catch(e){} };
+
+/* ---- share this board as a QR code ---- */
+const BOARD_URL="https://iamteacherta-code.github.io/panya-thai/interactive-letter-tracing-2.html";
+function makeQR(el,size){ if(!window.QRCode||!el)return; el.innerHTML="";
+  try{ new QRCode(el,{text:BOARD_URL,width:size,height:size,colorDark:"#2f2a20",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M}); }catch(e){} }
+makeQR($("qrSmall"),54);
+$("qrCorner").onclick=()=>{ makeQR($("qrBig"),236); $("qrUrl").textContent=BOARD_URL; $("qrPop").classList.add("show"); };
+$("qrClose").onclick=()=>$("qrPop").classList.remove("show");
+$("qrPop").onclick=(e)=>{ if(e.target===$("qrPop")) $("qrPop").classList.remove("show"); };
+$("qrCopy").onclick=async()=>{ try{ await navigator.clipboard.writeText(BOARD_URL); $("qrCopy").textContent="✓ คัดลอกแล้ว"; setTimeout(()=>$("qrCopy").textContent="คัดลอกลิงก์",1500);}catch(e){ $("qrCopy").textContent=BOARD_URL; } };
+if(!window.QRCode && $("qrCorner")) $("qrCorner").style.display="none";   // hide if the QR lib failed to load
+$("nextBtn").onclick=()=>{ idx=(idx+1)%LETTERS.length; setup(); };
+$("again").onclick=()=>{ done.fill(false); idx=0; $("done").style.display="none"; $("game").style.display=""; setup(); };
+
+let audioEl=null, cmdEl=null;
+function playSound(){   // the letter's recorded name (กอ ไก่ …)
+  const L=LETTERS[idx];
+  if(L.audio){ try{ if(audioEl){ audioEl.pause(); } audioEl=new Audio(L.audio); audioEl.play().catch(()=>{}); }catch(e){} }
+}
+function playCmd(n){   // the recorded voice command for the phase
+  const url=CMD[n]; if(!url) return;
+  try{ if(cmdEl){ cmdEl.pause(); } cmdEl=new Audio(url); cmdEl.playbackRate=1.15; cmdEl.play().catch(()=>{}); }catch(e){}
+}
+function loadImg(src){ return new Promise(res=>{ const im=new Image(); im.onload=()=>res(im); im.onerror=()=>res(im); im.src=src; }); }
+(async()=>{ for(const L of LETTERS){ imgs[L.c]=await loadImg(L.f); } setup(); })();
+</script>
+</body>
+</html>

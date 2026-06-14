@@ -391,7 +391,8 @@ const lessonGradeLevel = (gg) => Object.keys(LESSON_LEVELS).find((L) => LESSON_L
 // Activity Sheets page, not here. Beginner blending is done live on the
 // Blending Board / Word Work Mat (Digital Apps), so there is no Beginner game.
 const GAMES = [
-  { en: "Letter Tracing", th: "ลากตามรอยพยัญชนะ (อักษรกลาง ก จ ด ต บ ป อ)", level: "beginner", file: "interactive-letter-tracing.html" },
+  { en: "Letter Tracing · Set 1", th: "ลากตามรอยพยัญชนะ · ชุดที่ 1 อักษรกลาง (ก จ ด ต บ ป อ)", level: "beginner", file: "interactive-letter-tracing.html" },
+  { en: "Letter Tracing · Set 2", th: "ลากตามรอยพยัญชนะ · ชุดที่ 2 อักษรสูง (ข ฉ ฐ ถ ผ ฝ ศ ษ ส ห)", level: "beginner", file: "interactive-letter-tracing-2.html" },
   { en: "Word Builder", th: "สร้างคำตามเป้าหมาย (ประสม–ลดรูปสระ)", level: "intermediate", file: "interactive-word-builder.html" },
   { en: "Word Map", th: "ลากคำเข้ากิ่งให้ถูกมาตรา", level: "advanced", file: "interactive-mindmap.html" },
   { en: "Sentence Builder", th: "เรียงประโยค (เกมโต้ตอบ)", level: "comprehension", file: "interactive-sentence-scramble.html" },
