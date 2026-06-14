@@ -32,7 +32,7 @@
   </div>
   <div class="eyebrow">Interactive · Beginner · อักษรกลางชุดแรก</div>
   <h1>ลากตามรอยพยัญชนะ</h1>
-  <p class="sub">แตะค้างแล้วลากนิ้ว/เมาส์ระบายให้เต็มตัวอักษร · อยู่ในเส้นก็ถือว่าถูก แล้วกด “เสียง” เพื่อฟังชื่อพยัญชนะ</p>
+  <p class="sub">เขียนตามรอยตัวอักษรแบบอิสระ (free-hand) ด้วยนิ้ว/เมาส์ · ให้เส้นอยู่ในกรอบตัวอักษรก็พอ แล้วกด “เสียง” เพื่อฟังชื่อพยัญชนะ</p>
 
   <div class="bar">
     <div class="chips" id="picker"></div>
@@ -89,14 +89,19 @@ const GUIDES={
   "ป":{head:1,a:[[0.15,0.55,90],[0.5,0.9,0],[0.88,0.40,270]]},
   "อ":{head:1,a:[[0.42,0.07,180],[0.11,0.5,90],[0.6,0.92,0],[0.9,0.5,270]]},
 };
-const SIZE=400, STEP=7, THRESH=0.80;
+const SIZE=400, STEP=7, THRESH=0.55;
 const $=id=>document.getElementById(id);
 const pad=$("pad"), ctx=pad.getContext("2d");
 const mask=document.createElement("canvas"); mask.width=mask.height=SIZE; const mctx=mask.getContext("2d");
 const ink=document.createElement("canvas"); ink.width=ink.height=SIZE; const ictx=ink.getContext("2d");
 const scratch=document.createElement("canvas"); scratch.width=scratch.height=SIZE; const sctx=scratch.getContext("2d");
+// `ink` = the thin freehand pen line that is shown; `cov` = a wider invisible
+// stroke along the same path used only to measure how much of the letter the
+// child's line has passed through (so a single centre trace counts as done).
+const cov=document.createElement("canvas"); cov.width=cov.height=SIZE; const cctx=cov.getContext("2d");
+const COVERW=46, PEN_FINGER=9, PEN_PENCIL=6, PENCOLOR="#2b5d8a";
 
-let idx=0, brush=26, drawing=false, last=null, cells=[], done=new Array(LETTERS.length).fill(false);
+let idx=0, pen=PEN_FINGER, drawing=false, last=null, cells=[], done=new Array(LETTERS.length).fill(false);
 
 function buildPicker(){
   const p=$("picker"); p.innerHTML="";
@@ -145,9 +150,10 @@ function detectHead(){
   }
   return bestN>40?best:null;
 }
-function compositeInk(){
+// Coverage = how much of the glyph the (wide) cov stroke has passed through.
+function covInsideGlyph(){
   sctx.clearRect(0,0,SIZE,SIZE);
-  sctx.drawImage(ink,0,0);
+  sctx.drawImage(cov,0,0);
   sctx.globalCompositeOperation="destination-in"; sctx.drawImage(mask,0,0);
   sctx.globalCompositeOperation="source-over";
 }
@@ -168,13 +174,13 @@ function drawGuide(c){
 }
 function render(){
   ctx.clearRect(0,0,SIZE,SIZE);
-  drawGlyphTo(ctx,"#f0ead9",true,3);   // ghost fill + dashed outline guide
+  drawGlyphTo(ctx,"#f3ecdb",true,2.5);  // pale letter "road" + dashed outline guide
   drawGuide(ctx);                       // start dot + direction arrows
-  compositeInk(); ctx.drawImage(scratch,0,0);   // coloured ink, clipped inside the glyph
+  ctx.drawImage(ink,0,0);               // thin freehand pen line, shown as the child wrote it
 }
 function coverage(){
   if(!cells.length) return 0;
-  compositeInk();
+  covInsideGlyph();
   const d=sctx.getImageData(0,0,SIZE,SIZE).data; let hit=0;
   for(const [x,y] of cells){ if(d[(y*SIZE+x)*4+3]>40) hit++; }
   return hit/cells.length;
@@ -193,8 +199,8 @@ function win(){
     $("dt").textContent="เขียนครบทั้ง 7 ตัวแล้ว!"; $("ds").textContent="เยี่ยมมาก หนูเขียนอักษรกลางชุดแรกได้ครบ ก จ ด ต บ ป อ"; }, 900); }
 }
 function setup(){
-  brush=$("tPencil").classList.contains("on")?16:26;
-  ictx.clearRect(0,0,SIZE,SIZE);
+  pen=$("tPencil").classList.contains("on")?PEN_PENCIL:PEN_FINGER;
+  ictx.clearRect(0,0,SIZE,SIZE); cctx.clearRect(0,0,SIZE,SIZE);
   buildMask();
   headPt = (GUIDES[LETTERS[idx].c]||{}).head ? detectHead() : null;
   buildPicker(); render();
@@ -207,20 +213,25 @@ function pos(e){
   const r=pad.getBoundingClientRect();
   return { x:(e.clientX-r.left)/r.width*SIZE, y:(e.clientY-r.top)/r.height*SIZE };
 }
+function inkSeg(c,col,w,a,b){
+  c.strokeStyle=col; c.lineWidth=w; c.lineCap="round"; c.lineJoin="round";
+  c.beginPath(); c.moveTo(a.x,a.y); c.lineTo(b.x,b.y); c.stroke();
+}
 function strokeTo(p){
-  ictx.strokeStyle="#5b7a4b"; ictx.lineWidth=brush; ictx.lineCap="round"; ictx.lineJoin="round";
-  ictx.beginPath(); ictx.moveTo(last.x,last.y); ictx.lineTo(p.x,p.y); ictx.stroke();
+  inkSeg(ictx, PENCOLOR, pen, last, p);   // thin visible pen line
+  inkSeg(cctx, "#000", COVERW, last, p);  // wide hidden line for coverage
   last=p; render();
 }
-pad.addEventListener("pointerdown",e=>{ pad.setPointerCapture(e.pointerId); drawing=true; last=pos(e);
-  ictx.fillStyle="#5b7a4b"; ictx.beginPath(); ictx.arc(last.x,last.y,brush/2,0,7); ictx.fill(); render(); });
+pad.addEventListener("pointerdown",e=>{ try{ pad.setPointerCapture(e.pointerId); }catch(_){} drawing=true; last=pos(e);
+  ictx.fillStyle=PENCOLOR; ictx.beginPath(); ictx.arc(last.x,last.y,pen/2,0,7); ictx.fill();
+  cctx.fillStyle="#000"; cctx.beginPath(); cctx.arc(last.x,last.y,COVERW/2,0,7); cctx.fill(); render(); });
 pad.addEventListener("pointermove",e=>{ if(drawing) strokeTo(pos(e)); });
 pad.addEventListener("pointerup",()=>{ if(!drawing)return; drawing=false; updateCover(); });
 pad.addEventListener("pointercancel",()=>{ drawing=false; updateCover(); });
 
-$("tFinger").onclick=()=>{ $("tFinger").classList.add("on"); $("tPencil").classList.remove("on"); brush=26; };
-$("tPencil").onclick=()=>{ $("tPencil").classList.add("on"); $("tFinger").classList.remove("on"); brush=16; };
-$("clearBtn").onclick=()=>{ ictx.clearRect(0,0,SIZE,SIZE); render(); $("coverFill").style.width="0%"; $("feedback").textContent=""; $("feedback").className="feedback"; };
+$("tFinger").onclick=()=>{ $("tFinger").classList.add("on"); $("tPencil").classList.remove("on"); pen=PEN_FINGER; };
+$("tPencil").onclick=()=>{ $("tPencil").classList.add("on"); $("tFinger").classList.remove("on"); pen=PEN_PENCIL; };
+$("clearBtn").onclick=()=>{ ictx.clearRect(0,0,SIZE,SIZE); cctx.clearRect(0,0,SIZE,SIZE); render(); $("coverFill").style.width="0%"; $("feedback").textContent=""; $("feedback").className="feedback"; };
 $("soundBtn").onclick=()=>playSound();
 $("nextBtn").onclick=()=>{ idx=(idx+1)%LETTERS.length; setup(); };
 $("again").onclick=()=>{ done.fill(false); idx=0; $("done").style.display="none"; $("game").style.display=""; setup(); };
