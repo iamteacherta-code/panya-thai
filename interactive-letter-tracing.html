@@ -69,13 +69,13 @@
 
 <script>
 const LETTERS=[
-  {c:"ก",name:"กอ ไก่",hint:"ก ไม่มีหัว — เริ่มล่างซ้าย ขึ้นก้าน โค้งหลังคา ลงก้านขวา"},
-  {c:"จ",name:"จอ จาน",hint:"เริ่มที่หัวด้านบน วนแล้วลากโค้งลงหาง"},
-  {c:"ด",name:"ดอ เด็ก",hint:"เริ่มที่หัว วนเป็นวง แล้วลากเส้นตัว"},
-  {c:"ต",name:"ตอ เต่า",hint:"เริ่มที่หัว แล้วลากเส้นตามรูป"},
-  {c:"บ",name:"บอ ใบไม้",hint:"เริ่มที่หัว ลากลงแล้ววนท้อง"},
-  {c:"ป",name:"ปอ ปลา",hint:"เริ่มที่หัว ลากขึ้นยอดธง แล้วลงตัว"},
-  {c:"อ",name:"ออ อ่าง",hint:"เริ่มที่หัว วนเป็นวงเดียว"},
+  {c:"ก",name:"กอ ไก่",audio:"audio/mid-ko-kai.mp3",hint:"ก ไม่มีหัว — เริ่มล่างซ้าย ขึ้นก้าน โค้งหลังคา ลงก้านขวา"},
+  {c:"จ",name:"จอ จาน",audio:"audio/mid-jo-jan.mp3",hint:"เริ่มที่หัวด้านบน วนแล้วลากโค้งลงหาง"},
+  {c:"ด",name:"ดอ เด็ก",audio:"audio/mid-do-dek.mp3",hint:"เริ่มที่หัว วนเป็นวง แล้วลากเส้นตัว"},
+  {c:"ต",name:"ตอ เต่า",audio:"audio/mid-to-tao.mp3",hint:"เริ่มที่หัว แล้วลากเส้นตามรูป"},
+  {c:"บ",name:"บอ ใบไม้",audio:"audio/mid-bo-baimai.mp3",hint:"เริ่มที่หัว ลากลงแล้ววนท้อง"},
+  {c:"ป",name:"ปอ ปลา",audio:"audio/mid-po-pla.mp3",hint:"เริ่มที่หัว ลากขึ้นยอดธง แล้วลงตัว"},
+  {c:"อ",name:"ออ อ่าง",audio:"audio/mid-o-ang.mp3",hint:"เริ่มที่หัว วนเป็นวงเดียว"},
 ];
 const SIZE=400, STEP=7, THRESH=0.80;
 const $=id=>document.getElementById(id);
@@ -133,7 +133,7 @@ function updateCover(){
 function win(){
   done[idx]=true; buildPicker();
   $("feedback").textContent="เก่งมาก! เขียน "+LETTERS[idx].c+" สำเร็จ ⭐"; $("feedback").className="feedback good";
-  speak(LETTERS[idx].name);
+  playSound();
   const n=done.filter(Boolean).length;
   $("prog").innerHTML="ผ่าน <b>"+n+"</b> / "+LETTERS.length;
   if(n===LETTERS.length){ setTimeout(()=>{ $("game").style.display="none"; $("done").style.display="";
@@ -166,11 +166,19 @@ pad.addEventListener("pointercancel",()=>{ drawing=false; updateCover(); });
 $("tFinger").onclick=()=>{ $("tFinger").classList.add("on"); $("tPencil").classList.remove("on"); brush=26; };
 $("tPencil").onclick=()=>{ $("tPencil").classList.add("on"); $("tFinger").classList.remove("on"); brush=16; };
 $("clearBtn").onclick=()=>{ ictx.clearRect(0,0,SIZE,SIZE); render(); $("coverFill").style.width="0%"; $("feedback").textContent=""; $("feedback").className="feedback"; };
-$("soundBtn").onclick=()=>speak(LETTERS[idx].name);
+$("soundBtn").onclick=()=>playSound();
 $("nextBtn").onclick=()=>{ idx=(idx+1)%LETTERS.length; setup(); };
 $("again").onclick=()=>{ done.fill(false); idx=0; $("done").style.display="none"; $("game").style.display=""; setup(); };
 
-function speak(txt){
+let audioEl=null;
+function playSound(){
+  const L=LETTERS[idx];
+  if(L.audio){
+    try{ if(audioEl){ audioEl.pause(); } audioEl=new Audio(L.audio); audioEl.play().catch(()=>speakTTS(L.name)); return; }catch(e){}
+  }
+  speakTTS(L.name);
+}
+function speakTTS(txt){
   try{ const u=new SpeechSynthesisUtterance(txt); u.lang="th-TH"; u.rate=.85; speechSynthesis.cancel(); speechSynthesis.speak(u); }catch(e){}
 }
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>setup());
