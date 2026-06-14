@@ -168,9 +168,9 @@ function HomePage({ go }) {
 /* shared 3-level selector — Beginner / Intermediate / Advanced (optional "All") */
 function LevelBar({ value, onChange, withAll, extra }) {
   const opts = (withAll ? [{ key: "all", n: "•", en: "All", th: "" }] : []).concat([
-    { key: "beginner", n: "1", en: "Beginner", th: "" },
-    { key: "intermediate", n: "2", en: "Intermediate", th: "" },
-    { key: "advanced", n: "3", en: "Advanced", th: "" },
+    { key: "beginner", n: "1", en: "Beginner", th: "K2–Y1" },
+    { key: "intermediate", n: "2", en: "Intermediate", th: "Y2" },
+    { key: "advanced", n: "3", en: "Advanced", th: "Y3" },
   ]).concat(extra || []);
   return (
     <div className="level-bar">
