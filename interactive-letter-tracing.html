@@ -77,6 +77,18 @@ const LETTERS=[
   {c:"ป",name:"ปอ ปลา",audio:"audio/mid-po-pla.mp3",hint:"เริ่มที่หัว ลากขึ้นยอดธง แล้วลงตัว"},
   {c:"อ",name:"ออ อ่าง",audio:"audio/mid-o-ang.mp3",hint:"เริ่มที่หัว วนเป็นวงเดียว"},
 ];
+// Writing guide per letter: start dot ● + direction arrows, positioned as
+// fractions of the glyph bounding box. deg: 0=→ 90=↓ 180=← 270=↑.
+// ก follows the teacher's reference image; the rest use standard Thai stroke order.
+const GUIDES={
+  "ก":{s:[0.13,0.92],a:[[0.13,0.45,270],[0.5,0.06,0],[0.9,0.55,90]]},
+  "จ":{s:[0.75,0.10],a:[[0.38,0.10,180],[0.16,0.55,90],[0.55,0.90,0]]},
+  "ด":{head:1,a:[[0.11,0.55,90],[0.45,0.88,0],[0.90,0.45,270]]},
+  "ต":{head:1,a:[[0.11,0.55,90],[0.50,0.88,0],[0.90,0.40,270]]},
+  "บ":{head:1,a:[[0.15,0.52,90],[0.5,0.9,0],[0.88,0.5,270]]},
+  "ป":{head:1,a:[[0.15,0.55,90],[0.5,0.9,0],[0.88,0.40,270]]},
+  "อ":{head:1,a:[[0.42,0.07,180],[0.11,0.5,90],[0.6,0.92,0],[0.9,0.5,270]]},
+};
 const SIZE=400, STEP=7, THRESH=0.80;
 const $=id=>document.getElementById(id);
 const pad=$("pad"), ctx=pad.getContext("2d");
@@ -103,10 +115,35 @@ function drawGlyphTo(c,fill,dash,lw){
   if(dash){ c.save(); c.setLineDash([7,9]); c.lineWidth=lw||3; c.strokeStyle="#b9ac8e"; c.lineJoin="round";
     c.strokeText(LETTERS[idx].c, SIZE/2, SIZE/2+14); c.restore(); }
 }
+let bbox={x:0,y:0,w:SIZE,h:SIZE}, headPt=null;
 function buildMask(){
   drawGlyphTo(mctx,"#000",false,0);
   const d=mctx.getImageData(0,0,SIZE,SIZE).data; cells=[];
-  for(let y=0;y<SIZE;y+=STEP) for(let x=0;x<SIZE;x+=STEP){ if(d[(y*SIZE+x)*4+3]>128) cells.push([x,y]); }
+  let mnX=SIZE,mnY=SIZE,mxX=0,mxY=0;
+  for(let y=0;y<SIZE;y+=STEP) for(let x=0;x<SIZE;x+=STEP){
+    if(d[(y*SIZE+x)*4+3]>128){ cells.push([x,y]); if(x<mnX)mnX=x; if(x>mxX)mxX=x; if(y<mnY)mnY=y; if(y>mxY)mxY=y; }
+  }
+  bbox={x:mnX,y:mnY,w:Math.max(1,mxX-mnX),h:Math.max(1,mxY-mnY)};
+}
+// Detect the หัว (head): the largest enclosed counter inside the glyph, by
+// flood-filling background from the border and finding the biggest trapped hole.
+function detectHead(){
+  const d=mctx.getImageData(0,0,SIZE,SIZE).data, W=SIZE, H=SIZE;
+  const isBg=i=>d[i*4+3]<128;
+  const out=new Uint8Array(W*H), st=[];
+  const seed=(x,y)=>{ if(x<0||y<0||x>=W||y>=H)return; const i=y*W+x; if(out[i]||!isBg(i))return; out[i]=1; st.push(i); };
+  for(let x=0;x<W;x++){ seed(x,0); seed(x,H-1); } for(let y=0;y<H;y++){ seed(0,y); seed(W-1,y); }
+  while(st.length){ const i=st.pop(), x=i%W, y=(i/W)|0; seed(x-1,y); seed(x+1,y); seed(x,y-1); seed(x,y+1); }
+  const seen=new Uint8Array(W*H); let best=null,bestN=0;
+  for(let i=0;i<W*H;i++){
+    if(isBg(i)&&!out[i]&&!seen[i]){
+      let n=0,sx=0,sy=0; const q=[i]; seen[i]=1;
+      while(q.length){ const j=q.pop(), x=j%W, y=(j/W)|0; n++; sx+=x; sy+=y;
+        const nb=[j-1,j+1,j-W,j+W]; for(const k of nb){ if(k<0||k>=W*H)continue; if(isBg(k)&&!out[k]&&!seen[k]){ seen[k]=1; q.push(k); } } }
+      if(n>bestN){ bestN=n; best={x:sx/n,y:sy/n}; }
+    }
+  }
+  return bestN>40?best:null;
 }
 function compositeInk(){
   sctx.clearRect(0,0,SIZE,SIZE);
@@ -114,9 +151,25 @@ function compositeInk(){
   sctx.globalCompositeOperation="destination-in"; sctx.drawImage(mask,0,0);
   sctx.globalCompositeOperation="source-over";
 }
+function arrowMark(c,x,y,deg){
+  c.save(); c.translate(x,y); c.rotate(deg*Math.PI/180);
+  c.fillStyle="#5c5341";
+  c.beginPath(); c.moveTo(14,0); c.lineTo(-7,-10); c.lineTo(-7,10); c.closePath(); c.fill();
+  c.restore();
+}
+function drawGuide(c){
+  const g=GUIDES[LETTERS[idx].c]; if(!g) return;
+  const px=f=>bbox.x+f*bbox.w, py=f=>bbox.y+f*bbox.h;
+  (g.a||[]).forEach(([fx,fy,deg])=>arrowMark(c,px(fx),py(fy),deg));
+  let sx,sy;
+  if(g.head && headPt){ sx=headPt.x; sy=headPt.y; } else { sx=px(g.s[0]); sy=py(g.s[1]); }
+  c.beginPath(); c.arc(sx,sy,12,0,7); c.fillStyle="#c98a3b"; c.fill();
+  c.lineWidth=3.5; c.strokeStyle="#fff"; c.stroke();
+}
 function render(){
   ctx.clearRect(0,0,SIZE,SIZE);
   drawGlyphTo(ctx,"#f0ead9",true,3);   // ghost fill + dashed outline guide
+  drawGuide(ctx);                       // start dot + direction arrows
   compositeInk(); ctx.drawImage(scratch,0,0);   // coloured ink, clipped inside the glyph
 }
 function coverage(){
@@ -142,7 +195,9 @@ function win(){
 function setup(){
   brush=$("tPencil").classList.contains("on")?16:26;
   ictx.clearRect(0,0,SIZE,SIZE);
-  buildMask(); buildPicker(); render();
+  buildMask();
+  headPt = (GUIDES[LETTERS[idx].c]||{}).head ? detectHead() : null;
+  buildPicker(); render();
   $("coverFill").style.width="0%";
   $("lethint").textContent=LETTERS[idx].hint;
   $("feedback").textContent=""; $("feedback").className="feedback";
