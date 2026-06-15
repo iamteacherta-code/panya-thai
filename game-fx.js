@@ -27,8 +27,15 @@
   FX.wrong=function(){ sweep(440,130,0,0.5,"sawtooth",0.26); };
   // fanfare for the end screen
   FX.celebrate=function(){ [523,659,784,1047,1319].forEach((f,k)=>ping(f,k*0.10,0.3,"triangle",0.34)); ping(1568,0.55,0.6,"sine",0.30); };
-  // read Thai text aloud (fallback when no recorded clip)
-  FX.speak=function(txt){ try{ const u=new SpeechSynthesisUtterance(txt); u.lang="th-TH"; u.rate=0.82; speechSynthesis.cancel(); speechSynthesis.speak(u);}catch(e){} };
+  // pick a Thai female voice if the device has one (Premwadee/Kanya/Narisa/…)
+  function thaiVoice(){ try{ const vs=speechSynthesis.getVoices(); if(!vs.length) return null;
+    const th=vs.filter(v=>/^th\b|th-|thai/i.test(v.lang)||/thai/i.test(v.name));
+    return th.find(v=>/premwadee|kanya|narisa|female|woman|หญิง|ผู้หญิง/i.test(v.name)) || th[0] || null;
+  }catch(e){ return null; } }
+  if("speechSynthesis" in window){ try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){} }
+  // read Thai text aloud — slow, clear, female-leaning (fallback when no recorded clip)
+  FX.speak=function(txt){ try{ const u=new SpeechSynthesisUtterance(txt); u.lang="th-TH"; u.rate=0.72; u.pitch=1.08;
+    const v=thaiVoice(); if(v) u.voice=v; speechSynthesis.cancel(); speechSynthesis.speak(u);}catch(e){} };
   // play a recorded clip, fall back to speech
   let _aud;
   FX.play=function(url,fallbackText){ if(url){ try{ if(_aud)_aud.pause(); _aud=new Audio(url); _aud.play().catch(()=>FX.speak(fallbackText||"")); return; }catch(e){} } FX.speak(fallbackText||""); };
