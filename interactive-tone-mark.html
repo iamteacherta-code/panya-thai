@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · เติมวรรณยุกต์ · Tone Marks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="interactive.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="game-fx.js"></script>
+<style>
+  .setname{font-size:.62em;font-weight:700;color:var(--earth-d);}
+  #game .card{position:relative;}
+  .ins{text-align:center;}
+  .timebar{height:12px;border-radius:999px;background:var(--earth-l);overflow:hidden;margin:6px 0 14px;}
+  .timebar>i{display:block;height:100%;width:100%;background:var(--earth);border-radius:999px;}
+  .timebar>i.run{transition:width var(--td,3s) linear;width:0;}
+  .timebar>i.low{background:var(--clay);}
+  .btn img{width:22px;height:22px;object-fit:contain;vertical-align:-5px;margin-right:5px;}
+  .target{font-family:var(--thai);font-weight:800;font-size:1.5rem;color:#fff;background:var(--leaf);border-radius:999px;padding:4px 20px;margin-bottom:10px;}
+  .ch{font-size:2rem !important;}
+  .ch small{font-size:.62rem !important;}
+  .qcard{display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;border:2px solid var(--line-2);
+    border-radius:22px;padding:26px 14px;margin:8px 0 16px;min-height:160px;}
+  .qbig{font-family:var(--thai);font-weight:800;font-size:84px;line-height:1;color:var(--ink);}
+  .choices{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+  .ch{flex:1 1 28%;min-width:118px;font-family:var(--thai);font-weight:800;font-size:1.2rem;border:2px solid var(--line-2);background:var(--surface);color:var(--ink);
+    border-radius:16px;padding:15px 8px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .07s,background .12s;}
+  .ch small{display:block;font-weight:700;font-size:.8rem;color:var(--ink-3);margin-top:2px;}
+  .ch.right small,.ch.wrong small{color:rgba(255,255,255,.85);}
+  .ch:hover{background:var(--earth-l);} .ch:active{transform:translateY(1px);}
+  .ch.right{background:var(--leaf);color:#fff;border-color:var(--leaf-d);}
+  .ch.wrong{background:var(--clay);color:#fff;border-color:var(--clay);}
+  .ch:disabled{cursor:default;}
+  @media(max-width:520px){ .qbig{font-size:70px;} .ch{font-size:1.05rem;min-width:104px;} }
+  .fs-back{display:none;position:absolute;top:14px;left:14px;z-index:6;border:2px solid var(--line-2);background:var(--surface);
+    color:var(--ink-2);font-family:var(--thai);font-weight:800;border-radius:999px;padding:9px 18px;font-size:1rem;cursor:pointer;}
+  #game .card:fullscreen{display:flex;flex-direction:column;justify-content:center;background:var(--bg);padding:30px;}
+  #game .card:fullscreen .fs-back{display:block;}
+  .qr-corner{position:absolute;right:12px;bottom:12px;z-index:5;display:flex;flex-direction:column;align-items:center;gap:1px;
+    cursor:pointer;background:#fff;border:1.5px solid var(--line-2);border-radius:12px;padding:6px;box-shadow:0 1px 5px rgba(60,48,28,.12);}
+  .qr-corner #qrSmall canvas,.qr-corner #qrSmall img{display:block;width:54px;height:54px;}
+  .qr-corner span{font-family:var(--thai);font-size:.66rem;color:var(--ink-3);font-weight:700;line-height:1;}
+  .qr-pop{display:none;position:absolute;inset:0;z-index:20;background:rgba(40,32,20,.55);align-items:center;justify-content:center;padding:16px;}
+  .qr-pop.show{display:flex;}
+  .qr-pop-inner{background:#fff;border-radius:22px;padding:26px 24px;text-align:center;max-width:90%;}
+  .qr-pop-inner h3{font-family:var(--thai);margin:0 0 4px;color:var(--ink);font-size:1.15rem;}
+  .qr-pop-inner #qrBig canvas,.qr-pop-inner #qrBig img{display:block;width:236px;height:236px;margin:14px auto 0;}
+  .qr-url{font-family:var(--font);font-size:.82rem;color:var(--ink-2);margin:12px 0 16px;word-break:break-all;}
+  .qr-acts{display:flex;gap:10px;justify-content:center;}
+  .qr-acts button{border:none;border-radius:11px;font-family:var(--thai);font-weight:800;font-size:.95rem;padding:11px 20px;cursor:pointer;color:#fff;background:var(--leaf);box-shadow:inset 0 -3px 0 rgba(0,0,0,.13);}
+  .qr-acts button.ghost{background:var(--surface);color:var(--ink-2);border:1.6px solid var(--line-2);box-shadow:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <span class="logo">P</span>
+    <div><div class="bn">PANYA</div><div class="bs">Y2 · เกมวรรณยุกต์</div></div>
+    <span class="spacer"></span><a class="home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก</a>
+  </div>
+  <div class="eyebrow">Interactive · Y2 · Unit 2</div>
+  <h1>เติมวรรณยุกต์ <span class="setname">· อักษรกลาง</span></h1>
+  <p class="sub">ใส่ <b>วรรณยุกต์</b>ให้พยางค์อ่านเป็นเสียงเป้าหมาย — แตะ ไม้เอก ◌่ · โท ◌้ · ตรี ◌๊ · จัตวา ◌๋ ⏱️</p>
+
+  <div class="bar"><div class="prog" id="prog"></div></div>
+
+  <div id="game">
+    <div class="card">
+      <button class="fs-back" id="fsBack">← ออกจากเต็มจอ</button>
+      <p class="ins">ใส่วรรณยุกต์ให้อ่านเป็นเสียงนี้:</p>
+      <div class="timebar"><i id="timeFill"></i></div>
+      <div class="qcard"><div class="target" id="target"></div><div class="qbig" id="q"></div></div>
+      <div class="choices" id="choices"></div>
+      <div class="feedback" id="fb"></div>
+      <div class="actions"><button class="btn check" id="readBtn"><img src="images/icons/sound.png" alt="" />อ่าน</button><button class="btn ghost" id="fsBtn">⛶ เต็มจอ</button></div>
+      <div class="qr-corner" id="qrCorner" title="แชร์เกมนี้"><div id="qrSmall"></div><span>แชร์</span></div>
+      <div class="qr-pop" id="qrPop"><div class="qr-pop-inner"><h3>แชร์เกมนี้ให้เด็ก ๆ สแกนเล่น</h3><div id="qrBig"></div><div class="qr-url" id="qrUrl"></div><div class="qr-acts"><button id="qrCopy">คัดลอกลิงก์</button><button class="ghost" id="qrClose">ปิด</button></div></div></div>
+    </div>
+  </div>
+
+  <div class="card done" id="done" style="display:none">
+    <div class="big">🎉</div><h2 id="dt"></h2><p class="sub" id="ds"></p>
+    <div class="actions"><button class="btn check" id="again">เล่นอีกครั้ง</button></div>
+  </div>
+</div>
+
+<script>
+// Y2 Unit 2 — add the right tone mark (mid class) to reach a target tone
+const BASES=["กา","จา","ดา","ตา","บา","ปา","อา"];
+const MARKS=[
+  {id:"ek", label:"◌่", name:"เสียงเอก",  mark:"่"},
+  {id:"to", label:"◌้", name:"เสียงโท",   mark:"้"},
+  {id:"tr", label:"◌๊", name:"เสียงตรี",  mark:"๊"},
+  {id:"ja", label:"◌๋", name:"เสียงจัตวา", mark:"๋"},
+];
+const ROUNDS=10;
+const $=id=>document.getElementById(id);
+let queue=[], i=0, score=0, locked=false, cur=null, timer=null, lowTimer=null;
+const TIMER=4000;   // 4 seconds per item
+const card=()=>$("game").querySelector(".card");
+function result(){ return cur.base[0]+cur.m.mark+cur.base.slice(1); }
+function readQ(){ if(cur) GameFX.speak(result()); }
+function startTimer(){
+  const t=$("timeFill"); t.classList.remove("run","low"); t.style.width="100%"; void t.offsetWidth;
+  requestAnimationFrame(()=>{ t.classList.add("run"); t.style.width="0%"; });
+  clearTimeout(timer); timer=setTimeout(timeUp, TIMER);
+  clearTimeout(lowTimer); lowTimer=setTimeout(()=>t.classList.add("low"), TIMER*0.6);
+}
+function stopTimer(){ clearTimeout(timer); clearTimeout(lowTimer); const t=$("timeFill"); t.classList.remove("run"); t.style.width=getComputedStyle(t).width; }
+function rnd(a){ return a[Math.floor(Math.random()*a.length)]; }
+function timeUp(){
+  if(locked) return; locked=true;
+  [...$("choices").children].forEach(b=>{ b.disabled=true; if(b.dataset.id===cur.m.id) b.classList.add("right"); });
+  $("q").textContent=result();
+  $("fb").textContent="หมดเวลา! "+cur.base+" "+cur.m.label+" = "+result(); $("fb").className="feedback bad"; GameFX.wrong();
+  setTimeout(()=>{ i++; if(i>=ROUNDS) finish(); else load(); }, 1350);
+}
+function buildChoices(){
+  const box=$("choices"); box.innerHTML="";
+  MARKS.forEach(m=>{ const b=document.createElement("button"); b.className="ch"; b.textContent=m.label; b.dataset.id=m.id; b.onclick=()=>pick(b,m); box.appendChild(b); });
+}
+function start(){ queue=[]; for(let k=0;k<ROUNDS;k++) queue.push({base:rnd(BASES), m:rnd(MARKS)}); i=0; score=0; $("done").style.display="none"; $("game").style.display=""; load(); }
+function load(){
+  locked=false; cur=queue[i];
+  $("q").textContent=cur.base;
+  $("target").textContent="🎯 "+cur.m.name;
+  buildChoices();
+  $("fb").textContent=""; $("fb").className="feedback";
+  $("prog").innerHTML="ข้อ <b>"+(i+1)+"</b> / "+ROUNDS+" · คะแนน "+score;
+  setTimeout(()=>GameFX.speak(cur.base),260); startTimer();
+}
+function pick(btn,m){
+  if(locked) return; locked=true; stopTimer();
+  [...$("choices").children].forEach(b=>{ b.disabled=true; if(b.dataset.id===cur.m.id) b.classList.add("right"); });
+  $("q").textContent=result();
+  if(m.id===cur.m.id){ score++; $("fb").textContent="ถูกต้อง! "+result()+" = "+cur.m.name+" 🎉"; $("fb").className="feedback good"; GameFX.correct(); GameFX.pop(card(),true); setTimeout(readQ,360); }
+  else { btn.classList.add("wrong"); $("fb").textContent=cur.m.name+" ต้องใส่ "+cur.m.label+" → "+result(); $("fb").className="feedback bad"; GameFX.wrong(); GameFX.pop(card(),false); }
+  $("prog").innerHTML="ข้อ <b>"+(i+1)+"</b> / "+ROUNDS+" · คะแนน "+score;
+  setTimeout(()=>{ i++; if(i>=ROUNDS) finish(); else load(); }, 1350);
+}
+function finish(){
+  stopTimer();
+  $("game").style.display="none"; $("done").style.display="";
+  $("dt").textContent="ได้ "+score+" / "+ROUNDS+" คะแนน";
+  $("ds").textContent = score===ROUNDS?"เก่งมาก! ใส่วรรณยุกต์ได้ครบทุกข้อ 👑" : score>=7?"เยี่ยม! เกือบเต็มแล้ว" : "ฝึกอีกนิดนะ แล้วจะเก่งขึ้น";
+  GameFX.celebrate(); GameFX.confetti($("done"));
+}
+$("readBtn").onclick=readQ;
+$("again").onclick=start;
+
+/* fullscreen + share QR */
+$("fsBtn").onclick=()=>{ const el=$("game").querySelector(".card"); try{ if(!document.fullscreenElement){(el.requestFullscreen||el.webkitRequestFullscreen).call(el);}else document.exitFullscreen(); }catch(e){} };
+$("fsBack").onclick=()=>{ try{ document.exitFullscreen(); }catch(e){} };
+const BOARD_URL="https://iamteacherta-code.github.io/panya-thai/interactive-tone-mark.html";
+function makeQR(el,size){ if(!window.QRCode||!el)return; el.innerHTML=""; try{ new QRCode(el,{text:BOARD_URL,width:size,height:size,colorDark:"#2f2a20",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M}); }catch(e){} }
+makeQR($("qrSmall"),54);
+$("qrCorner").onclick=()=>{ makeQR($("qrBig"),236); $("qrUrl").textContent=BOARD_URL; $("qrPop").classList.add("show"); };
+$("qrClose").onclick=()=>$("qrPop").classList.remove("show");
+$("qrPop").onclick=e=>{ if(e.target===$("qrPop")) $("qrPop").classList.remove("show"); };
+$("qrCopy").onclick=async()=>{ try{ await navigator.clipboard.writeText(BOARD_URL); $("qrCopy").textContent="✓ คัดลอกแล้ว"; setTimeout(()=>$("qrCopy").textContent="คัดลอกลิงก์",1500);}catch(e){ $("qrCopy").textContent=BOARD_URL; } };
+if(!window.QRCode && $("qrCorner")) $("qrCorner").style.display="none";
+start();
+</script>
+</body>
+</html>
