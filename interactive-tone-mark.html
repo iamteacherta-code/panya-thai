@@ -38,7 +38,8 @@
   .balloon .body::before{content:"";position:absolute;top:14px;left:16px;width:14px;height:20px;border-radius:50%;background:rgba(255,255,255,.42);transform:rotate(-18deg);}
   .balloon .body::after{content:"";position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid var(--bc,#444);}
   .balloon .string{width:2px;height:30px;background:rgba(60,48,28,.4);}
-  .balloon .mk{font-family:var(--thai);font-size:46px;font-weight:800;line-height:1;}
+  .balloon .mk{position:relative;display:grid;place-items:center;width:48px;height:48px;margin-bottom:3px;border:2.6px dashed rgba(255,255,255,.6);border-radius:50%;}
+  .balloon .mk b{position:absolute;left:0;right:0;top:19px;text-align:center;font-family:var(--thai);font-weight:800;font-size:38px;line-height:0;}
   .balloon .nm{font-size:.6rem;font-weight:700;opacity:.96;margin-top:1px;}
   .balloon.pop{animation:pop .42s ease-out forwards;}
   @keyframes pop{0%{transform:scale(1)}38%{transform:scale(1.38)}100%{transform:scale(1.7);opacity:0}}
@@ -46,7 +47,7 @@
   @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
   .balloon.dim{opacity:.3;filter:grayscale(.45);transition:opacity .3s,filter .3s;}
   @keyframes bob{from{transform:translateY(8px)}to{transform:translateY(-18px)}}
-  @media(max-width:520px){ .word{font-size:50px;} .doodle svg{width:104px;height:84px;} .sky{height:210px;} .balloon{width:82px;} .balloon .body{width:72px;height:88px;} .balloon .mk{font-size:40px;} }
+  @media(max-width:520px){ .word{font-size:50px;} .doodle svg{width:104px;height:84px;} .sky{height:210px;} .balloon{width:82px;} .balloon .body{width:72px;height:88px;} .balloon .mk{width:42px;height:42px;} .balloon .mk b{font-size:33px;top:16px;} }
 
   .fs-back{display:none;position:absolute;top:14px;left:14px;z-index:6;border:2px solid var(--line-2);background:var(--surface);
     color:var(--ink-2);font-family:var(--thai);font-weight:800;border-radius:999px;padding:9px 18px;font-size:1rem;cursor:pointer;}
@@ -76,7 +77,7 @@
   </div>
   <div class="eyebrow">Interactive · Y2 · Unit 2</div>
   <h1>เติมวรรณยุกต์ <span class="setname">· ลูกโป่งวรรณยุกต์</span></h1>
-  <p class="sub">ดูภาพ 🎈 แล้วแตะ<b>ลูกโป่งวรรณยุกต์</b>ที่เติมแล้วเป็นคำให้ถูก — ไม้เอก ◌่ · โท ◌้ · ตรี ◌๊ · จัตวา ◌๋ ⏱️</p>
+  <p class="sub">ดูภาพ 🎈 แล้วแตะ<b>ลูกโป่งวรรณยุกต์</b>ที่เติมแล้วเป็นคำให้ถูก — ไม้เอก · ไม้โท · ไม้ตรี · ไม้จัตวา ⏱️</p>
 
   <div class="bar"><div class="prog" id="prog"></div></div>
 
@@ -115,10 +116,10 @@ const FLUTE=S+'<path d="M18 42 h58 q9 0 9 7 q0 7 -9 7 h-58 q-7 0 -7 -7 q0 -7 7 -
 
 // the written tone marks (◌ shows the mark on a placeholder)
 const MARKS=[
-  {id:"ek", label:"◌่", name:"ไม้เอก"},
-  {id:"to", label:"◌้", name:"ไม้โท"},
-  {id:"tr", label:"◌๊", name:"ไม้ตรี"},
-  {id:"ja", label:"◌๋", name:"ไม้จัตวา"},
+  {id:"ek", mark:"่", name:"ไม้เอก"},
+  {id:"to", mark:"้", name:"ไม้โท"},
+  {id:"tr", mark:"๊", name:"ไม้ตรี"},
+  {id:"ja", mark:"๋", name:"ไม้จัตวา"},
 ];
 // word = full spelling · base = without the tone mark · m = correct mark id · d = doodle
 const WORDS=[
@@ -160,7 +161,7 @@ function spawnBalloons(){
     b.style.setProperty("--d",(3+Math.random()*1.7).toFixed(2)+"s");
     b.style.setProperty("--del",(Math.random()*1.3).toFixed(2)+"s");
     const col=COLORS[k%COLORS.length];
-    b.innerHTML='<div class="body" style="background:'+col+';--bc:'+col+'"><div class="mk">'+m.label+'</div><div class="nm">'+m.name+'</div></div><div class="string"></div>';
+    b.innerHTML='<div class="body" style="background:'+col+';--bc:'+col+'"><div class="mk"><b>'+m.mark+'</b></div><div class="nm">'+m.name+'</div></div><div class="string"></div>';
     b.onclick=()=>pick(b,m);
     sky.appendChild(b);
   });
