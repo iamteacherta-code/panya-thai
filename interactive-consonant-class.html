@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · อักษร 3 หมู่ · Consonant Classes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="interactive.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  .setname{font-size:.62em;font-weight:700;color:var(--earth-d);}
+  #game .card{position:relative;}
+  .ins{text-align:center;}
+  .qcard{display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;border:2px solid var(--line-2);
+    border-radius:22px;padding:22px 14px;margin:8px 0 16px;min-height:190px;}
+  .qbig{font-family:var(--thai);font-weight:800;font-size:108px;line-height:1;color:var(--ink);}
+  .qname{font-family:var(--thai);color:var(--ink-3);font-size:1.1rem;margin-top:6px;}
+  .choices{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .ch{font-family:var(--thai);font-weight:800;font-size:1.25rem;border:2px solid var(--line-2);background:var(--surface);color:var(--ink);
+    border-radius:16px;padding:18px 8px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .07s,background .12s;}
+  .ch:hover{background:var(--earth-l);} .ch:active{transform:translateY(1px);}
+  .ch.right{background:var(--leaf);color:#fff;border-color:var(--leaf-d);}
+  .ch.wrong{background:var(--clay);color:#fff;border-color:var(--clay);}
+  .ch:disabled{cursor:default;}
+  @media(max-width:520px){ .qbig{font-size:84px;} .ch{font-size:1.05rem;padding:14px 6px;} }
+  .fs-back{display:none;position:absolute;top:14px;left:14px;z-index:6;border:2px solid var(--line-2);background:var(--surface);
+    color:var(--ink-2);font-family:var(--thai);font-weight:800;border-radius:999px;padding:9px 18px;font-size:1rem;cursor:pointer;}
+  #game .card:fullscreen{display:flex;flex-direction:column;justify-content:center;background:var(--bg);padding:30px;}
+  #game .card:fullscreen .fs-back{display:block;}
+  .qr-corner{position:absolute;right:12px;bottom:12px;z-index:5;display:flex;flex-direction:column;align-items:center;gap:1px;
+    cursor:pointer;background:#fff;border:1.5px solid var(--line-2);border-radius:12px;padding:6px;box-shadow:0 1px 5px rgba(60,48,28,.12);}
+  .qr-corner #qrSmall canvas,.qr-corner #qrSmall img{display:block;width:54px;height:54px;}
+  .qr-corner span{font-family:var(--thai);font-size:.66rem;color:var(--ink-3);font-weight:700;line-height:1;}
+  .qr-pop{display:none;position:absolute;inset:0;z-index:20;background:rgba(40,32,20,.55);align-items:center;justify-content:center;padding:16px;}
+  .qr-pop.show{display:flex;}
+  .qr-pop-inner{background:#fff;border-radius:22px;padding:26px 24px;text-align:center;max-width:90%;}
+  .qr-pop-inner h3{font-family:var(--thai);margin:0 0 4px;color:var(--ink);font-size:1.15rem;}
+  .qr-pop-inner #qrBig canvas,.qr-pop-inner #qrBig img{display:block;width:236px;height:236px;margin:14px auto 0;}
+  .qr-url{font-family:var(--font);font-size:.82rem;color:var(--ink-2);margin:12px 0 16px;word-break:break-all;}
+  .qr-acts{display:flex;gap:10px;justify-content:center;}
+  .qr-acts button{border:none;border-radius:11px;font-family:var(--thai);font-weight:800;font-size:.95rem;padding:11px 20px;cursor:pointer;color:#fff;background:var(--leaf);box-shadow:inset 0 -3px 0 rgba(0,0,0,.13);}
+  .qr-acts button.ghost{background:var(--surface);color:var(--ink-2);border:1.6px solid var(--line-2);box-shadow:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <span class="logo">P</span>
+    <div><div class="bn">PANYA</div><div class="bs">Y1 · เกมพยัญชนะ</div></div>
+    <span class="spacer"></span><a class="home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก</a>
+  </div>
+  <div class="eyebrow">Interactive · Y1 · Unit 1</div>
+  <h1>อักษร 3 หมู่ <span class="setname">· กลาง · สูง · ต่ำ</span></h1>
+  <p class="sub">พยัญชนะที่เห็นเป็น <b>อักษรกลาง / สูง / ต่ำ</b>? แตะเลือกเลย — รู้ผลทันที</p>
+
+  <div class="bar"><div class="prog" id="prog"></div></div>
+
+  <div id="game">
+    <div class="card">
+      <button class="fs-back" id="fsBack">← ออกจากเต็มจอ</button>
+      <p class="ins">พยัญชนะนี้เป็นหมู่ไหน?</p>
+      <div class="qcard"><div class="qbig" id="q">ก</div><div class="qname" id="qname"></div></div>
+      <div class="choices">
+        <button class="ch" data-c="M">อักษรกลาง</button>
+        <button class="ch" data-c="H">อักษรสูง</button>
+        <button class="ch" data-c="L">อักษรต่ำ</button>
+      </div>
+      <div class="feedback" id="fb"></div>
+      <div class="actions"><button class="btn ghost" id="fsBtn">⛶ เต็มจอ</button></div>
+      <div class="qr-corner" id="qrCorner" title="แชร์เกมนี้"><div id="qrSmall"></div><span>แชร์</span></div>
+      <div class="qr-pop" id="qrPop"><div class="qr-pop-inner"><h3>แชร์เกมนี้ให้เด็ก ๆ สแกนเล่น</h3><div id="qrBig"></div><div class="qr-url" id="qrUrl"></div><div class="qr-acts"><button id="qrCopy">คัดลอกลิงก์</button><button class="ghost" id="qrClose">ปิด</button></div></div></div>
+    </div>
+  </div>
+
+  <div class="card done" id="done" style="display:none">
+    <div class="big">🎉</div><h2 id="dt"></h2><p class="sub" id="ds"></p>
+    <div class="actions"><button class="btn check" id="again">เล่นอีกครั้ง</button></div>
+  </div>
+</div>
+
+<script>
+// frequent Y1 consonants with class (M=กลาง H=สูง L=ต่ำ)
+const CONS=[
+  ["ก","ไก่","M"],["จ","จาน","M"],["ด","เด็ก","M"],["ต","เต่า","M"],["บ","ใบไม้","M"],["ป","ปลา","M"],["อ","อ่าง","M"],
+  ["ข","ไข่","H"],["ฉ","ฉิ่ง","H"],["ถ","ถุง","H"],["ผ","ผึ้ง","H"],["ฝ","ฝา","H"],["ศ","ศาลา","H"],["ส","เสือ","H"],["ห","หีบ","H"],
+  ["ค","ควาย","L"],["ฆ","ระฆัง","L"],["ง","งู","L"],["ช","ช้าง","L"],["ซ","โซ่","L"],["ท","ทหาร","L"],["ธ","ธง","L"],["น","หนู","L"],
+  ["พ","พาน","L"],["ฟ","ฟัน","L"],["ม","ม้า","L"],["ย","ยักษ์","L"],["ร","เรือ","L"],["ล","ลิง","L"],["ว","แหวน","L"],["ฮ","นกฮูก","L"],
+];
+const CLSNAME={M:"อักษรกลาง",H:"อักษรสูง",L:"อักษรต่ำ"};
+const ROUNDS=10;
+const $=id=>document.getElementById(id);
+let queue=[], i=0, score=0, locked=false;
+
+function shuffle(a){ for(let k=a.length-1;k>0;k--){ const j=Math.floor(Math.random()*(k+1)); [a[k],a[j]]=[a[j],a[k]]; } return a; }
+function start(){ queue=shuffle([...CONS]).slice(0,ROUNDS); i=0; score=0; $("done").style.display="none"; $("game").style.display=""; load(); }
+function load(){
+  locked=false; const r=queue[i];
+  $("q").textContent=r[0]; $("qname").textContent=r[0]+" "+r[1];
+  $("fb").textContent=""; $("fb").className="feedback";
+  document.querySelectorAll(".ch").forEach(b=>{ b.className="ch"; b.disabled=false; });
+  $("prog").innerHTML="ข้อ <b>"+(i+1)+"</b> / "+ROUNDS+" · คะแนน "+score;
+}
+function pick(btn){
+  if(locked) return; locked=true;
+  const ans=btn.dataset.c, r=queue[i], correct=r[2];
+  document.querySelectorAll(".ch").forEach(b=>{ b.disabled=true; if(b.dataset.c===correct) b.classList.add("right"); });
+  if(ans===correct){ score++; $("fb").textContent="ถูกต้อง! "+r[0]+" = "+CLSNAME[correct]+" 🎉"; $("fb").className="feedback good"; }
+  else { btn.classList.add("wrong"); $("fb").textContent="ตอบ "+CLSNAME[ans]+" · "+r[0]+" เป็น "+CLSNAME[correct]; $("fb").className="feedback bad"; }
+  $("prog").innerHTML="ข้อ <b>"+(i+1)+"</b> / "+ROUNDS+" · คะแนน "+score;
+  setTimeout(()=>{ i++; if(i>=ROUNDS) finish(); else load(); }, 1100);
+}
+function finish(){
+  $("game").style.display="none"; $("done").style.display="";
+  $("dt").textContent="ได้ "+score+" / "+ROUNDS+" คะแนน";
+  $("ds").textContent = score===ROUNDS?"เก่งมาก! จัดหมู่อักษรได้ครบทุกข้อ 👑" : score>=7?"เยี่ยม! เกือบเต็มแล้ว" : "ฝึกอีกนิดนะ แล้วจะเก่งขึ้น";
+}
+document.querySelectorAll(".ch").forEach(b=>b.onclick=()=>pick(b));
+$("again").onclick=start;
+
+/* fullscreen + share QR */
+$("fsBtn").onclick=()=>{ const el=$("game").querySelector(".card"); try{ if(!document.fullscreenElement){(el.requestFullscreen||el.webkitRequestFullscreen).call(el);}else document.exitFullscreen(); }catch(e){} };
+$("fsBack").onclick=()=>{ try{ document.exitFullscreen(); }catch(e){} };
+const BOARD_URL="https://iamteacherta-code.github.io/panya-thai/interactive-consonant-class.html";
+function makeQR(el,size){ if(!window.QRCode||!el)return; el.innerHTML=""; try{ new QRCode(el,{text:BOARD_URL,width:size,height:size,colorDark:"#2f2a20",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M}); }catch(e){} }
+makeQR($("qrSmall"),54);
+$("qrCorner").onclick=()=>{ makeQR($("qrBig"),236); $("qrUrl").textContent=BOARD_URL; $("qrPop").classList.add("show"); };
+$("qrClose").onclick=()=>$("qrPop").classList.remove("show");
+$("qrPop").onclick=e=>{ if(e.target===$("qrPop")) $("qrPop").classList.remove("show"); };
+$("qrCopy").onclick=async()=>{ try{ await navigator.clipboard.writeText(BOARD_URL); $("qrCopy").textContent="✓ คัดลอกแล้ว"; setTimeout(()=>$("qrCopy").textContent="คัดลอกลิงก์",1500);}catch(e){ $("qrCopy").textContent=BOARD_URL; } };
+if(!window.QRCode && $("qrCorner")) $("qrCorner").style.display="none";
+start();
+</script>
+</body>
+</html>
