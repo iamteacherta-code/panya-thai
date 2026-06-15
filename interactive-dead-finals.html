@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>PANYA · แม่ตาย · Dead Finals</title>
+<title>PANYA · ตัวสะกดไม่ตรงมาตรา · Irregular Finals</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -65,15 +65,15 @@
     <span class="spacer"></span><a class="home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก</a>
   </div>
   <div class="eyebrow">Interactive · Y2 · Unit 1</div>
-  <h1>แม่ตาย <span class="setname">· มาตราตัวสะกดเสียงตาย</span></h1>
-  <p class="sub">คำนี้สะกดด้วย <b>แม่ตาย</b>ไหน? แตะเลือก แม่กก · กด · กบ — ระวังตัวสะกดที่ออกเสียงเหมือนกัน! ⏱️</p>
+  <h1>ตัวสะกดไม่ตรงมาตรา <span class="setname">· Irregular final consonants</span></h1>
+  <p class="sub">คำนี้สะกดอยู่ <b>มาตรา</b>ไหน? แตะเลือก แม่กก · กด · กบ — ระวังตัวสะกดที่ไม่ตรงรูปแต่ออกเสียงเดียวกัน! ⏱️</p>
 
   <div class="bar"><div class="prog" id="prog"></div></div>
 
   <div id="game">
     <div class="card">
       <button class="fs-back" id="fsBack">← ออกจากเต็มจอ</button>
-      <p class="ins">คำนี้อยู่แม่ตัวสะกดไหน?</p>
+      <p class="ins">คำนี้อยู่มาตราตัวสะกดไหน?</p>
       <div class="timebar"><i id="timeFill"></i></div>
       <div class="qcard"><div class="doodle" id="doodle"></div><div class="qbig" id="q"></div></div>
       <div class="choices" id="choices"></div>
@@ -91,7 +91,7 @@
 </div>
 
 <script>
-// Y2 Unit 1 — 3 dead (เสียงตาย) finals; words include other letters in each มาตรา
+// Y2 Unit 1 — irregular finals: words whose final letter doesn't match the มาตรา's representative
 const MAATRA=[
   {id:"k", label:"แม่กก", fin:"-ก ข ค"},
   {id:"d", label:"แม่กด", fin:"-ด จ ต ส"},
@@ -154,7 +154,7 @@ function finish(){
   stopTimer();
   $("game").style.display="none"; $("done").style.display="";
   $("dt").textContent="ได้ "+score+" / "+ROUNDS+" คะแนน";
-  $("ds").textContent = score===ROUNDS?"เก่งมาก! แยกแม่ตายได้ครบทุกข้อ 👑" : score>=7?"เยี่ยม! เกือบเต็มแล้ว" : "ฝึกอีกนิดนะ แล้วจะเก่งขึ้น";
+  $("ds").textContent = score===ROUNDS?"เก่งมาก! แยกมาตราตัวสะกดได้ครบทุกข้อ 👑" : score>=7?"เยี่ยม! เกือบเต็มแล้ว" : "ฝึกอีกนิดนะ แล้วจะเก่งขึ้น";
   GameFX.celebrate(); GameFX.confetti($("done"));
 }
 $("readBtn").onclick=readQ;

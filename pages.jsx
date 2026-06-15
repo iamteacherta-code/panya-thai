@@ -317,7 +317,7 @@ const LESSONS_BY_GRADE = {
   ],
   y2: [
     {
-      n: 1, en: "Dead finals", th: "มาตราตัวสะกดเสียงตาย",
+      n: 1, en: "Irregular final consonants", th: "ตัวสะกดไม่ตรงมาตรา",
       lessons: [
         { no: "L1", name: "แม่กก ‑ก", ex: "นก · ปาก" },
         { no: "L2", name: "แม่กด ‑ด", ex: "มด · ตัด" },
@@ -397,7 +397,7 @@ const GAMES = [
   { en: "อักษร 3 หมู่", th: "Y1 · จัดหมู่พยัญชนะ กลาง/สูง/ต่ำ (ตอบทันที)", level: "beginner", file: "interactive-consonant-class.html" },
   { en: "เลือกสระให้ถูก", th: "Y1 · สระพิเศษ & สระสั้น ไ ใ -ำ เ-า -ิ -ี -ุ (ตอบทันที)", level: "beginner", file: "interactive-vowel-pick.html" },
   { en: "มาตราตัวสะกด", th: "Y1 · แยกคำเข้ามาตรา กง/กน/กม/เกย/เกอว (ตอบทันที)", level: "beginner", file: "interactive-final-sort.html" },
-  { en: "แม่ตาย", th: "Y2 · แยกคำเข้าแม่ตาย กก/กด/กบ (ตอบทันที + จับเวลา)", level: "intermediate", file: "interactive-dead-finals.html" },
+  { en: "ตัวสะกดไม่ตรงมาตรา", th: "Y2 · แยกคำเข้ามาตรา กก/กด/กบ — ตัวสะกดไม่ตรงรูป (ตอบทันที + จับเวลา)", level: "intermediate", file: "interactive-dead-finals.html" },
   { en: "เติมวรรณยุกต์", th: "Y2 · ใส่วรรณยุกต์อักษรกลางให้ตรงเสียง ่ ้ ๊ ๋ (ตอบทันที)", level: "intermediate", file: "interactive-tone-mark.html" },
   { en: "ผันเสียงไตรยางศ์", th: "Y2 · อ่านเสียงวรรณยุกต์ สามัญ/เอก/โท/ตรี/จัตวา (ท้าทาย)", level: "intermediate", file: "interactive-tone-rules.html" },
   { en: "Word Builder", th: "สร้างคำตามเป้าหมาย (ประสม–ลดรูปสระ)", level: "intermediate", file: "interactive-word-builder.html" },
