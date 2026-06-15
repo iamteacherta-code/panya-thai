@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="interactive.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="game-fx.js"></script>
 <style>
   .setname{font-size:.62em;font-weight:700;color:var(--earth-d);}
   #game .card{position:relative;}
@@ -63,7 +64,7 @@
       <div class="qcard"><div class="qbig" id="q"></div></div>
       <div class="choices" id="choices"></div>
       <div class="feedback" id="fb"></div>
-      <div class="actions"><button class="btn ghost" id="fsBtn">⛶ เต็มจอ</button></div>
+      <div class="actions"><button class="btn check" id="readBtn">🔊 อ่าน</button><button class="btn ghost" id="fsBtn">⛶ เต็มจอ</button></div>
       <div class="qr-corner" id="qrCorner" title="แชร์เกมนี้"><div id="qrSmall"></div><span>แชร์</span></div>
       <div class="qr-pop" id="qrPop"><div class="qr-pop-inner"><h3>แชร์เกมนี้ให้เด็ก ๆ สแกนเล่น</h3><div id="qrBig"></div><div class="qr-url" id="qrUrl"></div><div class="qr-acts"><button id="qrCopy">คัดลอกลิงก์</button><button class="ghost" id="qrClose">ปิด</button></div></div></div>
     </div>
@@ -89,6 +90,8 @@ const VOWELS=[
 const ROUNDS=10;
 const $=id=>document.getElementById(id);
 let i=0, score=0, locked=false, cur=null;
+const card=()=>$("game").querySelector(".card");
+function readQ(){ GameFX.speak($("q").textContent); }
 function shuffle(a){ for(let k=a.length-1;k>0;k--){ const j=Math.floor(Math.random()*(k+1)); [a[k],a[j]]=[a[j],a[k]]; } return a; }
 function rnd(a){ return a[Math.floor(Math.random()*a.length)]; }
 function start(){ i=0; score=0; $("done").style.display="none"; $("game").style.display=""; load(); }
@@ -102,20 +105,23 @@ function load(){
   opts.forEach(o=>{ const b=document.createElement("button"); b.className="ch"; b.textContent=o.label; b.dataset.id=o.id; b.onclick=()=>pick(b,o); box.appendChild(b); });
   $("fb").textContent=""; $("fb").className="feedback";
   $("prog").innerHTML="ข้อ <b>"+(i+1)+"</b> / "+ROUNDS+" · คะแนน "+score;
+  setTimeout(readQ,260);
 }
 function pick(btn,o){
   if(locked) return; locked=true;
   [...$("choices").children].forEach(b=>{ b.disabled=true; if(b.dataset.id===cur.id) b.classList.add("right"); });
-  if(o.id===cur.id){ score++; $("fb").textContent="ถูกต้อง! สระ "+cur.label+" 🎉"; $("fb").className="feedback good"; }
-  else { btn.classList.add("wrong"); $("fb").textContent="คำนี้ใช้สระ "+cur.label; $("fb").className="feedback bad"; }
+  if(o.id===cur.id){ score++; $("fb").textContent="ถูกต้อง! สระ "+cur.label+" 🎉"; $("fb").className="feedback good"; GameFX.correct(); GameFX.pop(card(),true); }
+  else { btn.classList.add("wrong"); $("fb").textContent="คำนี้ใช้สระ "+cur.label; $("fb").className="feedback bad"; GameFX.wrong(); GameFX.pop(card(),false); }
   $("prog").innerHTML="ข้อ <b>"+(i+1)+"</b> / "+ROUNDS+" · คะแนน "+score;
-  setTimeout(()=>{ i++; if(i>=ROUNDS) finish(); else load(); }, 1100);
+  setTimeout(()=>{ i++; if(i>=ROUNDS) finish(); else load(); }, 1250);
 }
 function finish(){
   $("game").style.display="none"; $("done").style.display="";
   $("dt").textContent="ได้ "+score+" / "+ROUNDS+" คะแนน";
   $("ds").textContent = score===ROUNDS?"เก่งมาก! เลือกสระถูกทุกข้อ 👑" : score>=7?"เยี่ยม! เกือบเต็มแล้ว" : "ฝึกอีกนิดนะ แล้วจะเก่งขึ้น";
+  GameFX.celebrate(); GameFX.confetti($("done"));
 }
+$("readBtn").onclick=readQ;
 $("again").onclick=start;
 
 /* fullscreen + share QR */

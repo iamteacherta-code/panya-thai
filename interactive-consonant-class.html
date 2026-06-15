@@ -9,8 +9,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="interactive.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="game-fx.js"></script>
 <style>
   .setname{font-size:.62em;font-weight:700;color:var(--earth-d);}
+  .doodle{height:0;overflow:visible;}
+  .doodle svg{width:120px;height:78px;display:none;}
+  .doodle.show svg{display:block;animation:swim 1.6s ease-in-out infinite alternate;}
+  .doodle.cheer svg{animation:cheer .6s ease-out 2;}
+  @keyframes swim{from{transform:translateX(-16px) rotate(-3deg)}to{transform:translateX(16px) rotate(3deg)}}
+  @keyframes cheer{0%{transform:translateY(0) scale(1)}40%{transform:translateY(-16px) scale(1.12)}100%{transform:translateY(0) scale(1)}}
   #game .card{position:relative;}
   .ins{text-align:center;}
   .qcard{display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;border:2px solid var(--line-2);
@@ -61,14 +68,14 @@
     <div class="card">
       <button class="fs-back" id="fsBack">← ออกจากเต็มจอ</button>
       <p class="ins">พยัญชนะนี้เป็นหมู่ไหน?</p>
-      <div class="qcard"><div class="qbig" id="q">ก</div><div class="qname" id="qname"></div></div>
+      <div class="qcard"><div class="doodle" id="doodle"></div><div class="qbig" id="q">ก</div><div class="qname" id="qname"></div></div>
       <div class="choices">
         <button class="ch" data-c="M">อักษรกลาง</button>
         <button class="ch" data-c="H">อักษรสูง</button>
         <button class="ch" data-c="L">อักษรต่ำ</button>
       </div>
       <div class="feedback" id="fb"></div>
-      <div class="actions"><button class="btn ghost" id="fsBtn">⛶ เต็มจอ</button></div>
+      <div class="actions"><button class="btn check" id="readBtn">🔊 อ่าน</button><button class="btn ghost" id="fsBtn">⛶ เต็มจอ</button></div>
       <div class="qr-corner" id="qrCorner" title="แชร์เกมนี้"><div id="qrSmall"></div><span>แชร์</span></div>
       <div class="qr-pop" id="qrPop"><div class="qr-pop-inner"><h3>แชร์เกมนี้ให้เด็ก ๆ สแกนเล่น</h3><div id="qrBig"></div><div class="qr-url" id="qrUrl"></div><div class="qr-acts"><button id="qrCopy">คัดลอกลิงก์</button><button class="ghost" id="qrClose">ปิด</button></div></div></div>
     </div>
@@ -89,34 +96,52 @@ const CONS=[
   ["พ","พาน","L"],["ฟ","ฟัน","L"],["ม","ม้า","L"],["ย","ยักษ์","L"],["ร","เรือ","L"],["ล","ลิง","L"],["ว","แหวน","L"],["ฮ","นกฮูก","L"],
 ];
 const CLSNAME={M:"อักษรกลาง",H:"อักษรสูง",L:"อักษรต่ำ"};
+// recorded teacher voice per consonant (the Letter Tracing clips)
+const AUDIO={
+ "ก":"audio/mid-ko-kai.mp3","จ":"audio/mid-jo-jan.mp3","ด":"audio/mid-do-dek.mp3","ต":"audio/mid-to-tao.mp3","บ":"audio/mid-bo-baimai.mp3","ป":"audio/mid-po-pla.mp3","อ":"audio/mid-o-ang.mp3",
+ "ข":"audio/hi-kho-khai.mp3","ฉ":"audio/hi-cho-ching.mp3","ถ":"audio/hi-tho-thung.mp3","ผ":"audio/hi-pho-phueng.mp3","ฝ":"audio/hi-fo-fa.mp3","ศ":"audio/hi-so-sala.mp3","ส":"audio/hi-so-suea.mp3","ห":"audio/hi-ho-hip.mp3",
+ "ค":"audio/lo-kho-khwai.mp3","ฆ":"audio/lo-kho-rakhang.mp3","ง":"audio/lo-ngo-ngu.mp3","ช":"audio/lo-cho-chang.mp3","ซ":"audio/lo-so-so.mp3","ท":"audio/lo-tho-thahan.mp3","ธ":"audio/lo-tho-thong.mp3","น":"audio/lo-no-nu.mp3","พ":"audio/lo-pho-phan.mp3","ฟ":"audio/lo-fo-fan.mp3","ม":"audio/lo-mo-ma.mp3","ย":"audio/lo-yo-yak.mp3","ร":"audio/lo-ro-ruea.mp3","ล":"audio/lo-lo-ling.mp3","ว":"audio/lo-wo-waen.mp3","ฮ":"audio/lo-ho-nokhuk.mp3"
+};
+// kid pencil-doodle illustrations (start with ป → a fish swimming out)
+const FISH='<svg viewBox="0 0 140 90" xmlns="http://www.w3.org/2000/svg"><g fill="#fff" stroke="#2f2a20" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M44 18 Q97 15 120 45 Q97 75 44 72 Q18 60 16 45 Q18 30 44 18 Z"/><path d="M16 45 Q1 27 6 45 Q1 63 16 45 Z"/><path d="M62 18 Q71 4 82 16" fill="none"/><path d="M84 28 Q80 45 84 62" fill="none"/><circle cx="101" cy="38" r="3.4" fill="#2f2a20" stroke="none"/><path d="M108 49 Q114 53 117 47" fill="none"/><circle cx="129" cy="22" r="3" fill="none"/><circle cx="135" cy="11" r="2" fill="none"/></g></svg>';
+const DOODLES={ "ป":FISH };
 const ROUNDS=10;
 const $=id=>document.getElementById(id);
 let queue=[], i=0, score=0, locked=false;
+const card=()=>$("game").querySelector(".card");
+function readQ(){ const r=queue[i]; if(!r)return; GameFX.play(AUDIO[r[0]], r[0]+" "+r[1]); }
 
 function shuffle(a){ for(let k=a.length-1;k>0;k--){ const j=Math.floor(Math.random()*(k+1)); [a[k],a[j]]=[a[j],a[k]]; } return a; }
 function start(){ queue=shuffle([...CONS]).slice(0,ROUNDS); i=0; score=0; $("done").style.display="none"; $("game").style.display=""; load(); }
 function load(){
   locked=false; const r=queue[i];
   $("q").textContent=r[0]; $("qname").textContent=r[0]+" "+r[1];
+  const dd=$("doodle"); if(DOODLES[r[0]]){ dd.innerHTML=DOODLES[r[0]]; dd.className="doodle show"; } else { dd.innerHTML=""; dd.className="doodle"; }
   $("fb").textContent=""; $("fb").className="feedback";
   document.querySelectorAll(".ch").forEach(b=>{ b.className="ch"; b.disabled=false; });
   $("prog").innerHTML="ข้อ <b>"+(i+1)+"</b> / "+ROUNDS+" · คะแนน "+score;
+  setTimeout(readQ,260);
 }
 function pick(btn){
   if(locked) return; locked=true;
   const ans=btn.dataset.c, r=queue[i], correct=r[2];
   document.querySelectorAll(".ch").forEach(b=>{ b.disabled=true; if(b.dataset.c===correct) b.classList.add("right"); });
-  if(ans===correct){ score++; $("fb").textContent="ถูกต้อง! "+r[0]+" = "+CLSNAME[correct]+" 🎉"; $("fb").className="feedback good"; }
-  else { btn.classList.add("wrong"); $("fb").textContent="ตอบ "+CLSNAME[ans]+" · "+r[0]+" เป็น "+CLSNAME[correct]; $("fb").className="feedback bad"; }
+  if(ans===correct){ score++; $("fb").textContent="ถูกต้อง! "+r[0]+" = "+CLSNAME[correct]+" 🎉"; $("fb").className="feedback good";
+    GameFX.correct(); GameFX.pop(card(),true); const dd=$("doodle"); if(DOODLES[r[0]]) dd.className="doodle show cheer";
+    setTimeout(()=>GameFX.play(AUDIO[r[0]], r[0]+" "+r[1]), 360); }
+  else { btn.classList.add("wrong"); $("fb").textContent="ตอบ "+CLSNAME[ans]+" · "+r[0]+" เป็น "+CLSNAME[correct]; $("fb").className="feedback bad";
+    GameFX.wrong(); GameFX.pop(card(),false); }
   $("prog").innerHTML="ข้อ <b>"+(i+1)+"</b> / "+ROUNDS+" · คะแนน "+score;
-  setTimeout(()=>{ i++; if(i>=ROUNDS) finish(); else load(); }, 1100);
+  setTimeout(()=>{ i++; if(i>=ROUNDS) finish(); else load(); }, 1250);
 }
 function finish(){
   $("game").style.display="none"; $("done").style.display="";
   $("dt").textContent="ได้ "+score+" / "+ROUNDS+" คะแนน";
   $("ds").textContent = score===ROUNDS?"เก่งมาก! จัดหมู่อักษรได้ครบทุกข้อ 👑" : score>=7?"เยี่ยม! เกือบเต็มแล้ว" : "ฝึกอีกนิดนะ แล้วจะเก่งขึ้น";
+  GameFX.celebrate(); GameFX.confetti($("done"));
 }
 document.querySelectorAll(".ch").forEach(b=>b.onclick=()=>pick(b));
+$("readBtn").onclick=readQ;
 $("again").onclick=start;
 
 /* fullscreen + share QR */
