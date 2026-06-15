@@ -112,7 +112,8 @@ const $=id=>document.getElementById(id);
 let queue=[], i=0, score=0, locked=false, cur=null, timer=null, lowTimer=null;
 const TIMER=3000;   // 3 seconds per word
 const card=()=>$("game").querySelector(".card");
-function readQ(){ if(cur) GameFX.speak(cur[0]); }
+// play the recorded teacher clip if present (audio/words/<word>.mp3), else fall back to TTS
+function readQ(){ if(cur) GameFX.play("audio/words/"+cur[0]+".mp3", cur[0]); }
 function startTimer(){
   const t=$("timeFill"); t.classList.remove("run","low"); t.style.width="100%"; void t.offsetWidth;
   requestAnimationFrame(()=>{ t.classList.add("run"); t.style.width="0%"; });
