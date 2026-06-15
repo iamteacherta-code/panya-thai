@@ -14,27 +14,40 @@
   .setname{font-size:.62em;font-weight:700;color:var(--earth-d);}
   #game .card{position:relative;}
   .ins{text-align:center;}
-  .timebar{height:12px;border-radius:999px;background:var(--earth-l);overflow:hidden;margin:6px 0 14px;}
+  .timebar{height:12px;border-radius:999px;background:var(--earth-l);overflow:hidden;margin:6px 0 12px;}
   .timebar>i{display:block;height:100%;width:100%;background:var(--earth);border-radius:999px;}
   .timebar>i.run{transition:width var(--td,3s) linear;width:0;}
   .timebar>i.low{background:var(--clay);}
   .btn img{width:22px;height:22px;object-fit:contain;vertical-align:-5px;margin-right:5px;}
-  .target{font-family:var(--thai);font-weight:800;font-size:1.5rem;color:#fff;background:var(--leaf);border-radius:999px;padding:4px 20px;margin-bottom:10px;}
-  .ch{font-size:2rem !important;}
-  .ch small{font-size:.62rem !important;}
-  .qcard{display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;border:2px solid var(--line-2);
-    border-radius:22px;padding:26px 14px;margin:8px 0 16px;min-height:160px;}
-  .qbig{font-family:var(--thai);font-weight:800;font-size:84px;line-height:1;color:var(--ink);}
-  .choices{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
-  .ch{flex:1 1 28%;min-width:118px;font-family:var(--thai);font-weight:800;font-size:1.2rem;border:2px solid var(--line-2);background:var(--surface);color:var(--ink);
-    border-radius:16px;padding:15px 8px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .07s,background .12s;}
-  .ch small{display:block;font-weight:700;font-size:.8rem;color:var(--ink-3);margin-top:2px;}
-  .ch.right small,.ch.wrong small{color:rgba(255,255,255,.85);}
-  .ch:hover{background:var(--earth-l);} .ch:active{transform:translateY(1px);}
-  .ch.right{background:var(--leaf);color:#fff;border-color:var(--leaf-d);}
-  .ch.wrong{background:var(--clay);color:#fff;border-color:var(--clay);}
-  .ch:disabled{cursor:default;}
-  @media(max-width:520px){ .qbig{font-size:70px;} .ch{font-size:1.05rem;min-width:104px;} }
+
+  /* ---- picture stage (slides in each round) ---- */
+  .stage{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:150px;margin:2px 0;}
+  .stage.in{animation:slidein .42s cubic-bezier(.2,.8,.3,1);}
+  @keyframes slidein{from{opacity:0;transform:translateX(46px)}to{opacity:1;transform:none}}
+  .doodle svg{width:122px;height:98px;display:block;}
+  .word{font-family:var(--thai);font-weight:800;font-size:62px;line-height:1.05;color:var(--ink);letter-spacing:1px;}
+  .word.full{color:var(--leaf-d);animation:popword .4s ease-out;}
+  @keyframes popword{from{transform:scale(.7);opacity:.3}to{transform:scale(1);opacity:1}}
+
+  /* ---- floating balloons ---- */
+  .sky{position:relative;height:232px;margin:2px 0 6px;}
+  .balloon{position:absolute;bottom:6px;width:92px;border:none;background:transparent;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;
+    display:flex;flex-direction:column;align-items:center;animation:bob var(--d,3.4s) ease-in-out var(--del,0s) infinite alternate;}
+  .balloon .body{width:80px;height:96px;border-radius:50% 50% 49% 49%/56% 56% 44% 44%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    color:#fff;position:relative;box-shadow:inset -9px -12px 0 rgba(0,0,0,.10);}
+  .balloon .body::before{content:"";position:absolute;top:14px;left:16px;width:14px;height:20px;border-radius:50%;background:rgba(255,255,255,.42);transform:rotate(-18deg);}
+  .balloon .body::after{content:"";position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid var(--bc,#444);}
+  .balloon .string{width:2px;height:30px;background:rgba(60,48,28,.4);}
+  .balloon .mk{font-family:var(--thai);font-size:46px;font-weight:800;line-height:1;}
+  .balloon .nm{font-size:.6rem;font-weight:700;opacity:.96;margin-top:1px;}
+  .balloon.pop{animation:pop .42s ease-out forwards;}
+  @keyframes pop{0%{transform:scale(1)}38%{transform:scale(1.38)}100%{transform:scale(1.7);opacity:0}}
+  .balloon.miss{animation:shake .42s;}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+  .balloon.dim{opacity:.3;filter:grayscale(.45);transition:opacity .3s,filter .3s;}
+  @keyframes bob{from{transform:translateY(8px)}to{transform:translateY(-18px)}}
+  @media(max-width:520px){ .word{font-size:50px;} .doodle svg{width:104px;height:84px;} .sky{height:210px;} .balloon{width:82px;} .balloon .body{width:72px;height:88px;} .balloon .mk{font-size:40px;} }
+
   .fs-back{display:none;position:absolute;top:14px;left:14px;z-index:6;border:2px solid var(--line-2);background:var(--surface);
     color:var(--ink-2);font-family:var(--thai);font-weight:800;border-radius:999px;padding:9px 18px;font-size:1rem;cursor:pointer;}
   #game .card:fullscreen{display:flex;flex-direction:column;justify-content:center;background:var(--bg);padding:30px;}
@@ -62,18 +75,18 @@
     <span class="spacer"></span><a class="home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก</a>
   </div>
   <div class="eyebrow">Interactive · Y2 · Unit 2</div>
-  <h1>เติมวรรณยุกต์ <span class="setname">· อักษรกลาง</span></h1>
-  <p class="sub">ใส่ <b>วรรณยุกต์</b>ให้พยางค์อ่านเป็นเสียงเป้าหมาย — แตะ ไม้เอก ◌่ · โท ◌้ · ตรี ◌๊ · จัตวา ◌๋ ⏱️</p>
+  <h1>เติมวรรณยุกต์ <span class="setname">· ลูกโป่งวรรณยุกต์</span></h1>
+  <p class="sub">ดูภาพ 🎈 แล้วแตะ<b>ลูกโป่งวรรณยุกต์</b>ที่เติมแล้วเป็นคำให้ถูก — ไม้เอก ◌่ · โท ◌้ · ตรี ◌๊ · จัตวา ◌๋ ⏱️</p>
 
   <div class="bar"><div class="prog" id="prog"></div></div>
 
   <div id="game">
     <div class="card">
       <button class="fs-back" id="fsBack">← ออกจากเต็มจอ</button>
-      <p class="ins">ใส่วรรณยุกต์ให้อ่านเป็นเสียงนี้:</p>
+      <p class="ins">ดูภาพ แล้วแตะลูกโป่งวรรณยุกต์ที่ถูก ให้ลูกโป่งแตก!</p>
       <div class="timebar"><i id="timeFill"></i></div>
-      <div class="qcard"><div class="target" id="target"></div><div class="qbig" id="q"></div></div>
-      <div class="choices" id="choices"></div>
+      <div class="stage" id="stage"><div class="doodle" id="doodle"></div><div class="word" id="q"></div></div>
+      <div class="sky" id="sky"></div>
       <div class="feedback" id="fb"></div>
       <div class="actions"><button class="btn check" id="readBtn"><img src="images/icons/sound.png" alt="" />อ่าน</button><button class="btn ghost" id="fsBtn">⛶ เต็มจอ</button></div>
       <div class="qr-corner" id="qrCorner" title="แชร์เกมนี้"><div id="qrSmall"></div><span>แชร์</span></div>
@@ -88,64 +101,115 @@
 </div>
 
 <script>
-// Y2 Unit 2 — add the right tone mark (mid class) to reach a target tone
-const BASES=["กา","จา","ดา","ตา","บา","ปา","อา"];
+// Y2 Unit 2 — Tone-mark balloons: pick the mark that completes the pictured word
+// kid pencil-doodle pictures (wobbly black stroke, white fill)
+const S='<svg viewBox="0 0 100 92" fill="none" stroke="#2f2a20" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">';
+const ELEPHANT=S+'<ellipse cx="50" cy="46" rx="22" ry="20" fill="#fff"/><path d="M30 36 q-12 -2 -12 10 q0 10 12 8 z" fill="#fff"/><path d="M70 36 q12 -2 12 10 q0 10 -12 8 z" fill="#fff"/><path d="M50 62 q-4 12 2 18 q4 4 7 -1 q2 -4 -2 -6" fill="#fff"/><path d="M44 60 q-3 6 0 11"/><path d="M56 60 q3 6 0 11"/><circle cx="42" cy="44" r="2" fill="#2f2a20" stroke="none"/><circle cx="58" cy="44" r="2" fill="#2f2a20" stroke="none"/></svg>';
+const CHICK=S+'<circle cx="46" cy="54" r="20" fill="#fff"/><circle cx="64" cy="36" r="12" fill="#fff"/><path d="M64 24 q1 -6 6 -6 q1 5 -4 7" fill="#fff"/><path d="M75 35 l9 -1 l-8 5 z" fill="#fff"/><circle cx="67" cy="34" r="1.7" fill="#2f2a20" stroke="none"/><path d="M30 56 q-9 1 -6 10"/><path d="M42 74 v7"/><path d="M52 74 v7"/></svg>';
+const ORANGE=S+'<circle cx="50" cy="52" r="25" fill="#fff"/><path d="M50 27 q1 -7 9 -9"/><path d="M53 20 q11 -5 17 1 q-9 5 -17 -1 z" fill="#fff"/></svg>';
+const TREE=S+'<path d="M44 80 v-26 h12 v26" fill="#fff"/><path d="M50 12 q-20 1 -21 18 q-10 4 -5 15 q4 8 15 6 q6 9 19 3 q14 1 16 -11 q9 -8 1 -18 q-1 -15 -25 -13 z" fill="#fff"/></svg>';
+const UMBRELLA=S+'<path d="M50 24 V72 q0 8 8 8"/><path d="M16 46 q34 -36 68 0 q-11 -7 -17 0 q-12 -8 -17 0 q-12 -8 -17 0 q-6 -5 -17 0 z" fill="#fff"/><path d="M50 24 v-5"/></svg>';
+const SHIRT=S+'<path d="M36 24 L24 36 l9 9 l5 -5 V76 h26 V40 l5 5 l9 -9 l-12 -12 q-7 7 -16 7 q-9 0 -15 -7 z" fill="#fff"/></svg>';
+const DROP=S+'<path d="M50 16 q19 26 19 38 a19 19 0 0 1 -38 0 q0 -12 19 -38 z" fill="#fff"/><path d="M40 52 q1 9 9 11"/></svg>';
+const FLUTE=S+'<path d="M18 42 h58 q9 0 9 7 q0 7 -9 7 h-58 q-7 0 -7 -7 q0 -7 7 -7 z" fill="#fff"/><path d="M85 41 q7 8 0 16"/><circle cx="34" cy="49" r="1.7" fill="#2f2a20" stroke="none"/><circle cx="45" cy="49" r="1.7" fill="#2f2a20" stroke="none"/><circle cx="56" cy="49" r="1.7" fill="#2f2a20" stroke="none"/><circle cx="67" cy="49" r="1.7" fill="#2f2a20" stroke="none"/></svg>';
+
+// the written tone marks (◌ shows the mark on a placeholder)
 const MARKS=[
-  {id:"ek", label:"◌่", name:"เสียงเอก",  mark:"่"},
-  {id:"to", label:"◌้", name:"เสียงโท",   mark:"้"},
-  {id:"tr", label:"◌๊", name:"เสียงตรี",  mark:"๊"},
-  {id:"ja", label:"◌๋", name:"เสียงจัตวา", mark:"๋"},
+  {id:"ek", label:"◌่", name:"ไม้เอก"},
+  {id:"to", label:"◌้", name:"ไม้โท"},
+  {id:"tr", label:"◌๊", name:"ไม้ตรี"},
+  {id:"ja", label:"◌๋", name:"ไม้จัตวา"},
 ];
-const ROUNDS=10;
+// word = full spelling · base = without the tone mark · m = correct mark id · d = doodle
+const WORDS=[
+  {w:"ช้าง",  base:"ชาง",  m:"to", d:ELEPHANT},
+  {w:"ไก่",   base:"ไก",   m:"ek", d:CHICK},
+  {w:"ส้ม",   base:"สม",   m:"to", d:ORANGE},
+  {w:"ไม้",   base:"ไม",   m:"to", d:TREE},
+  {w:"ร่ม",   base:"รม",   m:"ek", d:UMBRELLA},
+  {w:"เสื้อ", base:"เสือ", m:"to", d:SHIRT},
+  {w:"น้ำ",   base:"นำ",   m:"to", d:DROP},
+  {w:"ปี่",   base:"ปี",   m:"ek", d:FLUTE},
+];
+const COLORS=["#d9694a","#5b8c6e","#e0a93f","#5f86a8"];
+const ROUNDS=WORDS.length;
+const TIMER=6000;   // 6 seconds per word
+
 const $=id=>document.getElementById(id);
 let queue=[], i=0, score=0, locked=false, cur=null, timer=null, lowTimer=null;
-const TIMER=4000;   // 4 seconds per item
 const card=()=>$("game").querySelector(".card");
-function result(){ return cur.base[0]+cur.m.mark+cur.base.slice(1); }
-function readQ(){ if(cur) GameFX.speak(result()); }
+function shuffle(a){ for(let k=a.length-1;k>0;k--){ const j=Math.floor(Math.random()*(k+1)); const t=a[k]; a[k]=a[j]; a[j]=t; } return a; }
+// play the recorded teacher clip if present (audio/words/<word>.mp3), else fall back to TTS
+function readQ(){ if(cur) GameFX.play("audio/words/"+cur.w+".mp3", cur.w); }
+
 function startTimer(){
-  const t=$("timeFill"); t.classList.remove("run","low"); t.style.width="100%"; void t.offsetWidth;
+  const t=$("timeFill"); t.style.setProperty("--td",TIMER+"ms"); t.classList.remove("run","low"); t.style.width="100%"; void t.offsetWidth;
   requestAnimationFrame(()=>{ t.classList.add("run"); t.style.width="0%"; });
   clearTimeout(timer); timer=setTimeout(timeUp, TIMER);
   clearTimeout(lowTimer); lowTimer=setTimeout(()=>t.classList.add("low"), TIMER*0.6);
 }
 function stopTimer(){ clearTimeout(timer); clearTimeout(lowTimer); const t=$("timeFill"); t.classList.remove("run"); t.style.width=getComputedStyle(t).width; }
-function rnd(a){ return a[Math.floor(Math.random()*a.length)]; }
-function timeUp(){
-  if(locked) return; locked=true;
-  [...$("choices").children].forEach(b=>{ b.disabled=true; if(b.dataset.id===cur.m.id) b.classList.add("right"); });
-  $("q").textContent=result();
-  $("fb").textContent="หมดเวลา! "+cur.base+" "+cur.m.label+" = "+result(); $("fb").className="feedback bad"; GameFX.wrong();
-  setTimeout(()=>{ i++; if(i>=ROUNDS) finish(); else load(); }, 1350);
+
+function spawnBalloons(){
+  const sky=$("sky"); sky.innerHTML="";
+  const order=shuffle(MARKS.slice());
+  const lefts=[3,28,53,77];
+  order.forEach((m,k)=>{
+    const b=document.createElement("button"); b.className="balloon"; b.dataset.id=m.id;
+    b.style.left=lefts[k]+"%";
+    b.style.setProperty("--d",(3+Math.random()*1.7).toFixed(2)+"s");
+    b.style.setProperty("--del",(Math.random()*1.3).toFixed(2)+"s");
+    const col=COLORS[k%COLORS.length];
+    b.innerHTML='<div class="body" style="background:'+col+';--bc:'+col+'"><div class="mk">'+m.label+'</div><div class="nm">'+m.name+'</div></div><div class="string"></div>';
+    b.onclick=()=>pick(b,m);
+    sky.appendChild(b);
+  });
 }
-function buildChoices(){
-  const box=$("choices"); box.innerHTML="";
-  MARKS.forEach(m=>{ const b=document.createElement("button"); b.className="ch"; b.textContent=m.label; b.dataset.id=m.id; b.onclick=()=>pick(b,m); box.appendChild(b); });
+function highlightCorrect(){
+  let cb=null;
+  [...$("sky").children].forEach(x=>{ x.disabled=true; if(x.dataset.id===cur.m){cb=x;} else x.classList.add("dim"); });
+  if(cb){ cb.classList.remove("dim"); cb.classList.add("pop"); }
+  $("q").textContent=cur.w; $("q").className="word full";
 }
-function start(){ queue=[]; for(let k=0;k<ROUNDS;k++) queue.push({base:rnd(BASES), m:rnd(MARKS)}); i=0; score=0; $("done").style.display="none"; $("game").style.display=""; load(); }
+function setProg(){ $("prog").innerHTML="ข้อ <b>"+(i+1)+"</b> / "+ROUNDS+" · คะแนน "+score; }
+
+function start(){ queue=shuffle(WORDS.slice()); i=0; score=0; $("done").style.display="none"; $("game").style.display=""; load(); }
 function load(){
   locked=false; cur=queue[i];
-  $("q").textContent=cur.base;
-  $("target").textContent="🎯 "+cur.m.name;
-  buildChoices();
+  const stage=$("stage"); stage.classList.remove("in"); void stage.offsetWidth; stage.classList.add("in");
+  $("doodle").innerHTML=cur.d;
+  $("q").textContent=cur.base; $("q").className="word";
+  spawnBalloons();
   $("fb").textContent=""; $("fb").className="feedback";
-  $("prog").innerHTML="ข้อ <b>"+(i+1)+"</b> / "+ROUNDS+" · คะแนน "+score;
-  setTimeout(()=>GameFX.speak(cur.base),260); startTimer();
+  setProg();
+  setTimeout(readQ,320); startTimer();
 }
-function pick(btn,m){
-  if(locked) return; locked=true; stopTimer();
-  [...$("choices").children].forEach(b=>{ b.disabled=true; if(b.dataset.id===cur.m.id) b.classList.add("right"); });
-  $("q").textContent=result();
-  if(m.id===cur.m.id){ score++; $("fb").textContent="ถูกต้อง! "+result()+" = "+cur.m.name+" 🎉"; $("fb").className="feedback good"; GameFX.correct(); GameFX.pop(card(),true); setTimeout(readQ,360); }
-  else { btn.classList.add("wrong"); $("fb").textContent=cur.m.name+" ต้องใส่ "+cur.m.label+" → "+result(); $("fb").className="feedback bad"; GameFX.wrong(); GameFX.pop(card(),false); }
-  $("prog").innerHTML="ข้อ <b>"+(i+1)+"</b> / "+ROUNDS+" · คะแนน "+score;
-  setTimeout(()=>{ i++; if(i>=ROUNDS) finish(); else load(); }, 1350);
+function pick(b,m){
+  if(locked) return;
+  if(m.id===cur.m){
+    locked=true; stopTimer(); score++;
+    highlightCorrect();
+    $("fb").textContent="ถูกต้อง! "+cur.w+" 🎉"; $("fb").className="feedback good";
+    GameFX.correct(); GameFX.pop(card(),true); GameFX.confetti($("sky"));
+    setProg(); setTimeout(readQ,430); setTimeout(next,1550);
+  } else {
+    b.disabled=true; b.classList.add("miss");
+    setTimeout(()=>{ b.classList.remove("miss"); b.classList.add("dim"); },420);
+    GameFX.wrong(); GameFX.pop(card(),false);
+  }
 }
+function timeUp(){
+  if(locked) return; locked=true;
+  highlightCorrect();
+  $("fb").textContent="หมดเวลา! คำนี้คือ "+cur.w; $("fb").className="feedback bad";
+  GameFX.wrong(); setTimeout(readQ,430); setTimeout(next,1700);
+}
+function next(){ i++; if(i>=ROUNDS) finish(); else load(); }
 function finish(){
   stopTimer();
   $("game").style.display="none"; $("done").style.display="";
   $("dt").textContent="ได้ "+score+" / "+ROUNDS+" คะแนน";
-  $("ds").textContent = score===ROUNDS?"เก่งมาก! ใส่วรรณยุกต์ได้ครบทุกข้อ 👑" : score>=7?"เยี่ยม! เกือบเต็มแล้ว" : "ฝึกอีกนิดนะ แล้วจะเก่งขึ้น";
+  $("ds").textContent = score===ROUNDS?"เก่งมาก! เติมวรรณยุกต์ได้ครบทุกข้อ 👑" : score>=Math.ceil(ROUNDS*0.7)?"เยี่ยม! เกือบเต็มแล้ว" : "ฝึกอีกนิดนะ แล้วจะเก่งขึ้น";
   GameFX.celebrate(); GameFX.confetti($("done"));
 }
 $("readBtn").onclick=readQ;
