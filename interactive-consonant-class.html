@@ -12,6 +12,11 @@
 <script src="game-fx.js"></script>
 <style>
   .setname{font-size:.62em;font-weight:700;color:var(--earth-d);}
+  .timebar{height:12px;border-radius:999px;background:var(--earth-l);overflow:hidden;margin:6px 0 14px;}
+  .timebar>i{display:block;height:100%;width:100%;background:var(--earth);border-radius:999px;}
+  .timebar>i.run{transition:width var(--td,3s) linear;width:0;}
+  .timebar>i.low{background:var(--clay);}
+  .btn img{width:22px;height:22px;object-fit:contain;vertical-align:-5px;margin-right:5px;}
   .doodle{height:0;overflow:visible;}
   .doodle svg{width:120px;height:78px;display:none;}
   .doodle.show svg{display:block;animation:swim 1.6s ease-in-out infinite alternate;}
@@ -68,6 +73,7 @@
     <div class="card">
       <button class="fs-back" id="fsBack">← ออกจากเต็มจอ</button>
       <p class="ins">พยัญชนะนี้เป็นหมู่ไหน?</p>
+      <div class="timebar"><i id="timeFill"></i></div>
       <div class="qcard"><div class="doodle" id="doodle"></div><div class="qbig" id="q">ก</div><div class="qname" id="qname"></div></div>
       <div class="choices">
         <button class="ch" data-c="M">อักษรกลาง</button>
@@ -75,7 +81,7 @@
         <button class="ch" data-c="L">อักษรต่ำ</button>
       </div>
       <div class="feedback" id="fb"></div>
-      <div class="actions"><button class="btn check" id="readBtn">🔊 อ่าน</button><button class="btn ghost" id="fsBtn">⛶ เต็มจอ</button></div>
+      <div class="actions"><button class="btn check" id="readBtn"><img src="images/icons/sound.png" alt="" />อ่าน</button><button class="btn ghost" id="fsBtn">⛶ เต็มจอ</button></div>
       <div class="qr-corner" id="qrCorner" title="แชร์เกมนี้"><div id="qrSmall"></div><span>แชร์</span></div>
       <div class="qr-pop" id="qrPop"><div class="qr-pop-inner"><h3>แชร์เกมนี้ให้เด็ก ๆ สแกนเล่น</h3><div id="qrBig"></div><div class="qr-url" id="qrUrl"></div><div class="qr-acts"><button id="qrCopy">คัดลอกลิงก์</button><button class="ghost" id="qrClose">ปิด</button></div></div></div>
     </div>
@@ -107,9 +113,23 @@ const FISH='<svg viewBox="0 0 140 90" xmlns="http://www.w3.org/2000/svg"><g fill
 const DOODLES={ "ป":FISH };
 const ROUNDS=10;
 const $=id=>document.getElementById(id);
-let queue=[], i=0, score=0, locked=false;
+let queue=[], i=0, score=0, locked=false, timer=null, lowTimer=null;
+const TIMER=3000;   // 3 seconds per consonant
 const card=()=>$("game").querySelector(".card");
 function readQ(){ const r=queue[i]; if(!r)return; GameFX.play(AUDIO[r[0]], r[0]+" "+r[1]); }
+function startTimer(){
+  const t=$("timeFill"); t.classList.remove("run","low"); t.style.width="100%"; void t.offsetWidth;
+  requestAnimationFrame(()=>{ t.classList.add("run"); t.style.width="0%"; });
+  clearTimeout(timer); timer=setTimeout(timeUp, TIMER);
+  clearTimeout(lowTimer); lowTimer=setTimeout(()=>t.classList.add("low"), TIMER*0.6);
+}
+function stopTimer(){ clearTimeout(timer); clearTimeout(lowTimer); const t=$("timeFill"); t.classList.remove("run"); t.style.width=getComputedStyle(t).width; }
+function timeUp(){
+  if(locked) return; locked=true; const r=queue[i], correct=r[2];
+  document.querySelectorAll(".ch").forEach(b=>{ b.disabled=true; if(b.dataset.c===correct) b.classList.add("right"); });
+  $("fb").textContent="หมดเวลา! "+r[0]+" เป็น "+CLSNAME[correct]; $("fb").className="feedback bad"; GameFX.wrong();
+  setTimeout(()=>{ i++; if(i>=ROUNDS) finish(); else load(); }, 1250);
+}
 
 function shuffle(a){ for(let k=a.length-1;k>0;k--){ const j=Math.floor(Math.random()*(k+1)); [a[k],a[j]]=[a[j],a[k]]; } return a; }
 function start(){ queue=shuffle([...CONS]).slice(0,ROUNDS); i=0; score=0; $("done").style.display="none"; $("game").style.display=""; load(); }
@@ -120,10 +140,10 @@ function load(){
   $("fb").textContent=""; $("fb").className="feedback";
   document.querySelectorAll(".ch").forEach(b=>{ b.className="ch"; b.disabled=false; });
   $("prog").innerHTML="ข้อ <b>"+(i+1)+"</b> / "+ROUNDS+" · คะแนน "+score;
-  setTimeout(readQ,260);
+  setTimeout(readQ,260); startTimer();
 }
 function pick(btn){
-  if(locked) return; locked=true;
+  if(locked) return; locked=true; stopTimer();
   const ans=btn.dataset.c, r=queue[i], correct=r[2];
   document.querySelectorAll(".ch").forEach(b=>{ b.disabled=true; if(b.dataset.c===correct) b.classList.add("right"); });
   if(ans===correct){ score++; $("fb").textContent="ถูกต้อง! "+r[0]+" = "+CLSNAME[correct]+" 🎉"; $("fb").className="feedback good";
@@ -135,6 +155,7 @@ function pick(btn){
   setTimeout(()=>{ i++; if(i>=ROUNDS) finish(); else load(); }, 1250);
 }
 function finish(){
+  stopTimer();
   $("game").style.display="none"; $("done").style.display="";
   $("dt").textContent="ได้ "+score+" / "+ROUNDS+" คะแนน";
   $("ds").textContent = score===ROUNDS?"เก่งมาก! จัดหมู่อักษรได้ครบทุกข้อ 👑" : score>=7?"เยี่ยม! เกือบเต็มแล้ว" : "ฝึกอีกนิดนะ แล้วจะเก่งขึ้น";
