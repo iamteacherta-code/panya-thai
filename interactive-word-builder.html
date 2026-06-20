@@ -114,8 +114,7 @@ const VLABEL={a:"-ะ",aa:"-า",i:"-ิ",ii:"-ี",u:"-ุ",uu:"-ู",e:"เ-",
 const INITS=["ก","ข","ค","ง","จ","ด","ต","น","ป","ม","ย","ร","ล","ส","ห","อ"];
 const VOWS=["a","aa","i","ii","u","uu","e","e_s","ae","ae_s","o","o_s","aw_s","oe","ua"];
 const FINS=["","ง","น","ม","ก","ด","บ","ว","ย"];
-// recorded teacher consonant clips (read aloud when a letter tile is tapped)
-const AUDIO={ "ก":"audio/mid-ko-kai.mp3","ข":"audio/hi-kho-khai.mp3","ค":"audio/lo-kho-khwai.mp3","ง":"audio/lo-ngo-ngu.mp3","จ":"audio/mid-jo-jan.mp3","ด":"audio/mid-do-dek.mp3","ต":"audio/mid-to-tao.mp3","น":"audio/lo-no-nu.mp3","ป":"audio/mid-po-pla.mp3","ม":"audio/lo-mo-ma.mp3","ย":"audio/lo-yo-yak.mp3","ร":"audio/lo-ro-ruea.mp3","ล":"audio/lo-lo-ling.mp3","ส":"audio/hi-so-suea.mp3","ห":"audio/hi-ho-hip.mp3","อ":"audio/mid-o-ang.mp3","บ":"audio/mid-bo-baimai.mp3","ว":"audio/lo-wo-waen.mp3" };
+// trimmed consonant-sound clips for blending — "กอ" (not "กอ ไก่"), see audio/blend/
 const ALLROUNDS=[
   {t:"กา",hint:"นกสีดำ",e:"🐦"},
   {t:"ตา",hint:"อวัยวะที่ใช้มอง",e:"👁️"},
@@ -158,7 +157,7 @@ function stopTimer(){ clearTimeout(timer); clearTimeout(lowTimer); const t=$("ti
 function mk(txt,cls,fn){ const b=document.createElement("button"); b.className="w"+(cls?" "+cls:""); b.textContent=txt; b.onclick=()=>fn(b); return b; }
 function bump(b){ b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump"); }
 function mark(row,txt){ [...$(row).children].forEach(c=>c.classList.toggle("sel",c.textContent===txt)); }
-function playLetter(c){ if(AUDIO[c]) GameFX.play(AUDIO[c], c); else GameFX.speak(c); }
+function playLetter(c){ GameFX.play("audio/blend/"+c+".mp3", c); }
 // play a recorded vowel-sound clip if present (audio/vowels/<อ-form>.mp3), else TTS
 function speakVowel(id){ try{ const form=T.buildSyllable("อ",vobj(id),null,""); GameFX.play("audio/vowels/"+form+".mp3", form); }catch(e){} }
 
