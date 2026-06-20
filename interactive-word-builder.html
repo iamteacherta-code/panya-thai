@@ -109,7 +109,8 @@
 <script src="thai-data.js"></script>
 <script>
 const T=window.THAI;
-const VLABEL={a:"◌ะ",aa:"า",i:"◌ิ",ii:"◌ี",u:"◌ุ",uu:"◌ู",e:"เ◌",e_s:"เ◌ะ",ae:"แ◌",ae_s:"แ◌ะ",o:"โ◌",o_s:"โ◌ะ",aw_s:"เ◌าะ",oe:"เ◌อ",ua:"◌ัว"};
+// "-" marks where the initial consonant goes (e.g. -า, เ-า, โ-)
+const VLABEL={a:"-ะ",aa:"-า",i:"-ิ",ii:"-ี",u:"-ุ",uu:"-ู",e:"เ-",e_s:"เ-ะ",ae:"แ-",ae_s:"แ-ะ",o:"โ-",o_s:"โ-ะ",aw_s:"เ-าะ",oe:"เ-อ",ua:"-ัว"};
 const INITS=["ก","ข","ค","ง","จ","ด","ต","น","ป","ม","ย","ร","ล","ส","ห","อ"];
 const VOWS=["a","aa","i","ii","u","uu","e","e_s","ae","ae_s","o","o_s","aw_s","oe","ua"];
 const FINS=["","ง","น","ม","ก","ด","บ","ว","ย"];
