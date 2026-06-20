@@ -8,15 +8,63 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="interactive.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="game-fx.js"></script>
 <style>
-  .preview{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:150px;border:2px solid var(--line);border-radius:16px;background:#fff;margin:10px 0 4px;}
-  .preview .big{font-family:var(--thai);font-size:84px;line-height:1.1;color:var(--ink);}
-  .preview .hint{font-family:var(--thai);color:var(--ink-3);font-size:1rem;}
-  .row{margin:12px 0;}
-  .row .rl{font-family:var(--thai);font-weight:700;font-size:.85rem;color:var(--earth-d);margin-bottom:6px;}
+  #game .card{position:relative;}
+  .ins{text-align:center;}
+  .timebar{height:12px;border-radius:999px;background:var(--earth-l);overflow:hidden;margin:6px 0 10px;}
+  .timebar>i{display:block;height:100%;width:100%;background:var(--earth);border-radius:999px;}
+  .timebar>i.run{transition:width var(--td,30s) linear;width:0;}
+  .timebar>i.low{background:var(--clay);}
+  .goal{text-align:center;font-family:var(--thai);font-size:1.05rem;color:var(--ink-2);margin:2px 0 6px;}
+  .goal .target{font-weight:800;color:var(--leaf-d);font-size:1.3em;}
+  .goal .emo{font-size:1.3em;vertical-align:-2px;}
+  .goal .hint{color:var(--ink-3);}
+
+  .preview{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:150px;
+    border:2.5px solid var(--line-2);border-radius:22px;background:#fff;margin:6px 0 14px;overflow:hidden;transition:border-color .2s,background .2s;}
+  .preview .big{font-family:var(--thai);font-weight:800;font-size:86px;line-height:1.1;color:var(--ink);}
+  .preview .cap{font-family:var(--thai);color:var(--ink-3);font-size:.95rem;}
+  .preview.hit{border-color:var(--leaf);background:#f2f8ee;animation:hitpop .42s ease;}
+  .preview.hit .big{color:var(--leaf-d);}
+  @keyframes hitpop{0%{transform:scale(.96)}55%{transform:scale(1.03)}100%{transform:scale(1)}}
+
+  .row{margin:10px 0;}
+  .row .rl{font-family:var(--thai);font-weight:800;font-size:.82rem;margin-bottom:6px;}
+  #lblI{color:var(--earth-d);} #lblV{color:var(--leaf-d);} #lblF{color:#4c6f90;}
   .tiles{display:flex;gap:8px;flex-wrap:wrap;}
-  .tiles .w{min-width:52px;text-align:center;}
-  .target{font-family:var(--thai);font-weight:800;color:var(--leaf-d);}
+  .tiles .w{min-width:54px;min-height:54px;font-family:var(--thai);font-weight:800;font-size:1.55rem;color:var(--ink);
+    border:2px solid var(--line-2);background:var(--surface);border-radius:14px;padding:6px 10px;cursor:pointer;
+    -webkit-tap-highlight-color:transparent;transition:transform .08s,background .15s,border-color .15s;box-shadow:0 2px 0 rgba(60,48,28,.08);}
+  .tiles .w:hover{background:var(--earth-l);}
+  .tiles .w:active{transform:translateY(2px);}
+  .tiles .w.bump{animation:bump .34s ease;}
+  @keyframes bump{0%{transform:scale(1)}42%{transform:scale(1.22)}100%{transform:scale(1)}}
+  #rowI .w.sel{background:var(--earth);border-color:var(--earth-d);color:#fff;box-shadow:0 2px 0 var(--earth-d);}
+  #rowV .w.sel{background:var(--leaf);border-color:var(--leaf-d);color:#fff;box-shadow:0 2px 0 var(--leaf-d);}
+  #rowF .w.sel{background:#5f86a8;border-color:#4c6f90;color:#fff;box-shadow:0 2px 0 #4c6f90;}
+  .w.small{font-size:.95rem;font-weight:700;}
+  .btn img{width:22px;height:22px;object-fit:contain;vertical-align:-5px;margin-right:5px;}
+  @media(max-width:520px){ .preview .big{font-size:70px;} .tiles .w{min-width:46px;min-height:46px;font-size:1.3rem;} }
+
+  .fs-back{display:none;position:absolute;top:14px;left:14px;z-index:6;border:2px solid var(--line-2);background:var(--surface);
+    color:var(--ink-2);font-family:var(--thai);font-weight:800;border-radius:999px;padding:9px 18px;font-size:1rem;cursor:pointer;}
+  #game .card:fullscreen{display:flex;flex-direction:column;justify-content:flex-start;background:var(--bg);padding:24px;overflow:auto;}
+  #game .card:fullscreen .fs-back{display:block;}
+  .qr-corner{position:absolute;right:12px;bottom:12px;z-index:5;display:flex;flex-direction:column;align-items:center;gap:1px;
+    cursor:pointer;background:#fff;border:1.5px solid var(--line-2);border-radius:12px;padding:6px;box-shadow:0 1px 5px rgba(60,48,28,.12);}
+  .qr-corner #qrSmall canvas,.qr-corner #qrSmall img{display:block;width:54px;height:54px;}
+  .qr-corner span{font-family:var(--thai);font-size:.66rem;color:var(--ink-3);font-weight:700;line-height:1;}
+  .qr-pop{display:none;position:absolute;inset:0;z-index:20;background:rgba(40,32,20,.55);align-items:center;justify-content:center;padding:16px;}
+  .qr-pop.show{display:flex;}
+  .qr-pop-inner{background:#fff;border-radius:22px;padding:26px 24px;text-align:center;max-width:90%;}
+  .qr-pop-inner h3{font-family:var(--thai);margin:0 0 4px;color:var(--ink);font-size:1.15rem;}
+  .qr-pop-inner #qrBig canvas,.qr-pop-inner #qrBig img{display:block;width:236px;height:236px;margin:14px auto 0;}
+  .qr-url{font-family:var(--font);font-size:.82rem;color:var(--ink-2);margin:12px 0 16px;word-break:break-all;}
+  .qr-acts{display:flex;gap:10px;justify-content:center;}
+  .qr-acts button{border:none;border-radius:11px;font-family:var(--thai);font-weight:800;font-size:.95rem;padding:11px 20px;cursor:pointer;color:#fff;background:var(--leaf);box-shadow:inset 0 -3px 0 rgba(0,0,0,.13);}
+  .qr-acts button.ghost{background:var(--surface);color:var(--ink-2);border:1.6px solid var(--line-2);box-shadow:none;}
 </style>
 </head>
 <body>
@@ -28,24 +76,30 @@
   </div>
   <div class="eyebrow">Interactive · ประสมคำ (สระลดรูปอัตโนมัติ)</div>
   <h1>สร้างคำตามเป้าหมาย</h1>
-  <p class="sub">แตะ พยัญชนะ + สระ + ตัวสะกด ให้ได้คำตามเป้าหมาย — ระบบจะลดรูป/เปลี่ยนรูปสระให้อัตโนมัติเมื่อมีตัวสะกด</p>
+  <p class="sub">แตะ <b>พยัญชนะ + สระ + ตัวสะกด</b> ให้ประสมเป็นคำเป้าหมายก่อนหมดเวลา — ประสมตรงปุ๊บถูกทันที! 🔊 ⏱️</p>
   <div class="bar"><div class="prog" id="prog"></div></div>
 
   <div id="game">
     <div class="card">
-      <p class="ins">เป้าหมาย: <span class="target" id="target"></span> &nbsp;·&nbsp; <span id="hint" style="color:var(--ink-3)"></span></p>
-      <div class="preview"><div class="big" id="preview">—</div><div class="hint">คำที่ประสมได้</div></div>
-      <div class="row"><div class="rl">พยัญชนะต้น · Initial</div><div class="tiles" id="rowI"></div></div>
-      <div class="row"><div class="rl">สระ · Vowel</div><div class="tiles" id="rowV"></div></div>
-      <div class="row"><div class="rl">ตัวสะกด · Final</div><div class="tiles" id="rowF"></div></div>
+      <button class="fs-back" id="fsBack">← ออกจากเต็มจอ</button>
+      <p class="ins">ประสมคำให้ตรงเป้าหมายก่อนเวลาหมด!</p>
+      <div class="timebar"><i id="timeFill"></i></div>
+      <div class="goal">เป้าหมาย: <span class="target" id="target"></span> <span class="emo" id="emoji"></span> &nbsp;·&nbsp; <span class="hint" id="hint"></span></div>
+      <div class="preview"><div class="big" id="preview">—</div><div class="cap">คำที่ประสมได้</div></div>
+      <div class="row"><div class="rl" id="lblI">พยัญชนะต้น · Initial</div><div class="tiles" id="rowI"></div></div>
+      <div class="row"><div class="rl" id="lblV">สระ · Vowel</div><div class="tiles" id="rowV"></div></div>
+      <div class="row"><div class="rl" id="lblF">ตัวสะกด · Final</div><div class="tiles" id="rowF"></div></div>
       <div class="feedback" id="feedback"></div>
       <div class="actions">
-        <button class="btn check" id="checkBtn">✓ ตรวจ</button>
+        <button class="btn check" id="listenBtn"><img src="images/icons/sound.png" alt="" />ฟังเป้าหมาย</button>
         <button class="btn ghost" id="clearBtn">ล้าง</button>
-        <button class="btn next" id="nextBtn" disabled>ถัดไป →</button>
+        <button class="btn ghost" id="fsBtn">⛶ เต็มจอ</button>
       </div>
+      <div class="qr-corner" id="qrCorner" title="แชร์เกมนี้"><div id="qrSmall"></div><span>แชร์</span></div>
+      <div class="qr-pop" id="qrPop"><div class="qr-pop-inner"><h3>แชร์เกมนี้ให้เด็ก ๆ สแกนเล่น</h3><div id="qrBig"></div><div class="qr-url" id="qrUrl"></div><div class="qr-acts"><button id="qrCopy">คัดลอกลิงก์</button><button class="ghost" id="qrClose">ปิด</button></div></div></div>
     </div>
   </div>
+
   <div class="card done" id="done" style="display:none">
     <div class="big">🧩</div><h2 id="dt"></h2><p class="sub" id="ds"></p>
     <div class="actions"><button class="btn check" id="again">เล่นอีกครั้ง</button></div>
@@ -54,65 +108,119 @@
 
 <script src="thai-data.js"></script>
 <script>
-const T = window.THAI;
-const DOT="◌";
+const T=window.THAI;
 const VLABEL={a:"◌ะ",aa:"า",i:"◌ิ",ii:"◌ี",u:"◌ุ",uu:"◌ู",e:"เ◌",e_s:"เ◌ะ",ae:"แ◌",ae_s:"แ◌ะ",o:"โ◌",o_s:"โ◌ะ",aw_s:"เ◌าะ",oe:"เ◌อ",ua:"◌ัว"};
 const INITS=["ก","ข","ค","ง","จ","ด","ต","น","ป","ม","ย","ร","ล","ส","ห","อ"];
 const VOWS=["a","aa","i","ii","u","uu","e","e_s","ae","ae_s","o","o_s","aw_s","oe","ua"];
 const FINS=["","ง","น","ม","ก","ด","บ","ว","ย"];
-const ROUNDS=[
-  {t:"กา",hint:"นกสีดำ"},
-  {t:"ตา",hint:"อวัยวะที่ใช้มอง"},
-  {t:"ปู",hint:"สัตว์ทะเลก้ามใหญ่"},
-  {t:"ดี",hint:"ตรงข้ามกับเลว"},
-  {t:"โต",hint:"ใหญ่ขึ้น"},
-  {t:"แดง",hint:"สีของเลือด"},
-  {t:"จาน",hint:"ภาชนะใส่อาหาร"},
-  {t:"ปาก",hint:"ใช้พูดและกิน"},
-  {t:"ตาม",hint:"เดินไปข้างหลัง"},
-  {t:"ลม",hint:"อากาศที่เคลื่อนที่"},
-  {t:"นก",hint:"สัตว์ปีกบินได้"},
-  {t:"คน",hint:"มนุษย์"},
-  {t:"งง",hint:"อาการมึน"},
-  {t:"กัน",hint:"ด้วยกัน"},
-  {t:"รัก",hint:"ความรู้สึกชอบมาก"},
-  {t:"เป็น",hint:"มีสภาพเป็น"},
-  {t:"แข็ง",hint:"ตรงข้ามกับอ่อนนุ่ม"},
-  {t:"เดิน",hint:"ก้าวขาไป"},
-  {t:"สวน",hint:"ที่ปลูกต้นไม้"},
-  {t:"ล็อก",hint:"ใส่กุญแจ"},
+// recorded teacher consonant clips (read aloud when a letter tile is tapped)
+const AUDIO={ "ก":"audio/mid-ko-kai.mp3","ข":"audio/hi-kho-khai.mp3","ค":"audio/lo-kho-khwai.mp3","ง":"audio/lo-ngo-ngu.mp3","จ":"audio/mid-jo-jan.mp3","ด":"audio/mid-do-dek.mp3","ต":"audio/mid-to-tao.mp3","น":"audio/lo-no-nu.mp3","ป":"audio/mid-po-pla.mp3","ม":"audio/lo-mo-ma.mp3","ย":"audio/lo-yo-yak.mp3","ร":"audio/lo-ro-ruea.mp3","ล":"audio/lo-lo-ling.mp3","ส":"audio/hi-so-suea.mp3","ห":"audio/hi-ho-hip.mp3","อ":"audio/mid-o-ang.mp3","บ":"audio/mid-bo-baimai.mp3","ว":"audio/lo-wo-waen.mp3" };
+const ALLROUNDS=[
+  {t:"กา",hint:"นกสีดำ",e:"🐦"},
+  {t:"ตา",hint:"อวัยวะที่ใช้มอง",e:"👁️"},
+  {t:"ปู",hint:"สัตว์ทะเลก้ามใหญ่",e:"🦀"},
+  {t:"ดี",hint:"ตรงข้ามกับเลว",e:"👍"},
+  {t:"โต",hint:"ใหญ่ขึ้น",e:"🌱"},
+  {t:"แดง",hint:"สีของเลือด",e:"🔴"},
+  {t:"จาน",hint:"ภาชนะใส่อาหาร",e:"🍽️"},
+  {t:"ปาก",hint:"ใช้พูดและกิน",e:"👄"},
+  {t:"ตาม",hint:"เดินไปข้างหลัง",e:"👣"},
+  {t:"ลม",hint:"อากาศที่เคลื่อนที่",e:"💨"},
+  {t:"นก",hint:"สัตว์ปีกบินได้",e:"🐤"},
+  {t:"คน",hint:"มนุษย์",e:"🧑"},
+  {t:"งง",hint:"อาการมึน",e:"😵"},
+  {t:"กัน",hint:"ด้วยกัน",e:"🤝"},
+  {t:"รัก",hint:"ความรู้สึกชอบมาก",e:"❤️"},
+  {t:"เป็น",hint:"มีสภาพเป็น",e:"✨"},
+  {t:"แข็ง",hint:"ตรงข้ามกับอ่อนนุ่ม",e:"💪"},
+  {t:"เดิน",hint:"ก้าวขาไป",e:"🚶"},
+  {t:"สวน",hint:"ที่ปลูกต้นไม้",e:"🌳"},
+  {t:"ล็อก",hint:"ใส่กุญแจ",e:"🔒"},
 ];
+const PLAY=12;            // words per game (random subset)
+const TIMER=30000;        // 30 seconds per word
+
 const $=id=>document.getElementById(id);
 const vobj=id=>T.vowels.find(v=>v.id===id);
-let i=0,score=0,selI=null,selV=null,selF="";
+let queue=[],i=0,score=0,cur=null,selI=null,selV=null,selF="",locked=false,timer=null,lowTimer=null;
+const card=()=>$("game").querySelector(".card");
+function shuffle(a){ for(let k=a.length-1;k>0;k--){ const j=Math.floor(Math.random()*(k+1)); const t=a[k]; a[k]=a[j]; a[j]=t; } return a; }
+
+function startTimer(){
+  const t=$("timeFill"); t.style.setProperty("--td",TIMER+"ms"); t.classList.remove("run","low"); t.style.width="100%"; void t.offsetWidth;
+  requestAnimationFrame(()=>{ t.classList.add("run"); t.style.width="0%"; });
+  clearTimeout(timer); timer=setTimeout(timeUp, TIMER);
+  clearTimeout(lowTimer); lowTimer=setTimeout(()=>t.classList.add("low"), TIMER*0.65);
+}
+function stopTimer(){ clearTimeout(timer); clearTimeout(lowTimer); const t=$("timeFill"); t.classList.remove("run"); t.style.width=getComputedStyle(t).width; }
+
+function mk(txt,cls,fn){ const b=document.createElement("button"); b.className="w"+(cls?" "+cls:""); b.textContent=txt; b.onclick=()=>fn(b); return b; }
+function bump(b){ b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump"); }
+function mark(row,txt){ [...$(row).children].forEach(c=>c.classList.toggle("sel",c.textContent===txt)); }
+function playLetter(c){ if(AUDIO[c]) GameFX.play(AUDIO[c], c); else GameFX.speak(c); }
+function speakVowel(id){ try{ GameFX.speak(T.buildSyllable("อ",vobj(id),null,"")); }catch(e){} }
 
 function tilesInit(){
-  $("rowI").innerHTML=""; INITS.forEach(c=>{ const b=mk(c,()=>{selI=c;mark("rowI",c);upd();}); $("rowI").appendChild(b); });
-  $("rowV").innerHTML=""; VOWS.forEach(id=>{ const b=mk(VLABEL[id]||id,()=>{selV=id;mark("rowV",VLABEL[id]);upd();}); $("rowV").appendChild(b); });
-  $("rowF").innerHTML=""; FINS.forEach(f=>{ const b=mk(f===""?"— ไม่มี":f,()=>{selF=f;mark("rowF",f===""?"— ไม่มี":f);upd();}); $("rowF").appendChild(b); });
+  $("rowI").innerHTML=""; INITS.forEach(c=>$("rowI").appendChild(mk(c,"",b=>{ if(locked)return; selI=c; mark("rowI",c); bump(b); playLetter(c); upd(); })));
+  $("rowV").innerHTML=""; VOWS.forEach(id=>$("rowV").appendChild(mk(VLABEL[id]||id,"",b=>{ if(locked)return; selV=id; mark("rowV",VLABEL[id]); bump(b); speakVowel(id); upd(); })));
+  $("rowF").innerHTML=""; FINS.forEach(f=>$("rowF").appendChild(mk(f===""?"— ไม่มี":f, f===""?"small":"", b=>{ if(locked)return; selF=f; mark("rowF",f===""?"— ไม่มี":f); bump(b); if(f)playLetter(f); upd(); })));
 }
-function mk(txt,fn){ const b=document.createElement("button"); b.className="w"; b.textContent=txt; b.onclick=fn; return b; }
-function mark(row,txt){ [...$(row).children].forEach(c=>c.classList.toggle("sel",c.textContent===txt)); }
-function upd(){ $("preview").textContent = (selI&&selV) ? T.buildSyllable(selI, vobj(selV), null, selF) : (selI||"—"); }
+function built(){ return (selI&&selV) ? T.buildSyllable(selI, vobj(selV), null, selF) : (selI||"—"); }
+function upd(){
+  const g=built(); $("preview").textContent=g;
+  if(!locked && selI && selV && g===cur.t) win();
+}
+function win(){
+  locked=true; stopTimer(); score++;
+  $("preview").classList.add("hit");
+  $("feedback").textContent="ถูกต้อง! "+cur.t+" 🎉"; $("feedback").className="feedback good";
+  GameFX.correct(); GameFX.pop(card(),true); GameFX.confetti($("preview"));
+  setTimeout(()=>GameFX.speak(cur.t),360);
+  setProg();
+  setTimeout(next,1700);
+}
+function timeUp(){
+  if(locked) return; locked=true;
+  $("feedback").textContent="หมดเวลา! คำที่ถูกคือ "+cur.t; $("feedback").className="feedback bad";
+  GameFX.wrong(); setTimeout(()=>GameFX.speak(cur.t),320);
+  setTimeout(next,1900);
+}
+function setProg(){ $("prog").innerHTML="ข้อ <b>"+(i+1)+"</b> / "+PLAY+" · ทำได้ "+score; }
+function next(){ i++; if(i>=PLAY) finish(); else load(); }
 
+function start(){ queue=shuffle(ALLROUNDS.slice()).slice(0,PLAY); i=0; score=0; $("done").style.display="none"; $("game").style.display=""; load(); }
 function load(){
-  const r=ROUNDS[i]; selI=null;selV=null;selF="";
-  $("target").textContent=r.t; $("hint").textContent=r.hint; $("preview").textContent="—";
-  $("feedback").textContent=""; $("feedback").className="feedback"; $("nextBtn").disabled=true; $("checkBtn").disabled=false;
-  $("prog").innerHTML="ข้อ <b>"+(i+1)+"</b> / "+ROUNDS.length+" · ถูก "+score;
-  tilesInit();
+  locked=false; cur=queue[i]; selI=null; selV=null; selF="";
+  $("target").textContent=cur.t; $("emoji").textContent=cur.e||""; $("hint").textContent=cur.hint;
+  $("preview").textContent="—"; $("preview").classList.remove("hit");
+  $("feedback").textContent=""; $("feedback").className="feedback";
+  setProg(); tilesInit(); startTimer();
+  setTimeout(()=>GameFX.speak(cur.t),320);   // announce the target word
 }
-$("checkBtn").onclick=()=>{
-  if(!selI||!selV){ $("feedback").textContent="เลือกพยัญชนะและสระก่อน"; $("feedback").className="feedback bad"; return; }
-  const got=T.buildSyllable(selI,vobj(selV),null,selF), r=ROUNDS[i];
-  if(got===r.t){ $("feedback").textContent="✓ ถูกต้อง! "+got+" 🎉"; $("feedback").className="feedback good"; score++; $("nextBtn").disabled=false; $("checkBtn").disabled=true; }
-  else { $("feedback").textContent="ได้ \""+got+"\" — ยังไม่ตรงเป้าหมาย ลองปรับสระ/ตัวสะกด"; $("feedback").className="feedback bad"; }
-  $("prog").innerHTML="ข้อ <b>"+(i+1)+"</b> / "+ROUNDS.length+" · ถูก "+score;
-};
-$("clearBtn").onclick=()=>{ selI=null;selV=null;selF=""; ["rowI","rowV","rowF"].forEach(r=>[...$(r).children].forEach(c=>c.classList.remove("sel"))); $("preview").textContent="—"; $("feedback").textContent=""; };
-$("nextBtn").onclick=()=>{ i++; if(i>=ROUNDS.length){ $("game").style.display="none"; $("done").style.display=""; $("dt").textContent="ทำครบแล้ว! ได้ "+score+" / "+ROUNDS.length; $("ds").textContent=score===ROUNDS.length?"ยอดเยี่ยม! ประสมคำถูกทุกข้อ":"เก่งมาก ลองอีกครั้งให้คล่องขึ้น"; } else load(); };
-$("again").onclick=()=>{ i=0;score=0;$("done").style.display="none";$("game").style.display="";load(); };
-load();
+function finish(){
+  stopTimer();
+  $("game").style.display="none"; $("done").style.display="";
+  $("dt").textContent="ทำได้ "+score+" / "+PLAY+" คำ";
+  $("ds").textContent = score===PLAY?"ยอดเยี่ยม! ประสมคำถูกทุกข้อ 👑" : score>=Math.ceil(PLAY*0.7)?"เยี่ยมมาก เกือบครบแล้ว!" : "เก่งมาก ลองอีกครั้งให้คล่องขึ้น";
+  GameFX.celebrate(); GameFX.confetti($("done"));
+}
+
+$("listenBtn").onclick=()=>{ if(cur) GameFX.speak(cur.t); };
+$("clearBtn").onclick=()=>{ if(locked)return; selI=null;selV=null;selF=""; ["rowI","rowV","rowF"].forEach(r=>[...$(r).children].forEach(c=>c.classList.remove("sel"))); $("preview").textContent="—"; $("feedback").textContent=""; };
+$("again").onclick=start;
+
+/* fullscreen + share QR */
+$("fsBtn").onclick=()=>{ const el=$("game").querySelector(".card"); try{ if(!document.fullscreenElement){(el.requestFullscreen||el.webkitRequestFullscreen).call(el);}else document.exitFullscreen(); }catch(e){} };
+$("fsBack").onclick=()=>{ try{ document.exitFullscreen(); }catch(e){} };
+const BOARD_URL="https://iamteacherta-code.github.io/panya-thai/interactive-word-builder.html";
+function makeQR(el,size){ if(!window.QRCode||!el)return; el.innerHTML=""; try{ new QRCode(el,{text:BOARD_URL,width:size,height:size,colorDark:"#2f2a20",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M}); }catch(e){} }
+makeQR($("qrSmall"),54);
+$("qrCorner").onclick=()=>{ makeQR($("qrBig"),236); $("qrUrl").textContent=BOARD_URL; $("qrPop").classList.add("show"); };
+$("qrClose").onclick=()=>$("qrPop").classList.remove("show");
+$("qrPop").onclick=e=>{ if(e.target===$("qrPop")) $("qrPop").classList.remove("show"); };
+$("qrCopy").onclick=async()=>{ try{ await navigator.clipboard.writeText(BOARD_URL); $("qrCopy").textContent="✓ คัดลอกแล้ว"; setTimeout(()=>$("qrCopy").textContent="คัดลอกลิงก์",1500);}catch(e){ $("qrCopy").textContent=BOARD_URL; } };
+if(!window.QRCode && $("qrCorner")) $("qrCorner").style.display="none";
+start();
 </script>
 </body>
 </html>
