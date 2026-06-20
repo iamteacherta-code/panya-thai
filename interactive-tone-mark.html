@@ -190,6 +190,20 @@ function startTimer(){
 }
 function stopTimer(){ clearTimeout(timer); clearTimeout(lowTimer); const t=$("timeFill"); t.classList.remove("run"); t.style.width=getComputedStyle(t).width; }
 
+// isolated tone marks are drawn to the LEFT of the text origin, so measure each
+// glyph's ink box (font Mali) and shift it back to dead-centre — values in em so
+// they scale with the balloon's font-size on any screen
+const MSHIFT={ek:{x:0.14,y:0.34}, to:{x:0.22,y:0.34}, tr:{x:0.25,y:0.34}, ja:{x:0.145,y:0.34}};
+let _mctx;
+function computeShifts(){ try{ if(!_mctx) _mctx=document.createElement("canvas").getContext("2d");
+  _mctx.font='800 100px "Mali"'; _mctx.textAlign="left"; _mctx.textBaseline="alphabetic";
+  MARKS.forEach(m=>{ const me=_mctx.measureText(m.mark);
+    const x=-((me.actualBoundingBoxRight-me.actualBoundingBoxLeft)/2)/100;
+    const y=((me.actualBoundingBoxAscent-me.actualBoundingBoxDescent)/2)/100;
+    if(isFinite(x)&&isFinite(y)) MSHIFT[m.id]={x:x,y:y}; }); }catch(e){} }
+computeShifts();
+try{ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(computeShifts); }catch(e){}
+
 function spawnBalloons(){
   const sky=$("sky"); sky.innerHTML="";
   const order=shuffle(MARKS.slice());
@@ -201,6 +215,7 @@ function spawnBalloons(){
     b.style.setProperty("--del",(Math.random()*1.3).toFixed(2)+"s");
     const col=COLORS[k%COLORS.length];
     b.innerHTML='<div class="body" style="background:'+col+';--bc:'+col+'"><div class="mk"><b>'+m.mark+'</b></div></div><div class="string"></div>';
+    const sh=MSHIFT[m.id]||{x:0}; b.querySelector(".mk b").style.transform="translate("+sh.x.toFixed(3)+"em,0.74em)";
     b.onclick=()=>pick(b,m);
     sky.appendChild(b);
   });
