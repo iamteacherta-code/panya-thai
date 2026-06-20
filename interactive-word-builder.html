@@ -159,7 +159,8 @@ function mk(txt,cls,fn){ const b=document.createElement("button"); b.className="
 function bump(b){ b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump"); }
 function mark(row,txt){ [...$(row).children].forEach(c=>c.classList.toggle("sel",c.textContent===txt)); }
 function playLetter(c){ if(AUDIO[c]) GameFX.play(AUDIO[c], c); else GameFX.speak(c); }
-function speakVowel(id){ try{ GameFX.speak(T.buildSyllable("อ",vobj(id),null,"")); }catch(e){} }
+// play a recorded vowel-sound clip if present (audio/vowels/<อ-form>.mp3), else TTS
+function speakVowel(id){ try{ const form=T.buildSyllable("อ",vobj(id),null,""); GameFX.play("audio/vowels/"+form+".mp3", form); }catch(e){} }
 
 function tilesInit(){
   $("rowI").innerHTML=""; INITS.forEach(c=>$("rowI").appendChild(mk(c,"",b=>{ if(locked)return; selI=c; mark("rowI",c); bump(b); playLetter(c); upd(); })));
