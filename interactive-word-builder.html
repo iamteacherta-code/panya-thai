@@ -157,9 +157,19 @@ function stopTimer(){ clearTimeout(timer); clearTimeout(lowTimer); const t=$("ti
 function mk(txt,cls,fn){ const b=document.createElement("button"); b.className="w"+(cls?" "+cls:""); b.textContent=txt; b.onclick=()=>fn(b); return b; }
 function bump(b){ b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump"); }
 function mark(row,txt){ [...$(row).children].forEach(c=>c.classList.toggle("sel",c.textContent===txt)); }
-function playLetter(c){ GameFX.play("audio/blend/"+c+".mp3", c); }
+let lastClip=null;   // the audio element of the most recent letter/vowel tap
+function playLetter(c){ lastClip=GameFX.play("audio/blend/"+c+".mp3", c); }
 // play a recorded vowel-sound clip if present (audio/vowels/<อ-form>.mp3), else TTS
-function speakVowel(id){ try{ const form=T.buildSyllable("อ",vobj(id),null,""); GameFX.play("audio/vowels/"+form+".mp3", form); }catch(e){} }
+function speakVowel(id){ try{ const form=T.buildSyllable("อ",vobj(id),null,""); lastClip=GameFX.play("audio/vowels/"+form+".mp3", form); }catch(e){} }
+// run cb once the given clip finishes playing (with a generous safety timeout)
+function afterClip(a, cb){
+  if(a && !a.paused && !a.ended){
+    let done=false; const go=()=>{ if(done)return; done=true; cb(); };
+    a.addEventListener("ended", go, {once:true});
+    const rem=(isFinite(a.duration)&&a.duration>0)?(a.duration-(a.currentTime||0))+0.25:2.2;
+    setTimeout(go, Math.max(300, rem*1000));
+  } else { setTimeout(cb, 250); }
+}
 
 function tilesInit(){
   $("rowI").innerHTML=""; INITS.forEach(c=>$("rowI").appendChild(mk(c,"",b=>{ if(locked)return; selI=c; mark("rowI",c); bump(b); playLetter(c); upd(); })));
@@ -176,11 +186,13 @@ function win(){
   $("preview").classList.add("hit");
   $("feedback").textContent="ถูกต้อง! "+cur.t+" 🎉"; $("feedback").className="feedback good";
   setProg();
-  // 1) read the finished blended word, 2) THEN the ✓ check + chime + confetti,
-  // 3) then a clear gap before the next target word is announced
-  setTimeout(()=>{ GameFX.stop(); GameFX.speak(cur.t); }, 800);
-  setTimeout(()=>{ GameFX.correct(); GameFX.pop(card(),true); GameFX.confetti($("preview")); }, 1900);
-  setTimeout(next, 3400);
+  // let the final tap's sound play fully (like the initial), THEN read the
+  // blended word, THEN pop the ✓ check, THEN move on — all in sequence
+  afterClip(lastClip, ()=>{
+    GameFX.stop(); GameFX.speak(cur.t);
+    setTimeout(()=>{ GameFX.correct(); GameFX.pop(card(),true); GameFX.confetti($("preview")); }, 1200);
+    setTimeout(next, 2700);
+  });
 }
 function timeUp(){
   if(locked) return; locked=true;
