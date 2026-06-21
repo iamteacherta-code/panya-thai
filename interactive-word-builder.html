@@ -175,12 +175,12 @@ function win(){
   locked=true; stopTimer(); score++;
   $("preview").classList.add("hit");
   $("feedback").textContent="ถูกต้อง! "+cur.t+" 🎉"; $("feedback").className="feedback good";
-  GameFX.correct(); GameFX.pop(card(),true); GameFX.confetti($("preview"));
   setProg();
-  // sequence the audio: let the last tap sound breathe, read the finished word,
-  // then leave a clear gap before the next target word is announced
+  // 1) read the finished blended word, 2) THEN the ✓ check + chime + confetti,
+  // 3) then a clear gap before the next target word is announced
   setTimeout(()=>{ GameFX.stop(); GameFX.speak(cur.t); }, 800);
-  setTimeout(next, 3000);
+  setTimeout(()=>{ GameFX.correct(); GameFX.pop(card(),true); GameFX.confetti($("preview")); }, 1900);
+  setTimeout(next, 3400);
 }
 function timeUp(){
   if(locked) return; locked=true;
