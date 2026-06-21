@@ -190,7 +190,7 @@ function win(){
   // blended word, THEN pop the ✓ check, THEN move on — all in sequence
   afterClip(lastClip, ()=>{
     GameFX.stop(); GameFX.speak(cur.t);
-    setTimeout(()=>{ GameFX.correct(); GameFX.pop(card(),true); GameFX.confetti($("preview")); }, 1200);
+    setTimeout(()=>{ GameFX.correct(); GameFX.pop(card(),true); GameFX.confetti(card()); }, 1200);
     setTimeout(next, 2700);
   });
 }
