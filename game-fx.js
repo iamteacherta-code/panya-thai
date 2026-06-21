@@ -38,7 +38,9 @@
     const v=thaiVoice(); if(v) u.voice=v; speechSynthesis.cancel(); speechSynthesis.speak(u);}catch(e){} };
   // play a recorded clip, fall back to speech
   let _aud;
-  FX.play=function(url,fallbackText){ if(url){ try{ if(_aud)_aud.pause(); _aud=new Audio(url); _aud.play().catch(()=>FX.speak(fallbackText||"")); return; }catch(e){} } FX.speak(fallbackText||""); };
+  FX.play=function(url,fallbackText){ if(url){ try{ if(_aud)_aud.pause(); _aud=new Audio(url); _aud.play().catch(e=>{ if(e&&e.name==="AbortError")return; FX.speak(fallbackText||""); }); return; }catch(e){} } FX.speak(fallbackText||""); };
+  // stop any playing clip + queued speech (keeps reads from overlapping)
+  FX.stop=function(){ try{ if(_aud){ _aud.pause(); _aud.currentTime=0; } }catch(e){} try{ if("speechSynthesis" in window) speechSynthesis.cancel(); }catch(e){} };
   // big ✓ (green) or ✗ (red) that pops over `host`
   FX.pop=function(host,ok){ const d=document.createElement("div"); d.className="fx-pop "+(ok?"fx-ok":"fx-no"); d.textContent=ok?"✓":"✗";
     (host||document.body).appendChild(d); setTimeout(()=>d.remove(),900); };

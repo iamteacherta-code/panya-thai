@@ -176,15 +176,18 @@ function win(){
   $("preview").classList.add("hit");
   $("feedback").textContent="ถูกต้อง! "+cur.t+" 🎉"; $("feedback").className="feedback good";
   GameFX.correct(); GameFX.pop(card(),true); GameFX.confetti($("preview"));
-  setTimeout(()=>GameFX.speak(cur.t),360);
   setProg();
-  setTimeout(next,1700);
+  // sequence the audio: let the last tap sound breathe, read the finished word,
+  // then leave a clear gap before the next target word is announced
+  setTimeout(()=>{ GameFX.stop(); GameFX.speak(cur.t); }, 800);
+  setTimeout(next, 3000);
 }
 function timeUp(){
   if(locked) return; locked=true;
   $("feedback").textContent="หมดเวลา! คำที่ถูกคือ "+cur.t; $("feedback").className="feedback bad";
-  GameFX.wrong(); setTimeout(()=>GameFX.speak(cur.t),320);
-  setTimeout(next,1900);
+  GameFX.wrong();
+  setTimeout(()=>{ GameFX.stop(); GameFX.speak(cur.t); }, 550);
+  setTimeout(next, 2700);
 }
 function setProg(){ $("prog").innerHTML="ข้อ <b>"+(i+1)+"</b> / "+PLAY+" · ทำได้ "+score; }
 function next(){ i++; if(i>=PLAY) finish(); else load(); }
@@ -196,7 +199,8 @@ function load(){
   $("preview").textContent="—"; $("preview").classList.remove("hit");
   $("feedback").textContent=""; $("feedback").className="feedback";
   setProg(); tilesInit(); startTimer();
-  setTimeout(()=>GameFX.speak(cur.t),320);   // announce the target word
+  // announce the new target word, clear of the previous round's reads
+  setTimeout(()=>{ GameFX.stop(); GameFX.speak(cur.t); }, 650);
 }
 function finish(){
   stopTimer();
