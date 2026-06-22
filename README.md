@@ -1,7 +1,7 @@
 # Panyaden Thai Literacy Studio
 
 A classroom web app for teaching Thai literacy with UFLI-style explicit, systematic
-phonics, for Kindergarten–Grade 6 learners at Panyaden International School, Chiang Mai.
+phonics, for K2–Y6 learners at Panyaden International School, Chiang Mai.
 
 Built from a Claude Design handoff. Warm, natural earth-wood-leaf palette; Sarabun
 font (embedded, Regular/Bold) for Thai, Sarabun for the UI. English-primary with Thai labels.

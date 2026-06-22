@@ -114,7 +114,8 @@ function HomePage({ go }) {
             <span className="squiggle" style={{ color: "var(--earth)" }} dangerouslySetInnerHTML={{ __html: SQUIGGLE }} />
             <p>
               A warm, friendly classroom toolkit built on explicit, systematic phonics (UFLI-style)
-              for K–Grade 6 learners. Blend sounds on the board, then practise with lessons, readings and games.
+              for K2–Y6 learners. Blend sounds on the board, then practise with lessons, readings, and
+              interactive games with recorded teacher audio.
             </p>
             <div className="hero-cta">
               <button className="btn btn-leaf" onClick={() => go("board")}>
@@ -401,7 +402,7 @@ const GAMES = [
   { en: "เติมวรรณยุกต์", th: "Y2 · ดูภาพ แตะลูกโป่งวรรณยุกต์ ่ ้ ๊ ๋ ให้เป็นคำที่ถูก 🎈 (ตอบทันที)", level: "intermediate", file: "interactive-tone-mark.html" },
   { en: "ผันเสียงไตรยางศ์", th: "Y2 · อ่านเสียงวรรณยุกต์ สามัญ/เอก/โท/ตรี/จัตวา (ท้าทาย)", level: "intermediate", file: "interactive-tone-rules.html" },
   { en: "Word Builder", th: "สร้างคำตามเป้าหมาย — ประสมอักษรแข่งเวลา มีเสียง 🔊 (ตอบทันที)", level: "intermediate", file: "interactive-word-builder.html" },
-  { en: "Word Map", th: "ลากคำเข้ากิ่งให้ถูกมาตรา", level: "advanced", file: "interactive-mindmap.html" },
+  { en: "Word Map", th: "ลากคำเข้ากิ่งให้ถูกมาตรา — 5 ด่าน ลากวาง มีเสียง 🔊", level: "advanced", file: "interactive-mindmap.html" },
   { en: "Sentence Builder", th: "เรียงประโยค (เกมโต้ตอบ)", level: "comprehension", file: "interactive-sentence-scramble.html" },
   { en: "Heart Words", th: "คำที่ต้องจำ (แตะส่วนที่ต้องจำ)", level: "comprehension", file: "interactive-heart-words.html" },
   { en: "Connected Text", th: "อ่านจับใจความ + คำถาม", level: "comprehension", file: "interactive-reading.html" },
