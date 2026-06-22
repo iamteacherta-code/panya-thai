@@ -17,7 +17,7 @@
   .hud .pill{display:flex;align-items:center;gap:7px;font-weight:800;color:var(--ink-2);font-size:.95rem;background:#fff;border:1.6px solid var(--line-2);border-radius:999px;padding:6px 14px;}
   .hud .pill b{color:var(--leaf-d);}
 
-  .maze{position:relative;width:100%;max-width:520px;margin:4px auto 14px;aspect-ratio:360/300;}
+  .maze{position:relative;width:100%;max-width:560px;margin:4px auto 14px;aspect-ratio:420/290;}
   .maze svg{position:absolute;inset:0;width:100%;height:100%;display:block;}
   .pin{position:absolute;transform:translate(-50%,-50%);z-index:3;font-size:26px;line-height:1;pointer-events:none;}
   .avatar{position:absolute;transform:translate(-50%,-50%);z-index:4;font-size:28px;line-height:1;pointer-events:none;
@@ -78,7 +78,7 @@
         <span class="pill">🧱 ทางตัน <b id="deadCnt">0</b> ครั้ง</span>
       </div>
       <div class="maze" id="maze">
-        <svg id="mazeSvg" viewBox="0 0 360 300" preserveAspectRatio="xMidYMid meet"></svg>
+        <svg id="mazeSvg" viewBox="0 0 420 290" preserveAspectRatio="xMidYMid meet"></svg>
         <div class="pin" id="pinStart">🏁</div>
         <div class="pin" id="pinGoal">🧀</div>
         <div class="avatar" id="avatar">🐭</div>
@@ -114,66 +114,59 @@ const WORDS={
   y:["สาย","โรย","ขาย","ยาย","โดย","เลย","ตาย"],
   w:["ดาว","แมว","หิว","เร็ว","ขาว","สาว","เลว"],
 };
-// hand-built maze (viewBox 360x300): hedge "walls" with cream corridors. Every
-// corridor looks the same — you only know the way by answering correctly. The
-// correct path winds to the cheese at the centre; wrong turns are real dead ends.
-const VBW=360, VBH=300;
-const ARROW={up:"↑",down:"↓",left:"←",right:"→"};
-const DIRNAME={up:"ขึ้นบน",down:"ลงล่าง",left:"ไปซ้าย",right:"ไปขวา"};
-const JUNC=[
-  {x:40,y:262, dir:"up",    ends:[{dir:"right",x:150,y:262}]},
-  {x:40,y:150, dir:"right", ends:[{dir:"up",x:40,y:60}]},
-  {x:130,y:150,dir:"up",    ends:[{dir:"down",x:130,y:250}]},
-  {x:130,y:60, dir:"right", ends:[{dir:"left",x:48,y:60}]},
-  {x:250,y:60, dir:"down",  ends:[{dir:"right",x:328,y:60}]},
-  {x:250,y:162,dir:"left",  ends:[{dir:"down",x:250,y:250},{dir:"right",x:328,y:162}]},
-];
-const GOAL={x:180,y:162};
-const PATH=[...JUNC.map(j=>({x:j.x,y:j.y})), GOAL];
-const STEPS=JUNC.length;
+// isometric 3D maze (viewBox 420x290): green hedge wall blocks on a sandy floor.
+// PATH = correct route through grid cells; STUB[i] = the dead end a wrong answer leads to.
+const VBW=420, VBH=290, HW=24, HH=13, WH=22, OX=214, OY=42;
+const iso=(c,r)=>({x:OX+(c-r)*HW, y:OY+(c+r)*HH});
+const PATH=[ [0,6],[1,6],[2,6],[2,5],[2,4],[3,4],[4,4],[4,5],[5,5],[6,5],[6,4],[6,3],[5,3] ];
+const STUB=[ [0,5],[1,5],[3,6],[3,5],[2,3],[3,3],[5,4],[4,6],[5,6],[7,5],[7,4],[6,2] ];
+const STEPS=PATH.length-1;
 
 const $=id=>document.getElementById(id);
 const shuffle=a=>{a=a.slice();for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]];}return a;};
 let step=0, dead=0, cur=null, locked=false, startMs=null;
 
-function seg(a,b){ return "M"+a.x+" "+a.y+" L"+b.x+" "+b.y; }
+const key=(c,r)=>c+","+r;
+function arrowFor(a,b){ const dc=b[0]-a[0],dr=b[1]-a[1],sx=dc-dr,sy=dc+dr;
+  if(sx>0&&sy<0)return"↗"; if(sx>0&&sy>0)return"↘"; if(sx<0&&sy>0)return"↙"; if(sx<0&&sy<0)return"↖";
+  if(sx>0)return"→"; if(sx<0)return"←"; if(sy>0)return"↓"; return"↑"; }
 function buildMaze(){
-  // every corridor: the winding correct path + each junction's dead-end stub(s)
-  let d=[]; for(let i=0;i<PATH.length-1;i++) d.push(seg(PATH[i],PATH[i+1]));
-  JUNC.forEach(j=>j.ends.forEach(e=>d.push(seg(j,e)))); d=d.join(" ");
-  // green hedge walls (raised, with drop shadow) + sandy floor showing through the carved corridors
-  $("mazeSvg").innerHTML=
-    '<defs>'+
-      '<mask id="corr"><rect x="0" y="0" width="360" height="300" fill="#fff"/>'+
-        '<path d="'+d+'" fill="none" stroke="#000" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/></mask>'+
-      '<filter id="raise" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="4" stdDeviation="2.6" flood-color="#3f5530" flood-opacity="0.5"/></filter>'+
-    '</defs>'+
-    '<rect x="5" y="5" width="350" height="290" rx="18" fill="#ece2c6"/>'+
-    '<g mask="url(#corr)" filter="url(#raise)">'+
-      '<rect x="5" y="5" width="350" height="290" rx="15" fill="#6fa04e"/>'+
-      '<rect x="5" y="5" width="350" height="290" rx="15" fill="#7fb058" mask="url(#corr)" transform="translate(0,-3)"/>'+
-    '</g>'+
-    '<rect x="5" y="5" width="350" height="290" rx="18" fill="none" stroke="#2f2a20" stroke-width="3.5"/>';
-  place($("pinStart"),PATH[0]); place($("pinGoal"),GOAL);
+  const floor=new Set(); PATH.concat(STUB).forEach(p=>floor.add(key(p[0],p[1])));
+  const cells=[]; for(let r=1;r<=6;r++) for(let c=0;c<=8;c++) cells.push([c,r]);
+  cells.sort((a,b)=>(a[0]+a[1])-(b[0]+b[1]));     // painter order: back to front
+  let s="";
+  cells.forEach(([c,r])=>{ const p=iso(c,r),X=p.x,Y=p.y;
+    if(floor.has(key(c,r))){
+      s+='<polygon points="'+X+','+(Y-HH)+' '+(X+HW)+','+Y+' '+X+','+(Y+HH)+' '+(X-HW)+','+Y+'" fill="#ece0c2" stroke="#dccfa8" stroke-width="1"/>';
+    } else {
+      s+='<polygon points="'+(X-HW)+','+(Y-WH)+' '+X+','+(Y+HH-WH)+' '+X+','+(Y+HH)+' '+(X-HW)+','+Y+'" fill="#5d8a3c"/>';      // left face
+      s+='<polygon points="'+X+','+(Y+HH-WH)+' '+(X+HW)+','+(Y-WH)+' '+(X+HW)+','+Y+' '+X+','+(Y+HH)+'" fill="#4c7430"/>';        // right face
+      s+='<polygon points="'+X+','+(Y-HH-WH)+' '+(X+HW)+','+(Y-WH)+' '+X+','+(Y+HH-WH)+' '+(X-HW)+','+(Y-WH)+'" fill="#7cac4e" stroke="#5d8a3c" stroke-width="1"/>';  // top
+    }
+  });
+  $("mazeSvg").innerHTML=s;
+  placeCell($("pinStart"),PATH[0]); placeCell($("pinGoal"),PATH[STEPS]);
 }
-function place(el,p){ el.style.left=(p.x/VBW*100)+"%"; el.style.top=(p.y/VBH*100)+"%"; }
-function avatarAt(p,bump){ const a=$("avatar"); place(a,p); if(bump){ a.classList.remove("bump"); void a.offsetWidth; a.classList.add("bump"); } }
+function placeCell(el,cell){ const p=iso(cell[0],cell[1]); el.style.left=(p.x/VBW*100)+"%"; el.style.top=((p.y-9)/VBH*100)+"%"; }
+function avatarCell(cell,bump){ const a=$("avatar"); placeCell(a,cell); if(bump){ a.classList.remove("bump"); void a.offsetWidth; a.classList.add("bump"); } }
 
 function readWord(){ if(cur) GameFX.play("audio/words/"+cur.w+".mp3", cur.w); }
 
 function loadJunction(){
   locked=false;
-  const j=JUNC[step], allM=Object.keys(MAATRA);
+  const allM=Object.keys(MAATRA);
   const correct=shuffle(allM)[0];                 // pick a category...
   const w=shuffle(WORDS[correct])[0];             // ...and a word in it
   cur={w, correct};
-  const dis=shuffle(allM.filter(m=>m!==correct)).slice(0,j.ends.length);
-  const opts=[{m:correct,dir:j.dir,end:null}];
-  j.ends.forEach((e,k)=>opts.push({m:dis[k],dir:e.dir,end:e}));   // distractors -> dead-end corridors
+  const dist=shuffle(allM.filter(m=>m!==correct))[0];
+  const opts=[
+    {m:correct, arrow:arrowFor(PATH[step],PATH[step+1]), stub:false},   // correct -> next cell
+    {m:dist,    arrow:arrowFor(PATH[step],STUB[step]),    stub:true},    // wrong -> dead end
+  ];
   const box=$("choices"); box.innerHTML="";
   shuffle(opts).forEach(o=>{
     const b=document.createElement("button"); b.className="ch"; b.dataset.m=o.m;
-    b.innerHTML='<span class="arr">'+ARROW[o.dir]+'</span><span class="dir">'+DIRNAME[o.dir]+'</span><span class="mt">'+MAATRA[o.m]+'</span>';
+    b.innerHTML='<span class="arr">'+o.arrow+'</span><span class="mt">'+MAATRA[o.m]+'</span>';
     b.onclick=()=>pick(b,o); box.appendChild(b);
   });
   $("qw").textContent=w; $("feedback").textContent=""; $("feedback").className="feedback";
@@ -185,16 +178,16 @@ function pick(btn,o){
   const card=$("game").querySelector(".card");
   if(o.m===cur.correct){
     btn.classList.add("right"); GameFX.correct();
-    step++; avatarAt(PATH[step],true); $("stepNum").textContent=step;
+    step++; avatarCell(PATH[step],true); $("stepNum").textContent=step;
     if(step>=STEPS){ setTimeout(win, 700); }
     else { $("feedback").textContent="ถูกต้อง! "+cur.w+" = "+MAATRA[cur.correct]+" — เดินต่อ!"; $("feedback").className="feedback good"; setTimeout(loadJunction, 800); }
   } else {
     btn.classList.add("wrong"); GameFX.wrong(); GameFX.pop(card,false);
     [...$("choices").children].forEach(c=>{ if(c.dataset.m===cur.correct) c.classList.add("right"); });
     dead++; $("deadCnt").textContent=dead;
-    avatarAt(o.end,true);                          // the mouse walks into the dead end
+    avatarCell(STUB[step],true);                   // the mouse walks into the dead end
     $("feedback").textContent="ทางตัน! "+cur.w+" อยู่ "+MAATRA[cur.correct]+" · กลับไปเริ่มใหม่"; $("feedback").className="feedback bad";
-    setTimeout(()=>{ step=0; avatarAt(PATH[0]); $("stepNum").textContent=0; loadJunction(); }, 1700);
+    setTimeout(()=>{ step=0; avatarCell(PATH[0]); $("stepNum").textContent=0; loadJunction(); }, 1700);
   }
 }
 function win(){
@@ -204,10 +197,10 @@ function win(){
 }
 
 function start(){ step=0; dead=0; cur=null; startMs=Date.now(); $("deadCnt").textContent=0; $("win").style.display="none"; $("game").style.display="";
-  buildMaze(); avatarAt(PATH[0]); loadJunction(); }
+  buildMaze(); avatarCell(PATH[0]); loadJunction(); }
 
 $("readBtn").onclick=readWord;
-$("restartBtn").onclick=()=>{ step=0; avatarAt(PATH[0]); $("stepNum").textContent=0; loadJunction(); };
+$("restartBtn").onclick=()=>{ step=0; avatarCell(PATH[0]); $("stepNum").textContent=0; loadJunction(); };
 $("againBtn").onclick=start;
 
 /* fullscreen + share QR */
