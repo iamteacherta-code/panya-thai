@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · Maze · เขาวงกตมาตราตัวสะกด</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="interactive.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="game-fx.js"></script>
+<style>
+  #game .card{position:relative;}
+  .ins{text-align:center;}
+  .hud{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin:2px 0 10px;}
+  .hud .pill{display:flex;align-items:center;gap:7px;font-weight:800;color:var(--ink-2);font-size:.95rem;background:#fff;border:1.6px solid var(--line-2);border-radius:999px;padding:6px 14px;}
+  .hud .pill b{color:var(--leaf-d);}
+
+  .maze{position:relative;width:100%;max-width:520px;margin:4px auto 14px;aspect-ratio:320/240;}
+  .maze svg{position:absolute;inset:0;width:100%;height:100%;display:block;}
+  .pin{position:absolute;transform:translate(-50%,-50%);z-index:3;font-size:26px;line-height:1;pointer-events:none;}
+  .avatar{position:absolute;transform:translate(-50%,-50%);z-index:4;font-size:28px;line-height:1;pointer-events:none;
+    transition:left .5s cubic-bezier(.4,1.3,.5,1),top .5s cubic-bezier(.4,1.3,.5,1);filter:drop-shadow(0 2px 2px rgba(0,0,0,.2));}
+  .avatar.bump{animation:bump .4s;}
+  @keyframes bump{0%,100%{}25%{transform:translate(-50%,-50%) scale(1.25) rotate(-8deg)}75%{transform:translate(-50%,-50%) scale(1.25) rotate(8deg)}}
+
+  .qcard{display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;border:2px solid var(--line-2);border-radius:18px;padding:14px;margin:4px 0 12px;}
+  .qcard .qw{font-family:var(--thai);font-weight:800;font-size:58px;line-height:1.05;color:var(--ink);}
+  .qcard .qq{font-family:var(--thai);color:var(--ink-3);font-size:.95rem;margin-top:2px;}
+  @media(max-width:520px){ .qcard .qw{font-size:46px;} }
+
+  .choices{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+  .ch{flex:1 1 30%;min-width:120px;border:2px solid var(--line-2);background:var(--surface);border-radius:16px;padding:12px 8px;cursor:pointer;
+    -webkit-tap-highlight-color:transparent;transition:transform .07s,background .12s,border-color .12s;text-align:center;}
+  .ch:hover{background:var(--earth-l);} .ch:active{transform:translateY(2px);}
+  .ch .arr{display:block;font-size:1.9rem;line-height:1;color:var(--earth-d);font-weight:800;}
+  .ch .dir{font-family:var(--thai);font-size:.74rem;color:var(--ink-3);font-weight:700;}
+  .ch .mt{display:block;font-family:var(--thai);font-weight:800;font-size:1.15rem;color:var(--ink);margin-top:3px;}
+  .ch.right{background:var(--leaf);border-color:var(--leaf-d);} .ch.right .arr,.ch.right .mt,.ch.right .dir{color:#fff;}
+  .ch.wrong{background:var(--clay);border-color:var(--clay);} .ch.wrong .arr,.ch.wrong .mt,.ch.wrong .dir{color:#fff;}
+  .ch:disabled{cursor:default;}
+  .btn img{width:22px;height:22px;object-fit:contain;vertical-align:-5px;margin-right:5px;}
+
+  .fs-back{display:none;position:absolute;top:14px;left:14px;z-index:6;border:2px solid var(--line-2);background:var(--surface);color:var(--ink-2);font-family:var(--thai);font-weight:800;border-radius:999px;padding:9px 18px;font-size:1rem;cursor:pointer;}
+  #game .card:fullscreen{display:block;background:var(--bg);padding:24px;overflow:auto;}
+  #game .card:fullscreen .fs-back{display:block;}
+  .qr-corner{position:absolute;right:12px;bottom:12px;z-index:5;display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer;background:#fff;border:1.5px solid var(--line-2);border-radius:12px;padding:6px;box-shadow:0 1px 5px rgba(60,48,28,.12);}
+  .qr-corner #qrSmall canvas,.qr-corner #qrSmall img{display:block;width:54px;height:54px;}
+  .qr-corner span{font-family:var(--thai);font-size:.66rem;color:var(--ink-3);font-weight:700;line-height:1;}
+  .qr-pop{display:none;position:absolute;inset:0;z-index:20;background:rgba(40,32,20,.55);align-items:center;justify-content:center;padding:16px;}
+  .qr-pop.show{display:flex;}
+  .qr-pop-inner{background:#fff;border-radius:22px;padding:26px 24px;text-align:center;max-width:90%;}
+  .qr-pop-inner h3{font-family:var(--thai);margin:0 0 4px;color:var(--ink);font-size:1.15rem;}
+  .qr-pop-inner #qrBig canvas,.qr-pop-inner #qrBig img{display:block;width:236px;height:236px;margin:14px auto 0;}
+  .qr-url{font-family:var(--font);font-size:.82rem;color:var(--ink-2);margin:12px 0 16px;word-break:break-all;}
+  .qr-acts{display:flex;gap:10px;justify-content:center;}
+  .qr-acts button{border:none;border-radius:11px;font-family:var(--thai);font-weight:800;font-size:.95rem;padding:11px 20px;cursor:pointer;color:#fff;background:var(--leaf);box-shadow:inset 0 -3px 0 rgba(0,0,0,.13);}
+  .qr-acts button.ghost{background:var(--surface);color:var(--ink-2);border:1.6px solid var(--line-2);box-shadow:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <span class="logo">P</span>
+    <div><div class="bn">PANYA</div><div class="bs">Maze · เขาวงกต</div></div>
+    <span class="spacer"></span><a class="home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก</a>
+  </div>
+  <div class="eyebrow">Interactive · เขาวงกตมาตราตัวสะกด</div>
+  <h1>พาหนูหาทางไปกินชีส! 🐭🧀</h1>
+  <p class="sub">แต่ละทางแยกมีคำ — เลือก<b>มาตราตัวสะกด</b>ที่ถูก หนูจะเดินไปทางนั้น · ตอบผิดเจอ<b>ทางตัน</b>ต้องเริ่มใหม่ · พาหนูไปถึงชีสกลางเขาวงกตให้ได้! 🔊</p>
+
+  <div id="game">
+    <div class="card">
+      <button class="fs-back" id="fsBack">← ออกจากเต็มจอ</button>
+      <div class="hud">
+        <span class="pill">🐾 ก้าวที่ <b id="stepNum">0</b> / <span id="stepTot">6</span></span>
+        <span class="pill">🧱 ทางตัน <b id="deadCnt">0</b> ครั้ง</span>
+      </div>
+      <div class="maze" id="maze">
+        <svg id="mazeSvg" viewBox="0 0 320 240" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="pin" id="pinStart">🏁</div>
+        <div class="pin" id="pinGoal">🧀</div>
+        <div class="avatar" id="avatar">🐭</div>
+      </div>
+      <div class="qcard"><div class="qw" id="qw">—</div><div class="qq">คำนี้อยู่มาตราใด? เลือกทางเดินให้หนู</div></div>
+      <div class="choices" id="choices"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="actions">
+        <button class="btn check" id="readBtn"><img src="images/icons/sound.png" alt="" />อ่านคำ</button>
+        <button class="btn ghost" id="restartBtn">เริ่มใหม่</button>
+        <button class="btn ghost" id="fsBtn">⛶ เต็มจอ</button>
+      </div>
+      <div class="qr-corner" id="qrCorner" title="แชร์เกมนี้"><div id="qrSmall"></div><span>แชร์</span></div>
+      <div class="qr-pop" id="qrPop"><div class="qr-pop-inner"><h3>แชร์เกมนี้ให้เด็ก ๆ สแกนเล่น</h3><div id="qrBig"></div><div class="qr-url" id="qrUrl"></div><div class="qr-acts"><button id="qrCopy">คัดลอกลิงก์</button><button class="ghost" id="qrClose">ปิด</button></div></div></div>
+    </div>
+  </div>
+
+  <div class="card done" id="win" style="display:none">
+    <div class="big">🧀</div><h2 id="winTitle">หนูเจอชีสแล้ว! 🎉</h2><p class="sub" id="winMsg"></p>
+    <div class="actions"><button class="btn check" id="againBtn">เล่นอีกครั้ง</button></div>
+  </div>
+</div>
+
+<script>
+const MAATRA={ k:"แม่กก (–ก)", d:"แม่กด (–ด)", b:"แม่กบ (–บ)", g:"แม่กง (–ง)", n:"แม่กน (–น)", m:"แม่กม (–ม)", y:"แม่เกย (–ย)", w:"แม่เกอว (–ว)" };
+const WORDS={
+  k:["นก","ปาก","มาก","ลูก","สุก","จาก","รัก","สุข","เลข","โรค","ฝาก","โชค"],
+  d:["ปิด","มืด","รด","บาด","หมด","พูด","มด","ตัด","มีด","รถ","กฎ","บาท"],
+  b:["จับ","ดิบ","ตอบ","ลูบ","พบ","คับ","ทับ","รับ","รูป","บาป","ภาพ","ซุป","ธูป"],
+  g:["ลิง","ทอง","กาง","ฟัง","แรง","ของ","ยุง","ปลิง","ลง","ดัง","สิง"],
+  n:["จาน","ปีน","กิน","นอน","บาน","วาน","คน","ฝน","ดิน","หิน"],
+  m:["ตาม","ลม","ชิม","ยาม","ถาม","นม","ริม","ดม","ส้ม"],
+  y:["สาย","โรย","ขาย","ยาย","โดย","เลย","ตาย"],
+  w:["ดาว","แมว","หิว","เร็ว","ขาว","สาว","เลว"],
+};
+// fixed maze trail (viewBox 320x240): start bottom-left -> cheese
+const VBW=320, VBH=240;
+const TRAIL=[ {x:42,y:206},{x:42,y:150},{x:120,y:150},{x:120,y:74},{x:208,y:74},{x:208,y:150},{x:280,y:150} ];
+const ARROW={up:"↑",down:"↓",left:"←",right:"→"};
+const DIRNAME={up:"ขึ้นบน",down:"ลงล่าง",left:"ไปซ้าย",right:"ไปขวา"};
+function segDir(a,b){ if(b.y<a.y)return"up"; if(b.y>a.y)return"down"; if(b.x>a.x)return"right"; return"left"; }
+const DIRS=TRAIL.slice(0,-1).map((p,i)=>segDir(p,TRAIL[i+1]));   // required dir per step
+const STEPS=TRAIL.length-1;
+
+const $=id=>document.getElementById(id);
+const shuffle=a=>{a=a.slice();for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]];}return a;};
+let step=0, dead=0, cur=null, locked=false, startMs=null;
+
+function buildMaze(){
+  const pts=TRAIL.map(p=>p.x+","+p.y).join(" ");
+  // decorative dead-end stubs for maze feel
+  const stubs=[[42,150,-30,0],[120,150,0,40],[208,74,40,0],[208,150,0,40],[120,74,-30,0]];
+  let stubStr=stubs.map(s=>'<path d="M'+s[0]+' '+s[1]+' l'+s[2]+' '+s[3]+'" />').join("");
+  $("mazeSvg").innerHTML=
+    '<rect x="6" y="6" width="308" height="228" rx="16" fill="#fff" stroke="#2f2a20" stroke-width="3"/>'+
+    '<g fill="none" stroke="#e7dcc2" stroke-width="22" stroke-linecap="round" stroke-linejoin="round">'+
+      '<polyline points="'+pts+'"/>'+
+    '</g>'+
+    '<g fill="none" stroke="#d9cdb0" stroke-width="10" stroke-linecap="round">'+stubStr+'</g>'+
+    '<polyline points="'+pts+'" fill="none" stroke="#bbab86" stroke-width="2" stroke-dasharray="2 7" stroke-linecap="round"/>';
+  place($("pinStart"),TRAIL[0]); place($("pinGoal"),TRAIL[STEPS]);
+}
+function place(el,p){ el.style.left=(p.x/VBW*100)+"%"; el.style.top=(p.y/VBH*100)+"%"; }
+function avatarTo(i,bump){ const a=$("avatar"); place(a,TRAIL[i]); if(bump){ a.classList.remove("bump"); void a.offsetWidth; a.classList.add("bump"); } }
+
+function readWord(){ if(cur) GameFX.play("audio/words/"+cur.w+".mp3", cur.w); }
+
+function loadJunction(){
+  locked=false;
+  const reqDir=DIRS[step];
+  const allMaatra=Object.keys(MAATRA);
+  const correct=shuffle(allMaatra)[0];                          // pick a category...
+  const w=shuffle(WORDS[correct])[0];                           // ...and a word in it
+  cur={w, correct};
+  // distractor categories + assign them the OTHER directions
+  const otherDirs=shuffle(["up","down","left","right"].filter(d=>d!==reqDir));
+  const distract=shuffle(allMaatra.filter(m=>m!==correct)).slice(0,2);
+  const opts=[{m:correct,dir:reqDir}, {m:distract[0],dir:otherDirs[0]}, {m:distract[1],dir:otherDirs[1]}];
+  const box=$("choices"); box.innerHTML="";
+  shuffle(opts).forEach(o=>{
+    const b=document.createElement("button"); b.className="ch"; b.dataset.m=o.m;
+    b.innerHTML='<span class="arr">'+ARROW[o.dir]+'</span><span class="dir">'+DIRNAME[o.dir]+'</span><span class="mt">'+MAATRA[o.m]+'</span>';
+    b.onclick=()=>pick(b,o); box.appendChild(b);
+  });
+  $("qw").textContent=w; $("feedback").textContent=""; $("feedback").className="feedback";
+  $("stepNum").textContent=step;
+  setTimeout(readWord,300);
+}
+function pick(btn,o){
+  if(locked) return; locked=true;
+  const card=$("game").querySelector(".card");
+  if(o.m===cur.correct){
+    btn.classList.add("right"); GameFX.correct();
+    step++; avatarTo(step,true); $("stepNum").textContent=step;
+    if(step>=STEPS){ setTimeout(win, 700); }
+    else { $("feedback").textContent="ถูกต้อง! "+cur.w+" = "+MAATRA[cur.correct]+" — เดินต่อ!"; $("feedback").className="feedback good"; setTimeout(loadJunction, 750); }
+  } else {
+    btn.classList.add("wrong"); GameFX.wrong(); GameFX.pop(card,false);
+    [...$("choices").children].forEach(c=>{ if(c.dataset.m===cur.correct) c.classList.add("right"); });
+    dead++; $("deadCnt").textContent=dead;
+    $("feedback").textContent="ทางตัน! "+cur.w+" อยู่ "+MAATRA[cur.correct]+" · กลับไปเริ่มใหม่"; $("feedback").className="feedback bad";
+    $("avatar").classList.add("bump");
+    setTimeout(()=>{ step=0; avatarTo(0); $("stepNum").textContent=0; loadJunction(); }, 1500);
+  }
+}
+function win(){
+  $("game").style.display="none"; $("win").style.display="";
+  $("winMsg").textContent = dead===0 ? "สุดยอด! พาหนูถึงชีสโดยไม่เจอทางตันเลย 👑" : ("เก่งมาก! ไปถึงชีสแล้ว (เจอทางตัน "+dead+" ครั้ง) ลองใหม่ให้ไม่ตันเลยนะ");
+  GameFX.celebrate(); GameFX.confetti($("win"));
+}
+
+function start(){ step=0; dead=0; cur=null; startMs=Date.now(); $("deadCnt").textContent=0; $("win").style.display="none"; $("game").style.display="";
+  buildMaze(); avatarTo(0); loadJunction(); }
+
+$("readBtn").onclick=readWord;
+$("restartBtn").onclick=()=>{ step=0; avatarTo(0); $("stepNum").textContent=0; loadJunction(); };
+$("againBtn").onclick=start;
+
+/* fullscreen + share QR */
+$("fsBtn").onclick=()=>{ const el=$("game").querySelector(".card"); try{ if(!document.fullscreenElement){(el.requestFullscreen||el.webkitRequestFullscreen).call(el);}else document.exitFullscreen(); }catch(e){} };
+$("fsBack").onclick=()=>{ try{ document.exitFullscreen(); }catch(e){} };
+const BOARD_URL="https://iamteacherta-code.github.io/panya-thai/interactive-maze.html";
+function makeQR(el,size){ if(!window.QRCode||!el)return; el.innerHTML=""; try{ new QRCode(el,{text:BOARD_URL,width:size,height:size,colorDark:"#2f2a20",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M}); }catch(e){} }
+makeQR($("qrSmall"),54);
+$("qrCorner").onclick=()=>{ makeQR($("qrBig"),236); $("qrUrl").textContent=BOARD_URL; $("qrPop").classList.add("show"); };
+$("qrClose").onclick=()=>$("qrPop").classList.remove("show");
+$("qrPop").onclick=e=>{ if(e.target===$("qrPop")) $("qrPop").classList.remove("show"); };
+$("qrCopy").onclick=async()=>{ try{ await navigator.clipboard.writeText(BOARD_URL); $("qrCopy").textContent="✓ คัดลอกแล้ว"; setTimeout(()=>$("qrCopy").textContent="คัดลอกลิงก์",1500);}catch(e){ $("qrCopy").textContent=BOARD_URL; } };
+if(!window.QRCode && $("qrCorner")) $("qrCorner").style.display="none";
+
+$("stepTot").textContent=STEPS;
+start();
+</script>
+</body>
+</html>
