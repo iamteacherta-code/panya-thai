@@ -402,7 +402,7 @@ const GAMES = [
   { en: "เติมวรรณยุกต์", th: "Y2 · ดูภาพ แตะลูกโป่งวรรณยุกต์ ่ ้ ๊ ๋ ให้เป็นคำที่ถูก 🎈 (ตอบทันที)", level: "intermediate", file: "interactive-tone-mark.html" },
   { en: "ผันเสียงไตรยางศ์", th: "Y2 · อ่านเสียงวรรณยุกต์ สามัญ/เอก/โท/ตรี/จัตวา (ท้าทาย)", level: "intermediate", file: "interactive-tone-rules.html" },
   { en: "Word Builder", th: "สร้างคำตามเป้าหมาย — ประสมอักษรแข่งเวลา มีเสียง 🔊 (ตอบทันที)", level: "intermediate", file: "interactive-word-builder.html" },
-  { en: "Word Map", th: "ลากคำเข้ากิ่งให้ถูกมาตรา — 5 ด่าน ลากวาง มีเสียง 🔊", level: "advanced", file: "interactive-mindmap.html" },
+  { en: "Word Map", th: "ลากคำศัพท์วางในช่องให้ตรงมาตรา — 5 ด่าน ลากวาง มีเสียง 🔊", level: "advanced", file: "interactive-mindmap.html" },
   { en: "Sentence Builder", th: "เรียงประโยค (เกมโต้ตอบ)", level: "comprehension", file: "interactive-sentence-scramble.html" },
   { en: "Heart Words", th: "คำที่ต้องจำ (แตะส่วนที่ต้องจำ)", level: "comprehension", file: "interactive-heart-words.html" },
   { en: "Connected Text", th: "อ่านจับใจความ + คำถาม", level: "comprehension", file: "interactive-reading.html" },
