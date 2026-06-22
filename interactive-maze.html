@@ -26,9 +26,11 @@
   @keyframes bump{0%,100%{}25%{transform:translate(-50%,-50%) scale(1.25) rotate(-8deg)}75%{transform:translate(-50%,-50%) scale(1.25) rotate(8deg)}}
 
   .qcard{display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;border:2px solid var(--line-2);border-radius:18px;padding:14px;margin:4px 0 12px;}
-  .qcard .qw{font-family:var(--thai);font-weight:800;font-size:58px;line-height:1.05;color:var(--ink);}
-  .qcard .qq{font-family:var(--thai);color:var(--ink-3);font-size:.95rem;margin-top:2px;}
-  @media(max-width:520px){ .qcard .qw{font-size:46px;} }
+  .qcard .qw{font-family:var(--thai);font-weight:700;font-size:1.55rem;line-height:1.6;color:var(--ink);text-align:center;}
+  .qcard .qw .blank{display:inline-block;min-width:58px;border-bottom:3px solid var(--earth);margin:0 5px;vertical-align:-2px;}
+  .qcard .qw .fill{color:var(--leaf-d);font-weight:800;border-bottom:3px solid var(--leaf);padding:0 3px;}
+  .qcard .qq{font-family:var(--thai);color:var(--ink-3);font-size:.9rem;margin-top:8px;}
+  @media(max-width:520px){ .qcard .qw{font-size:1.3rem;} }
 
   .choices{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
   .ch{flex:1 1 30%;min-width:120px;border:2px solid var(--line-2);background:var(--surface);border-radius:16px;padding:12px 8px;cursor:pointer;
@@ -66,9 +68,9 @@
     <div><div class="bn">PANYA</div><div class="bs">Maze · เขาวงกต</div></div>
     <span class="spacer"></span><a class="home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก</a>
   </div>
-  <div class="eyebrow">Interactive · เขาวงกตมาตราตัวสะกด</div>
-  <h1>พาหนูหาทางไปกินชีส! 🐭🧀</h1>
-  <p class="sub">แต่ละทางแยกมีคำ — เลือก<b>มาตราตัวสะกด</b>ที่ถูก หนูจะเดินไปทางนั้น · ตอบผิดเจอ<b>ทางตัน</b>ต้องเริ่มใหม่ · พาหนูไปถึงชีสกลางเขาวงกตให้ได้! 🔊</p>
+  <div class="eyebrow">Interactive · เติมคำในช่องว่าง (มาตราตัวสะกด)</div>
+  <h1>เติมคำพาหนูไปกินชีส! 🐭🧀</h1>
+  <p class="sub">อ่านประโยค แล้วเลือก<b>คำเติมในช่องว่าง</b>ให้ถูก หนูจะเดินไปทางนั้น · ตอบผิดเจอ<b>ทางตัน</b>ต้องเริ่มใหม่ · พาหนูไปถึงชีสกลางเขาวงกตให้ได้! 🔊</p>
 
   <div id="game">
     <div class="card">
@@ -83,11 +85,10 @@
         <div class="pin" id="pinGoal">🧀</div>
         <div class="avatar" id="avatar">🐭</div>
       </div>
-      <div class="qcard"><div class="qw" id="qw">—</div><div class="qq">คำนี้อยู่มาตราใด? เลือกทางเดินให้หนู</div></div>
+      <div class="qcard"><div class="qw" id="qw">—</div><div class="qq">เลือกคำเติมในช่องว่างให้ถูก แล้วหนูจะเดินไปทางนั้น</div></div>
       <div class="choices" id="choices"></div>
       <div class="feedback" id="feedback"></div>
       <div class="actions">
-        <button class="btn check" id="readBtn"><img src="images/icons/sound.png" alt="" />อ่านคำ</button>
         <button class="btn ghost" id="restartBtn">เริ่มใหม่</button>
         <button class="btn ghost" id="fsBtn">⛶ เต็มจอ</button>
       </div>
@@ -104,16 +105,26 @@
 
 <script>
 const MAATRA={ k:"แม่กก (–ก)", d:"แม่กด (–ด)", b:"แม่กบ (–บ)", g:"แม่กง (–ง)", n:"แม่กน (–น)", m:"แม่กม (–ม)", y:"แม่เกย (–ย)", w:"แม่เกอว (–ว)" };
-const WORDS={
-  k:["นก","ปาก","มาก","ลูก","สุก","จาก","รัก","สุข","เลข","โรค","ฝาก","โชค"],
-  d:["ปิด","มืด","รด","บาด","หมด","พูด","มด","ตัด","มีด","รถ","กฎ","บาท"],
-  b:["จับ","ดิบ","ตอบ","ลูบ","พบ","คับ","ทับ","รับ","รูป","บาป","ภาพ","ซุป","ธูป"],
-  g:["ลิง","ทอง","กาง","ฟัง","แรง","ของ","ยุง","ปลิง","ลง","ดัง","สิง"],
-  n:["จาน","ปีน","กิน","นอน","บาน","วาน","คน","ฝน","ดิน","หิน"],
-  m:["ตาม","ลม","ชิม","ยาม","ถาม","นม","ริม","ดม","ส้ม"],
-  y:["สาย","โรย","ขาย","ยาย","โดย","เลย","ตาย"],
-  w:["ดาว","แมว","หิว","เร็ว","ขาว","สาว","เลว"],
-};
+// cloze sentences — fill the blank with a word learned in มาตราตัวสะกด.
+// a=ก่อนช่องว่าง · b=หลังช่องว่าง · w=คำที่ถูก · bad=ตัวลวง · mt=มาตราของคำที่ถูก
+const POOL=[
+  {a:"",            b:"บินอยู่บนฟ้า",     w:"นก",   bad:"รถ",  mt:"k"},
+  {a:"แม่ขับ",      b:"ไปทำงาน",         w:"รถ",   bad:"กบ",  mt:"d"},
+  {a:"",            b:"กระโดดลงน้ำ",      w:"กบ",   bad:"เมฆ", mt:"b"},
+  {a:"เรากิน",      b:"เป็นอาหาร",        w:"ข้าว", bad:"ลม",  mt:"w"},
+  {a:"ฝนตกเพราะมี", b:"บนฟ้า",           w:"เมฆ",  bad:"นก",  mt:"k"},
+  {a:"กลางคืนเห็น", b:"บนฟ้า",           w:"ดาว",  bad:"รถ",  mt:"w"},
+  {a:"",            b:"พัดใบไม้ปลิว",      w:"ลม",   bad:"หิน", mt:"m"},
+  {a:"เด็กดื่ม",    b:"ทุกเช้า",          w:"นม",   bad:"ไฟ",  mt:"m"},
+  {a:"บนภูเขามี",   b:"ก้อนใหญ่",         w:"หิน",  bad:"นม",  mt:"n"},
+  {a:"",            b:"ขันตอนเช้า",       w:"ไก่",  bad:"ปลา", mt:"k"},
+  {a:"แมวชอบ",      b:"หนู",             w:"จับ",  bad:"นอน", mt:"b"},
+  {a:"เด็กถือ",     b:"กันแดด",          w:"ร่ม",  bad:"ไฟ",  mt:"m"},
+  {a:"เรือแล่นใน",  b:"",                w:"คลอง", bad:"รถ",  mt:"g"},
+  {a:"เรานอนบน",    b:"นุ่มๆ",           w:"เตียง", bad:"ไฟ",  mt:"g"},
+  {a:"ลูก",         b:"กลมๆ เด้งได้",     w:"บอล",  bad:"นม",  mt:"n"},
+  {a:"หนูชอบแทะ",   b:"อร่อยๆ",          w:"ขนม",  bad:"หิน", mt:"m"},
+];
 // isometric 3D maze (viewBox 420x290): green hedge wall blocks on a sandy floor.
 // PATH = correct route through grid cells; STUB[i] = the dead end a wrong answer leads to.
 const VBW=420, VBH=290, HW=24, HH=13, WH=22, OX=214, OY=42;
@@ -124,7 +135,7 @@ const STEPS=PATH.length-1;
 
 const $=id=>document.getElementById(id);
 const shuffle=a=>{a=a.slice();for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]];}return a;};
-let step=0, dead=0, cur=null, locked=false, startMs=null;
+let step=0, dead=0, cur=null, locked=false, startMs=null, QUEUE=[];
 
 const key=(c,r)=>c+","+r;
 function arrowFor(a,b){ const dc=b[0]-a[0],dr=b[1]-a[1],sx=dc-dr,sy=dc+dr;
@@ -150,43 +161,38 @@ function buildMaze(){
 function placeCell(el,cell){ const p=iso(cell[0],cell[1]); el.style.left=(p.x/VBW*100)+"%"; el.style.top=((p.y-9)/VBH*100)+"%"; }
 function avatarCell(cell,bump){ const a=$("avatar"); placeCell(a,cell); if(bump){ a.classList.remove("bump"); void a.offsetWidth; a.classList.add("bump"); } }
 
-function readWord(){ if(cur) GameFX.play("audio/words/"+cur.w+".mp3", cur.w); }
-
 function loadJunction(){
-  locked=false;
-  const allM=Object.keys(MAATRA);
-  const correct=shuffle(allM)[0];                 // pick a category...
-  const w=shuffle(WORDS[correct])[0];             // ...and a word in it
-  cur={w, correct};
-  const dist=shuffle(allM.filter(m=>m!==correct))[0];
+  locked=false; cur=QUEUE[step];
+  $("qw").innerHTML=cur.a+'<span class="blank">＿＿</span>'+cur.b;        // sentence with a blank
   const opts=[
-    {m:correct, arrow:arrowFor(PATH[step],PATH[step+1]), stub:false},   // correct -> next cell
-    {m:dist,    arrow:arrowFor(PATH[step],STUB[step]),    stub:true},    // wrong -> dead end
+    {word:cur.w,   ok:true,  arrow:arrowFor(PATH[step],PATH[step+1])},   // correct -> next cell
+    {word:cur.bad, ok:false, arrow:arrowFor(PATH[step],STUB[step])},     // wrong -> dead end
   ];
   const box=$("choices"); box.innerHTML="";
   shuffle(opts).forEach(o=>{
-    const b=document.createElement("button"); b.className="ch"; b.dataset.m=o.m;
-    b.innerHTML='<span class="arr">'+o.arrow+'</span><span class="mt">'+MAATRA[o.m]+'</span>';
+    const b=document.createElement("button"); b.className="ch"; b.dataset.ok=o.ok;
+    b.innerHTML='<span class="arr">'+o.arrow+'</span><span class="mt">'+o.word+'</span>';
     b.onclick=()=>pick(b,o); box.appendChild(b);
   });
-  $("qw").textContent=w; $("feedback").textContent=""; $("feedback").className="feedback";
+  $("feedback").textContent=""; $("feedback").className="feedback";
   $("stepNum").textContent=step;
-  setTimeout(readWord,300);
 }
 function pick(btn,o){
   if(locked) return; locked=true;
   const card=$("game").querySelector(".card");
-  if(o.m===cur.correct){
+  if(o.ok){
     btn.classList.add("right"); GameFX.correct();
+    $("qw").innerHTML=cur.a+'<b class="fill">'+cur.w+'</b>'+cur.b;       // reveal the filled sentence
+    GameFX.play("audio/words/"+cur.w+".mp3", cur.w);
     step++; avatarCell(PATH[step],true); $("stepNum").textContent=step;
-    if(step>=STEPS){ setTimeout(win, 700); }
-    else { $("feedback").textContent="ถูกต้อง! "+cur.w+" = "+MAATRA[cur.correct]+" — เดินต่อ!"; $("feedback").className="feedback good"; setTimeout(loadJunction, 800); }
+    if(step>=STEPS){ setTimeout(win, 850); }
+    else { $("feedback").textContent="ถูกต้อง! เติม “"+cur.w+"” ("+MAATRA[cur.mt]+") — เดินต่อ!"; $("feedback").className="feedback good"; setTimeout(loadJunction, 1050); }
   } else {
     btn.classList.add("wrong"); GameFX.wrong(); GameFX.pop(card,false);
-    [...$("choices").children].forEach(c=>{ if(c.dataset.m===cur.correct) c.classList.add("right"); });
+    [...$("choices").children].forEach(c=>{ if(c.dataset.ok==="true") c.classList.add("right"); });
     dead++; $("deadCnt").textContent=dead;
     avatarCell(STUB[step],true);                   // the mouse walks into the dead end
-    $("feedback").textContent="ทางตัน! "+cur.w+" อยู่ "+MAATRA[cur.correct]+" · กลับไปเริ่มใหม่"; $("feedback").className="feedback bad";
+    $("feedback").textContent="ทางตัน! ต้องเติม “"+cur.w+"” · กลับไปเริ่มใหม่"; $("feedback").className="feedback bad";
     setTimeout(()=>{ step=0; avatarCell(PATH[0]); $("stepNum").textContent=0; loadJunction(); }, 1700);
   }
 }
@@ -197,9 +203,9 @@ function win(){
 }
 
 function start(){ step=0; dead=0; cur=null; startMs=Date.now(); $("deadCnt").textContent=0; $("win").style.display="none"; $("game").style.display="";
+  QUEUE=shuffle(POOL).slice(0,STEPS);
   buildMaze(); avatarCell(PATH[0]); loadJunction(); }
 
-$("readBtn").onclick=readWord;
 $("restartBtn").onclick=()=>{ step=0; avatarCell(PATH[0]); $("stepNum").textContent=0; loadJunction(); };
 $("againBtn").onclick=start;
 
