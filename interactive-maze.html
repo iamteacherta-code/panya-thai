@@ -141,10 +141,19 @@ function buildMaze(){
   // every corridor: the winding correct path + each junction's dead-end stub(s)
   let d=[]; for(let i=0;i<PATH.length-1;i++) d.push(seg(PATH[i],PATH[i+1]));
   JUNC.forEach(j=>j.ends.forEach(e=>d.push(seg(j,e)))); d=d.join(" ");
+  // green hedge walls (raised, with drop shadow) + sandy floor showing through the carved corridors
   $("mazeSvg").innerHTML=
-    '<rect x="5" y="5" width="350" height="290" rx="18" fill="#c2d3ac" stroke="#2f2a20" stroke-width="3.5"/>'+
-    '<path d="'+d+'" fill="none" stroke="#cdbf9c" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>'+
-    '<path d="'+d+'" fill="none" stroke="#faf4e6" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>';
+    '<defs>'+
+      '<mask id="corr"><rect x="0" y="0" width="360" height="300" fill="#fff"/>'+
+        '<path d="'+d+'" fill="none" stroke="#000" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/></mask>'+
+      '<filter id="raise" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="4" stdDeviation="2.6" flood-color="#3f5530" flood-opacity="0.5"/></filter>'+
+    '</defs>'+
+    '<rect x="5" y="5" width="350" height="290" rx="18" fill="#ece2c6"/>'+
+    '<g mask="url(#corr)" filter="url(#raise)">'+
+      '<rect x="5" y="5" width="350" height="290" rx="15" fill="#6fa04e"/>'+
+      '<rect x="5" y="5" width="350" height="290" rx="15" fill="#7fb058" mask="url(#corr)" transform="translate(0,-3)"/>'+
+    '</g>'+
+    '<rect x="5" y="5" width="350" height="290" rx="18" fill="none" stroke="#2f2a20" stroke-width="3.5"/>';
   place($("pinStart"),PATH[0]); place($("pinGoal"),GOAL);
 }
 function place(el,p){ el.style.left=(p.x/VBW*100)+"%"; el.style.top=(p.y/VBH*100)+"%"; }
