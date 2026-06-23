@@ -19,8 +19,13 @@
 
   .maze{position:relative;width:100%;max-width:600px;margin:4px auto 14px;aspect-ratio:600/380;border-radius:16px;overflow:hidden;border:3px solid #2f2a20;}
   .maze svg{position:absolute;inset:0;width:100%;height:100%;display:block;}
-  .maze .scene{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.06);transform-origin:center;transition:opacity .55s ease, transform .55s ease;}
+  .maze .scene{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.06);transform-origin:center;transition:opacity 1s ease;z-index:0;}
   .maze .scene.hide{opacity:0;}
+  .walker{position:absolute;left:50%;bottom:1%;width:13%;max-width:66px;z-index:1;opacity:0;pointer-events:none;
+    transform:translateX(-50%);filter:drop-shadow(0 3px 3px rgba(0,0,0,.3));}
+  .walker svg{display:block;width:100%;height:auto;}
+  .walker.step svg{animation:walkbob .28s linear infinite;}
+  @keyframes walkbob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-3px) rotate(3deg)}}
   /* soft floating cards that fit the text, placed on the scene */
   .q-ov{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:2;width:max-content;max-width:84%;
     background:rgba(255,255,255,.95);border:2.5px solid #abc9de;border-radius:22px;padding:8px 20px;text-align:center;
@@ -97,6 +102,7 @@
       <div class="maze" id="maze">
         <img id="sceneA" class="scene" alt="" />
         <img id="sceneB" class="scene hide" alt="" />
+        <div class="walker" id="walker"><svg viewBox="0 0 60 72" xmlns="http://www.w3.org/2000/svg"><path d="M30 70 q15 5 19 -3" fill="none" stroke="#b58e84" stroke-width="3" stroke-linecap="round"/><ellipse cx="30" cy="45" rx="20" ry="25" fill="#6f655a" stroke="#4a4239" stroke-width="2"/><circle cx="16" cy="20" r="11" fill="#6f655a" stroke="#4a4239" stroke-width="2"/><circle cx="44" cy="20" r="11" fill="#6f655a" stroke="#4a4239" stroke-width="2"/><circle cx="16" cy="20" r="5" fill="#c89e96"/><circle cx="44" cy="20" r="5" fill="#c89e96"/><path d="M22 64 l-3 7 M38 64 l3 7" stroke="#c89e96" stroke-width="3" stroke-linecap="round"/></svg></div>
         <div class="q-ov" id="qw">—</div>
         <div class="hudchip" id="hudchip"></div>
         <div class="ch-ov" id="choices"></div>
@@ -154,6 +160,15 @@ const SCENES=["scene01","scene02","scene03","scene04","scene05","scene06","scene
 const WINSCENE="scene18";
 let front="sceneA";
 function sceneFile(i){ return "images/maze/"+(SCENES[i]||WINSCENE)+".jpg"; }
+// the overlay mouse walks off toward the chosen side (the next scene shows it back at the start)
+function walkMouse(dir){
+  const m=$("walker"), sgn=dir==="L"?-1:dir==="R"?1:0;
+  m.style.transition="none"; m.style.left="50%"; m.style.opacity="0"; m.style.transform="translateX(-50%) scale(1)"; void m.offsetWidth;
+  m.classList.add("step");
+  m.style.transition="opacity .3s ease, left 1.25s ease-in, transform 1.25s ease-in";
+  requestAnimationFrame(function(){ m.style.opacity="1"; m.style.left=(50+sgn*58)+"%"; m.style.transform="translateX(-50%) scale(.55)"; });
+  setTimeout(function(){ m.style.transition="opacity .35s ease"; m.style.opacity="0"; m.classList.remove("step"); }, 1250);
+}
 function showScene(i, instant, dir){
   $("hudchip").textContent="🐭 ก้าวที่ "+Math.min(i+1,STEPS)+"/"+STEPS;
   const f=$(front), b=$(front==="sceneA"?"sceneB":"sceneA");
@@ -161,16 +176,8 @@ function showScene(i, instant, dir){
   // incoming layer: reset centred + hidden (no transition for the reset)
   b.style.transition="none"; b.style.transform="scale(1.06)"; b.classList.add("hide"); void b.offsetWidth; b.style.transition="";
   const run=function(){ b.onload=null;
-    const sgn = dir==="L" ? -1 : dir==="R" ? 1 : 0;
-    // phase 1 (~1.3s): the scene (with the mouse) walks slowly toward the chosen side — visible, not faded yet
-    f.style.transition="transform 1.3s ease-in";
-    requestAnimationFrame(function(){ f.style.transform="scale(1.06) translateX("+(sgn*42)+"%)"; });
-    // phase 2 (~0.6s): only then does the scene fade out while the next scene fades in
-    setTimeout(function(){
-      f.style.transition="opacity .6s ease, transform .6s ease";
-      f.style.transform="scale(1.06) translateX("+(sgn*82)+"%)"; f.classList.add("hide");
-      b.style.transition="opacity .6s ease"; b.classList.remove("hide");
-    }, 1300);
+    // pure cross-fade — the scene fades out in place (no sliding) while the next fades in slowly
+    requestAnimationFrame(function(){ b.classList.remove("hide"); f.classList.add("hide"); });
   };
   b.onload=run; b.src=sceneFile(i); if(b.complete && b.naturalWidth>0) run();
   front=(front==="sceneA"?"sceneB":"sceneA");
@@ -202,16 +209,18 @@ function pick(btn,o){
     GameFX.play("audio/words/"+cur.w+".mp3", cur.w);
     step++; $("stepNum").textContent=step;
     $("feedback").textContent="ถูกต้อง! เติม “"+cur.w+"” ("+MAATRA[cur.mt]+") — หนูเดินต่อ…"; $("feedback").className="feedback good";
-    setTimeout(()=>showScene(step, false, o.side), 550);     // beat, then the mouse walks off slowly
-    if(step>=STEPS){ setTimeout(win, 2650); }
-    else { setTimeout(loadJunction, 2650); }
+    walkMouse(o.side);                                       // the mouse walks off toward the chosen side
+    setTimeout(()=>showScene(step, false, o.side), 1150);    // then the scene fades to the next
+    if(step>=STEPS){ setTimeout(win, 2550); }
+    else { setTimeout(loadJunction, 2550); }
   } else {
     btn.classList.add("wrong"); GameFX.wrong(); GameFX.pop(card,false);
     [...$("choices").children].forEach(c=>{ if(c.dataset.ok==="true") c.classList.add("right"); });
     dead++; $("deadCnt").textContent=dead;
     $("feedback").textContent="ตอบผิด! ต้องเติม “"+cur.w+"” · หนูถอยกลับ 1 ก้าว"; $("feedback").className="feedback bad";
-    setTimeout(()=>{ step=Math.max(0,step-1); $("stepNum").textContent=step; showScene(step, false, o.side); }, 900);
-    setTimeout(loadJunction, 3150);
+    walkMouse(o.side);
+    setTimeout(()=>{ step=Math.max(0,step-1); $("stepNum").textContent=step; showScene(step, false, o.side); }, 1150);
+    setTimeout(loadJunction, 2700);
   }
 }
 function win(){
