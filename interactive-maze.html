@@ -20,8 +20,22 @@
   .maze{position:relative;width:100%;max-width:600px;margin:4px auto 14px;aspect-ratio:600/380;border-radius:16px;overflow:hidden;border:3px solid #2f2a20;}
   .maze svg{position:absolute;inset:0;width:100%;height:100%;display:block;}
   .maze img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.06);transform-origin:center;}
-  .hudchip{position:absolute;top:8px;left:8px;z-index:3;background:rgba(35,28,16,.62);color:#fff;font-family:var(--thai);font-weight:800;
-    font-size:.86rem;padding:5px 12px;border-radius:999px;line-height:1;}
+  /* question + answers overlaid inside the scene frame (saves space below) */
+  .q-ov{position:absolute;top:8px;left:8px;right:8px;z-index:2;background:rgba(255,255,255,.93);border:2px solid var(--line-2);
+    border-radius:13px;padding:9px 54px;text-align:center;font-family:var(--thai);font-weight:700;font-size:1.12rem;line-height:1.45;
+    color:var(--ink);box-shadow:0 2px 9px rgba(0,0,0,.22);}
+  .q-ov .blank{display:inline-block;min-width:50px;border-bottom:3px solid var(--earth);margin:0 4px;vertical-align:-2px;}
+  .q-ov .fill{color:var(--leaf-d);font-weight:800;border-bottom:3px solid var(--leaf);padding:0 3px;}
+  .hudchip{position:absolute;top:13px;left:13px;z-index:3;background:var(--earth);color:#fff;font-family:var(--thai);font-weight:800;
+    font-size:.74rem;padding:5px 10px;border-radius:999px;line-height:1;box-shadow:0 1px 4px rgba(0,0,0,.3);}
+  .ch-ov{position:absolute;left:0;right:0;bottom:10px;z-index:2;display:flex;justify-content:space-between;gap:10px;padding:0 14px;pointer-events:none;}
+  .ch-ov .ch{pointer-events:auto;flex:0 1 44%;min-width:0;background:rgba(255,255,255,.93);border:2px solid var(--line-2);border-radius:14px;
+    padding:7px 6px;cursor:pointer;text-align:center;box-shadow:0 2px 9px rgba(0,0,0,.22);transition:transform .07s,background .12s;}
+  .ch-ov .ch:active{transform:translateY(2px);}
+  .ch-ov .ch .arr{display:block;font-size:1.35rem;line-height:1;color:var(--earth-d);font-weight:800;}
+  .ch-ov .ch .mt{display:block;font-family:var(--thai);font-weight:800;font-size:1.1rem;color:var(--ink);margin-top:1px;}
+  .ch-ov .ch.right{background:rgba(91,140,75,.96);border-color:var(--leaf-d);} .ch-ov .ch.right .arr,.ch-ov .ch.right .mt{color:#fff;}
+  .ch-ov .ch.wrong{background:rgba(176,64,44,.96);border-color:var(--clay);} .ch-ov .ch.wrong .arr,.ch-ov .ch.wrong .mt{color:#fff;}
 
   .qcard{display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;border:2px solid var(--line-2);border-radius:18px;padding:14px;margin:4px 0 12px;}
   .qcard .qw{font-family:var(--thai);font-weight:700;font-size:1.55rem;line-height:1.6;color:var(--ink);text-align:center;}
@@ -79,10 +93,10 @@
       </div>
       <div class="maze" id="maze">
         <img id="sceneImg" alt="ฉากเขาวงกต" />
+        <div class="q-ov" id="qw">—</div>
         <div class="hudchip" id="hudchip"></div>
+        <div class="ch-ov" id="choices"></div>
       </div>
-      <div class="qcard"><div class="qw" id="qw">—</div><div class="qq">เลือกคำเติมในช่องว่างให้ถูก แล้วหนูจะเดินไปทางนั้น</div></div>
-      <div class="choices" id="choices"></div>
       <div class="feedback" id="feedback"></div>
       <div class="actions">
         <button class="btn ghost" id="restartBtn">เริ่มใหม่</button>
@@ -143,7 +157,7 @@ function loadJunction(){
     {word:cur.bad, ok:false, arrow:dir[1]},
   ];
   const box=$("choices"); box.innerHTML="";
-  shuffle(opts).forEach(o=>{
+  opts.sort((a,b)=> a.arrow==="←" ? -1 : 1).forEach(o=>{    // ← on the left, → on the right
     const b=document.createElement("button"); b.className="ch"; b.dataset.ok=o.ok;
     b.innerHTML='<span class="arr">'+o.arrow+'</span><span class="mt">'+o.word+'</span>';
     b.onclick=()=>pick(b,o); box.appendChild(b);
