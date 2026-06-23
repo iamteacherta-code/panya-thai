@@ -19,7 +19,7 @@
 
   .maze{position:relative;width:100%;max-width:600px;margin:4px auto 14px;aspect-ratio:600/380;border-radius:16px;overflow:hidden;border:3px solid #2f2a20;}
   .maze svg{position:absolute;inset:0;width:100%;height:100%;display:block;}
-  .maze .scene{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.06);transform-origin:center;transition:opacity .55s ease;}
+  .maze .scene{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.06);transform-origin:center;transition:opacity .55s ease, transform .55s ease;}
   .maze .scene.hide{opacity:0;}
   /* soft floating cards that fit the text, placed on the scene */
   .q-ov{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:2;width:max-content;max-width:84%;
@@ -85,7 +85,7 @@
   </div>
   <div class="eyebrow">Interactive · เติมคำในช่องว่าง (มาตราตัวสะกด)</div>
   <h1>เติมคำพาหนูไปกินชีส! 🐭🧀</h1>
-  <p class="sub">อ่านประโยค แล้วเลือก<b>คำเติมในช่องว่าง</b>ให้ถูก หนูจะเดินต่อในเขาวงกต · ตอบผิด<b>ถอยกลับ 1 ก้าว</b> · พาหนูเดินครบ 12 ฉากไปเจอชีสให้ได้! 🔊</p>
+  <p class="sub">อ่านประโยค แล้วเลือก<b>คำเติมในช่องว่าง</b>ให้ถูก หนูจะเดินต่อในเขาวงกต · ตอบผิด<b>ถอยกลับ 1 ก้าว</b> · พาหนูเดินครบ 18 ฉากไปเจอชีสให้ได้! 🔊</p>
 
   <div id="game">
     <div class="card">
@@ -143,23 +143,30 @@ const POOL=[
 ];
 // first-person hedge-corridor scene (viewBox 600x380), drawn original in SVG.
 // the mouse walks up the path toward the cheese, one step per correct answer.
-const VBW=600, VBH=380, STEPS=12;
+const VBW=600, VBH=380, STEPS=18;
 
 const $=id=>document.getElementById(id);
 const shuffle=a=>{a=a.slice();for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]];}return a;};
 let step=0, dead=0, cur=null, locked=false, startMs=null, QUEUE=[];
 
 // the 12 background scenes of the journey + the goal scene at the end (player art)
-const SCENES=["scene01","scene03","scene04","scene05","scene07","scene10","scene12","scene13","scene14","scene16","scene15","scene17"];
+const SCENES=["scene01","scene02","scene03","scene04","scene05","scene06","scene07","scene08","scene09","scene10","scene11","scene12","scene13","scene14","scene15","scene16","scene17","scene18"];
 const WINSCENE="scene18";
 let front="sceneA";
 function sceneFile(i){ return "images/maze/"+(SCENES[i]||WINSCENE)+".jpg"; }
-function showScene(i, instant){
+function showScene(i, instant, dir){
   $("hudchip").textContent="🐭 ก้าวที่ "+Math.min(i+1,STEPS)+"/"+STEPS;
-  if(instant){ const f=$(front), b=$(front==="sceneA"?"sceneB":"sceneA"); f.src=sceneFile(i); f.classList.remove("hide"); b.classList.add("hide"); return; }
-  const back=front==="sceneA"?"sceneB":"sceneA", bEl=$(back), fEl=$(front);
-  bEl.onload=function(){ bEl.classList.remove("hide"); fEl.classList.add("hide"); };
-  bEl.src=sceneFile(i); front=back;
+  const f=$(front), b=$(front==="sceneA"?"sceneB":"sceneA");
+  if(instant){ f.src=sceneFile(i); f.style.transition="none"; f.style.transform="scale(1.06)"; f.classList.remove("hide"); b.classList.add("hide"); b.style.transform="scale(1.06)"; void f.offsetWidth; f.style.transition=""; return; }
+  // incoming layer: reset centred + hidden (no transition for the reset)
+  b.style.transition="none"; b.style.transform="scale(1.06)"; b.classList.add("hide"); void b.offsetWidth; b.style.transition="";
+  const reveal=function(){ b.onload=null;
+    requestAnimationFrame(function(){ b.classList.remove("hide"); });          // next scene fades in at centre
+    const tx = dir==="L" ? "-66%" : dir==="R" ? "66%" : "0%";                  // current scene (with the mouse) walks off that way
+    f.style.transform="scale(1.06) translateX("+tx+")"; f.classList.add("hide");
+  };
+  b.onload=reveal; b.src=sceneFile(i); if(b.complete && b.naturalWidth>0) reveal();
+  front=(front==="sceneA"?"sceneB":"sceneA");
 }
 
 function loadJunction(){
@@ -186,7 +193,7 @@ function pick(btn,o){
     btn.classList.add("right"); GameFX.correct();
     $("qw").innerHTML=cur.a+'<b class="fill">'+cur.w+'</b>'+cur.b;       // reveal the filled sentence
     GameFX.play("audio/words/"+cur.w+".mp3", cur.w);
-    step++; showScene(step); $("stepNum").textContent=step;
+    step++; showScene(step, false, o.side); $("stepNum").textContent=step;
     if(step>=STEPS){ setTimeout(win, 900); }
     else { $("feedback").textContent="ถูกต้อง! เติม “"+cur.w+"” ("+MAATRA[cur.mt]+") — เดินต่อ!"; $("feedback").className="feedback good"; setTimeout(loadJunction, 1050); }
   } else {
@@ -194,7 +201,7 @@ function pick(btn,o){
     [...$("choices").children].forEach(c=>{ if(c.dataset.ok==="true") c.classList.add("right"); });
     dead++; $("deadCnt").textContent=dead;
     $("feedback").textContent="ตอบผิด! ต้องเติม “"+cur.w+"” · ถอยกลับ 1 ก้าว"; $("feedback").className="feedback bad";
-    setTimeout(()=>{ step=Math.max(0,step-1); showScene(step); $("stepNum").textContent=step; loadJunction(); }, 1700);
+    setTimeout(()=>{ step=Math.max(0,step-1); showScene(step, false, o.side); $("stepNum").textContent=step; loadJunction(); }, 1700);
   }
 }
 function win(){
