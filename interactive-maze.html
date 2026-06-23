@@ -19,9 +19,9 @@
 
   .maze{position:relative;width:100%;max-width:600px;margin:4px auto 14px;aspect-ratio:600/380;border-radius:16px;overflow:hidden;border:3px solid #2f2a20;}
   .maze svg{position:absolute;inset:0;width:100%;height:100%;display:block;}
-  .pin{position:absolute;transform:translate(-50%,-90%);z-index:3;font-size:22px;line-height:1;pointer-events:none;}
-  .avatar{position:absolute;transform:translate(-50%,-88%);z-index:4;font-size:38px;line-height:1;pointer-events:none;
-    transition:top .55s cubic-bezier(.4,1.1,.5,1),font-size .55s cubic-bezier(.4,1.1,.5,1);filter:drop-shadow(0 3px 2px rgba(0,0,0,.25));}
+  .maze img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.06);transform-origin:center;}
+  .hudchip{position:absolute;top:8px;left:8px;z-index:3;background:rgba(35,28,16,.62);color:#fff;font-family:var(--thai);font-weight:800;
+    font-size:.86rem;padding:5px 12px;border-radius:999px;line-height:1;}
 
   .qcard{display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;border:2px solid var(--line-2);border-radius:18px;padding:14px;margin:4px 0 12px;}
   .qcard .qw{font-family:var(--thai);font-weight:700;font-size:1.55rem;line-height:1.6;color:var(--ink);text-align:center;}
@@ -68,20 +68,18 @@
   </div>
   <div class="eyebrow">Interactive · เติมคำในช่องว่าง (มาตราตัวสะกด)</div>
   <h1>เติมคำพาหนูไปกินชีส! 🐭🧀</h1>
-  <p class="sub">อ่านประโยค แล้วเลือก<b>คำเติมในช่องว่าง</b>ให้ถูก หนูจะเดินไปทางนั้น · ตอบผิดเจอ<b>ทางตัน</b>ต้องเริ่มใหม่ · พาหนูไปถึงชีสกลางเขาวงกตให้ได้! 🔊</p>
+  <p class="sub">อ่านประโยค แล้วเลือก<b>คำเติมในช่องว่าง</b>ให้ถูก หนูจะเดินต่อในเขาวงกต · ตอบผิด<b>ถอยกลับ 1 ก้าว</b> · พาหนูเดินครบ 12 ฉากไปเจอชีสให้ได้! 🔊</p>
 
   <div id="game">
     <div class="card">
       <button class="fs-back" id="fsBack">← ออกจากเต็มจอ</button>
       <div class="hud">
         <span class="pill">🐾 ก้าวที่ <b id="stepNum">0</b> / <span id="stepTot">6</span></span>
-        <span class="pill">🧱 ทางตัน <b id="deadCnt">0</b> ครั้ง</span>
+        <span class="pill">❌ ตอบผิด <b id="deadCnt">0</b> ครั้ง</span>
       </div>
       <div class="maze" id="maze">
-        <svg id="mazeSvg" viewBox="0 0 600 380" preserveAspectRatio="xMidYMid meet"></svg>
-        <div class="pin" id="pinStart">🏁</div>
-        <div class="pin" id="pinGoal">🧀</div>
-        <div class="avatar" id="avatar">🐭</div>
+        <img id="sceneImg" alt="ฉากเขาวงกต" />
+        <div class="hudchip" id="hudchip"></div>
       </div>
       <div class="qcard"><div class="qw" id="qw">—</div><div class="qq">เลือกคำเติมในช่องว่างให้ถูก แล้วหนูจะเดินไปทางนั้น</div></div>
       <div class="choices" id="choices"></div>
@@ -131,28 +129,10 @@ const $=id=>document.getElementById(id);
 const shuffle=a=>{a=a.slice();for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]];}return a;};
 let step=0, dead=0, cur=null, locked=false, startMs=null, QUEUE=[];
 
-function buildScene(){
-  let s='';
-  s+='<rect x="0" y="0" width="600" height="380" fill="#cfe8f4"/>';                 // sky
-  s+='<rect x="0" y="150" width="600" height="230" fill="#e7decb"/>';               // distant ground
-  // hedges
-  s+='<path d="M264,68 L336,68 L330,206 L270,206 Z" fill="#5e9440"/>';               // back hedge (far wall)
-  s+='<path d="M0,58 Q80,42 150,52 Q220,60 276,206 L180,380 L0,380 Z" fill="#6fa84a"/>';   // left hedge
-  s+='<path d="M600,58 Q520,42 450,52 Q380,60 324,206 L420,380 L600,380 Z" fill="#6fa84a"/>'; // right hedge
-  s+='<path d="M180,380 L276,206 L300,206 L214,380 Z" fill="#5c8e3c" opacity="0.55"/>';      // left inner shade
-  s+='<path d="M420,380 L324,206 L300,206 L386,380 Z" fill="#5c8e3c" opacity="0.55"/>';      // right inner shade
-  // path
-  s+='<polygon points="276,206 324,206 420,380 180,380" fill="#ead9b0"/>';
-  s+='<polygon points="276,206 283,206 200,380 180,380" fill="#caa86e"/>';
-  s+='<polygon points="317,206 324,206 420,380 400,380" fill="#caa86e"/>';
-  // scattered leaf doodles on the hedges
-  const leaf=(x,y,z,rot)=>'<g transform="translate('+x.toFixed(1)+','+y.toFixed(1)+') rotate('+rot.toFixed(0)+')"><path d="M0,0 q'+(z*0.6).toFixed(1)+',-'+z+' '+z+',0 q-'+(z*0.6).toFixed(1)+','+z+' -'+z+',0 z" fill="#5f9440" stroke="#4d7a32" stroke-width="0.7"/><path d="M'+(z*0.1).toFixed(1)+',0 L'+(z*0.8).toFixed(1)+',0" stroke="#4d7a32" stroke-width="0.6"/></g>';
-  for(let i=0;i<76;i++){ const lft=Math.random()<0.5; const x= lft? 6+Math.random()*150 : 444+Math.random()*150; const y=54+Math.random()*316; s+=leaf(x,y,4+Math.random()*4,Math.random()*360); }
-  $("mazeSvg").innerHTML=s;
-}
-function mouseToStep(st){ const t=st/STEPS, y=334-(334-198)*t, sc=1-(1-0.42)*t;
-  const a=$("avatar"); a.style.left="50%"; a.style.top=(y/VBH*100)+"%"; a.style.fontSize=(40*sc).toFixed(0)+"px"; }
-function placeGoal(){ const g=$("pinGoal"); g.style.left="50%"; g.style.top=(190/VBH*100)+"%"; g.style.fontSize="22px"; $("pinStart").style.display="none"; }
+// the 12 background scenes of the journey + the goal scene at the end (player art)
+const SCENES=["scene01","scene03","scene04","scene05","scene07","scene10","scene12","scene13","scene14","scene16","scene15","scene17"];
+const WINSCENE="scene18";
+function showScene(i){ $("sceneImg").src="images/maze/"+(SCENES[i]||WINSCENE)+".jpg"; $("hudchip").textContent="🐭 ก้าวที่ "+Math.min(i+1,STEPS)+"/"+STEPS; }
 
 function loadJunction(){
   locked=false; cur=QUEUE[step];
@@ -178,28 +158,28 @@ function pick(btn,o){
     btn.classList.add("right"); GameFX.correct();
     $("qw").innerHTML=cur.a+'<b class="fill">'+cur.w+'</b>'+cur.b;       // reveal the filled sentence
     GameFX.play("audio/words/"+cur.w+".mp3", cur.w);
-    step++; mouseToStep(step); $("stepNum").textContent=step;
-    if(step>=STEPS){ setTimeout(win, 850); }
+    step++; showScene(step); $("stepNum").textContent=step;
+    if(step>=STEPS){ setTimeout(win, 900); }
     else { $("feedback").textContent="ถูกต้อง! เติม “"+cur.w+"” ("+MAATRA[cur.mt]+") — เดินต่อ!"; $("feedback").className="feedback good"; setTimeout(loadJunction, 1050); }
   } else {
     btn.classList.add("wrong"); GameFX.wrong(); GameFX.pop(card,false);
     [...$("choices").children].forEach(c=>{ if(c.dataset.ok==="true") c.classList.add("right"); });
     dead++; $("deadCnt").textContent=dead;
-    $("feedback").textContent="ทางตัน! ต้องเติม “"+cur.w+"” · กลับไปเริ่มใหม่"; $("feedback").className="feedback bad";
-    setTimeout(()=>{ step=0; mouseToStep(0); $("stepNum").textContent=0; loadJunction(); }, 1700);
+    $("feedback").textContent="ตอบผิด! ต้องเติม “"+cur.w+"” · ถอยกลับ 1 ก้าว"; $("feedback").className="feedback bad";
+    setTimeout(()=>{ step=Math.max(0,step-1); showScene(step); $("stepNum").textContent=step; loadJunction(); }, 1700);
   }
 }
 function win(){
   $("game").style.display="none"; $("win").style.display="";
-  $("winMsg").textContent = dead===0 ? "สุดยอด! พาหนูถึงชีสโดยไม่เจอทางตันเลย 👑" : ("เก่งมาก! ไปถึงชีสแล้ว (เจอทางตัน "+dead+" ครั้ง) ลองใหม่ให้ไม่ตันเลยนะ");
+  $("winMsg").textContent = dead===0 ? "สุดยอด! พาหนูออกจากเขาวงกตไปเจอชีสโดยไม่ผิดเลย 👑" : ("เก่งมาก! ออกจากเขาวงกตได้แล้ว (ตอบผิด "+dead+" ครั้ง) ลองใหม่ให้ไม่ผิดเลยนะ");
   GameFX.celebrate(); GameFX.confetti($("win"));
 }
 
 function start(){ step=0; dead=0; cur=null; startMs=Date.now(); $("deadCnt").textContent=0; $("win").style.display="none"; $("game").style.display="";
   QUEUE=shuffle(POOL).slice(0,STEPS);
-  buildScene(); placeGoal(); mouseToStep(0); loadJunction(); }
+  showScene(0); loadJunction(); }
 
-$("restartBtn").onclick=()=>{ step=0; mouseToStep(0); $("stepNum").textContent=0; loadJunction(); };
+$("restartBtn").onclick=()=>{ step=0; showScene(0); $("stepNum").textContent=0; loadJunction(); };
 $("againBtn").onclick=start;
 
 /* fullscreen + share QR */
