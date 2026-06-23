@@ -160,12 +160,19 @@ function showScene(i, instant, dir){
   if(instant){ f.src=sceneFile(i); f.style.transition="none"; f.style.transform="scale(1.06)"; f.classList.remove("hide"); b.classList.add("hide"); b.style.transform="scale(1.06)"; void f.offsetWidth; f.style.transition=""; return; }
   // incoming layer: reset centred + hidden (no transition for the reset)
   b.style.transition="none"; b.style.transform="scale(1.06)"; b.classList.add("hide"); void b.offsetWidth; b.style.transition="";
-  const reveal=function(){ b.onload=null;
-    requestAnimationFrame(function(){ b.classList.remove("hide"); });          // next scene fades in at centre
-    const tx = dir==="L" ? "-66%" : dir==="R" ? "66%" : "0%";                  // current scene (with the mouse) walks off that way
-    f.style.transform="scale(1.06) translateX("+tx+")"; f.classList.add("hide");
+  const run=function(){ b.onload=null;
+    const sgn = dir==="L" ? -1 : dir==="R" ? 1 : 0;
+    // phase 1 (~1.3s): the scene (with the mouse) walks slowly toward the chosen side — visible, not faded yet
+    f.style.transition="transform 1.3s ease-in";
+    requestAnimationFrame(function(){ f.style.transform="scale(1.06) translateX("+(sgn*42)+"%)"; });
+    // phase 2 (~0.6s): only then does the scene fade out while the next scene fades in
+    setTimeout(function(){
+      f.style.transition="opacity .6s ease, transform .6s ease";
+      f.style.transform="scale(1.06) translateX("+(sgn*82)+"%)"; f.classList.add("hide");
+      b.style.transition="opacity .6s ease"; b.classList.remove("hide");
+    }, 1300);
   };
-  b.onload=reveal; b.src=sceneFile(i); if(b.complete && b.naturalWidth>0) reveal();
+  b.onload=run; b.src=sceneFile(i); if(b.complete && b.naturalWidth>0) run();
   front=(front==="sceneA"?"sceneB":"sceneA");
 }
 
@@ -193,15 +200,18 @@ function pick(btn,o){
     btn.classList.add("right"); GameFX.correct();
     $("qw").innerHTML=cur.a+'<b class="fill">'+cur.w+'</b>'+cur.b;       // reveal the filled sentence
     GameFX.play("audio/words/"+cur.w+".mp3", cur.w);
-    step++; showScene(step, false, o.side); $("stepNum").textContent=step;
-    if(step>=STEPS){ setTimeout(win, 900); }
-    else { $("feedback").textContent="ถูกต้อง! เติม “"+cur.w+"” ("+MAATRA[cur.mt]+") — เดินต่อ!"; $("feedback").className="feedback good"; setTimeout(loadJunction, 1050); }
+    step++; $("stepNum").textContent=step;
+    $("feedback").textContent="ถูกต้อง! เติม “"+cur.w+"” ("+MAATRA[cur.mt]+") — หนูเดินต่อ…"; $("feedback").className="feedback good";
+    setTimeout(()=>showScene(step, false, o.side), 550);     // beat, then the mouse walks off slowly
+    if(step>=STEPS){ setTimeout(win, 2650); }
+    else { setTimeout(loadJunction, 2650); }
   } else {
     btn.classList.add("wrong"); GameFX.wrong(); GameFX.pop(card,false);
     [...$("choices").children].forEach(c=>{ if(c.dataset.ok==="true") c.classList.add("right"); });
     dead++; $("deadCnt").textContent=dead;
-    $("feedback").textContent="ตอบผิด! ต้องเติม “"+cur.w+"” · ถอยกลับ 1 ก้าว"; $("feedback").className="feedback bad";
-    setTimeout(()=>{ step=Math.max(0,step-1); showScene(step, false, o.side); $("stepNum").textContent=step; loadJunction(); }, 1700);
+    $("feedback").textContent="ตอบผิด! ต้องเติม “"+cur.w+"” · หนูถอยกลับ 1 ก้าว"; $("feedback").className="feedback bad";
+    setTimeout(()=>{ step=Math.max(0,step-1); $("stepNum").textContent=step; showScene(step, false, o.side); }, 900);
+    setTimeout(loadJunction, 3150);
   }
 }
 function win(){
