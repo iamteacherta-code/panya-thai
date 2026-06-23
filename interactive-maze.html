@@ -19,23 +19,26 @@
 
   .maze{position:relative;width:100%;max-width:600px;margin:4px auto 14px;aspect-ratio:600/380;border-radius:16px;overflow:hidden;border:3px solid #2f2a20;}
   .maze svg{position:absolute;inset:0;width:100%;height:100%;display:block;}
-  .maze img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.06);transform-origin:center;}
-  /* question + answers overlaid inside the scene frame (saves space below) */
-  .q-ov{position:absolute;top:8px;left:8px;right:8px;z-index:2;background:rgba(255,255,255,.93);border:2px solid var(--line-2);
-    border-radius:13px;padding:9px 54px;text-align:center;font-family:var(--thai);font-weight:700;font-size:1.12rem;line-height:1.45;
-    color:var(--ink);box-shadow:0 2px 9px rgba(0,0,0,.22);}
-  .q-ov .blank{display:inline-block;min-width:50px;border-bottom:3px solid var(--earth);margin:0 4px;vertical-align:-2px;}
+  .maze .scene{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.06);transform-origin:center;transition:opacity .55s ease;}
+  .maze .scene.hide{opacity:0;}
+  /* soft floating cards that fit the text, placed on the scene */
+  .q-ov{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:2;width:max-content;max-width:84%;
+    background:rgba(255,255,255,.95);border:2.5px solid #abc9de;border-radius:22px;padding:8px 20px;text-align:center;
+    font-family:var(--thai);font-weight:700;font-size:1.12rem;line-height:1.45;color:var(--ink);box-shadow:0 5px 16px rgba(28,52,78,.26);}
+  .q-ov .blank{display:inline-block;min-width:46px;border-bottom:3px solid var(--earth);margin:0 4px;vertical-align:-2px;}
   .q-ov .fill{color:var(--leaf-d);font-weight:800;border-bottom:3px solid var(--leaf);padding:0 3px;}
-  .hudchip{position:absolute;top:13px;left:13px;z-index:3;background:var(--earth);color:#fff;font-family:var(--thai);font-weight:800;
-    font-size:.74rem;padding:5px 10px;border-radius:999px;line-height:1;box-shadow:0 1px 4px rgba(0,0,0,.3);}
-  .ch-ov{position:absolute;left:0;right:0;bottom:10px;z-index:2;display:flex;justify-content:space-between;gap:10px;padding:0 14px;pointer-events:none;}
-  .ch-ov .ch{pointer-events:auto;flex:0 1 44%;min-width:0;background:rgba(255,255,255,.93);border:2px solid var(--line-2);border-radius:14px;
-    padding:7px 6px;cursor:pointer;text-align:center;box-shadow:0 2px 9px rgba(0,0,0,.22);transition:transform .07s,background .12s;}
-  .ch-ov .ch:active{transform:translateY(2px);}
-  .ch-ov .ch .arr{display:block;font-size:1.35rem;line-height:1;color:var(--earth-d);font-weight:800;}
-  .ch-ov .ch .mt{display:block;font-family:var(--thai);font-weight:800;font-size:1.1rem;color:var(--ink);margin-top:1px;}
-  .ch-ov .ch.right{background:rgba(91,140,75,.96);border-color:var(--leaf-d);} .ch-ov .ch.right .arr,.ch-ov .ch.right .mt{color:#fff;}
-  .ch-ov .ch.wrong{background:rgba(176,64,44,.96);border-color:var(--clay);} .ch-ov .ch.wrong .arr,.ch-ov .ch.wrong .mt{color:#fff;}
+  .hudchip{position:absolute;top:12px;left:12px;z-index:3;background:rgba(54,84,64,.78);color:#fff;font-family:var(--thai);font-weight:800;
+    font-size:.74rem;padding:5px 11px;border-radius:999px;line-height:1;}
+  .ch-ov{position:absolute;inset:0;z-index:2;pointer-events:none;}
+  .ch-ov .ch{position:absolute;pointer-events:auto;background:rgba(255,255,255,.95);border:2.5px solid #abc9de;border-radius:18px;
+    padding:7px 18px;cursor:pointer;text-align:center;box-shadow:0 5px 14px rgba(28,52,78,.26);transition:transform .08s,background .15s,box-shadow .15s;}
+  .ch-ov .ch:hover{box-shadow:0 8px 20px rgba(28,52,78,.34);} .ch-ov .ch:active{transform:translateY(2px);}
+  .ch-ov .ch:first-child{left:5%;bottom:21%;}
+  .ch-ov .ch:last-child{right:5%;bottom:6%;}
+  .ch-ov .ch .mt{display:block;font-family:var(--thai);font-weight:800;font-size:1.2rem;color:var(--ink);line-height:1.1;}
+  .ch-ov .ch .side{display:block;font-family:var(--thai);font-size:.74rem;color:var(--ink-3);font-weight:700;margin-top:1px;}
+  .ch-ov .ch.right{background:rgba(91,140,75,.96);border-color:var(--leaf-d);} .ch-ov .ch.right .mt,.ch-ov .ch.right .side{color:#fff;}
+  .ch-ov .ch.wrong{background:rgba(176,64,44,.96);border-color:#9a3a28;} .ch-ov .ch.wrong .mt,.ch-ov .ch.wrong .side{color:#fff;}
 
   .qcard{display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;border:2px solid var(--line-2);border-radius:18px;padding:14px;margin:4px 0 12px;}
   .qcard .qw{font-family:var(--thai);font-weight:700;font-size:1.55rem;line-height:1.6;color:var(--ink);text-align:center;}
@@ -92,7 +95,8 @@
         <span class="pill">❌ ตอบผิด <b id="deadCnt">0</b> ครั้ง</span>
       </div>
       <div class="maze" id="maze">
-        <img id="sceneImg" alt="ฉากเขาวงกต" />
+        <img id="sceneA" class="scene" alt="" />
+        <img id="sceneB" class="scene hide" alt="" />
         <div class="q-ov" id="qw">—</div>
         <div class="hudchip" id="hudchip"></div>
         <div class="ch-ov" id="choices"></div>
@@ -134,6 +138,8 @@ const POOL=[
   {a:"เรานอนบน",    b:"นุ่มๆ",           w:"เตียง", bad:"ไฟ",  mt:"g"},
   {a:"ลูก",         b:"กลมๆ เด้งได้",     w:"บอล",  bad:"นม",  mt:"n"},
   {a:"หนูชอบแทะ",   b:"อร่อยๆ",          w:"ขนม",  bad:"หิน", mt:"m"},
+  {a:"เด็กไป",      b:"ที่โรงเรียน",       w:"เรียน", bad:"นอน", mt:"n"},
+  {a:"นกเกาะอยู่บน", b:"ของต้นไม้",        w:"กิ่ง",  bad:"รถ",  mt:"g"},
 ];
 // first-person hedge-corridor scene (viewBox 600x380), drawn original in SVG.
 // the mouse walks up the path toward the cheese, one step per correct answer.
@@ -146,20 +152,28 @@ let step=0, dead=0, cur=null, locked=false, startMs=null, QUEUE=[];
 // the 12 background scenes of the journey + the goal scene at the end (player art)
 const SCENES=["scene01","scene03","scene04","scene05","scene07","scene10","scene12","scene13","scene14","scene16","scene15","scene17"];
 const WINSCENE="scene18";
-function showScene(i){ $("sceneImg").src="images/maze/"+(SCENES[i]||WINSCENE)+".jpg"; $("hudchip").textContent="🐭 ก้าวที่ "+Math.min(i+1,STEPS)+"/"+STEPS; }
+let front="sceneA";
+function sceneFile(i){ return "images/maze/"+(SCENES[i]||WINSCENE)+".jpg"; }
+function showScene(i, instant){
+  $("hudchip").textContent="🐭 ก้าวที่ "+Math.min(i+1,STEPS)+"/"+STEPS;
+  if(instant){ const f=$(front), b=$(front==="sceneA"?"sceneB":"sceneA"); f.src=sceneFile(i); f.classList.remove("hide"); b.classList.add("hide"); return; }
+  const back=front==="sceneA"?"sceneB":"sceneA", bEl=$(back), fEl=$(front);
+  bEl.onload=function(){ bEl.classList.remove("hide"); fEl.classList.add("hide"); };
+  bEl.src=sceneFile(i); front=back;
+}
 
 function loadJunction(){
   locked=false; cur=QUEUE[step];
   $("qw").innerHTML=cur.a+'<span class="blank">＿＿</span>'+cur.b;        // sentence with a blank
-  const dir=shuffle(["←","→"]);
+  const side=shuffle(["L","R"]);
   const opts=[
-    {word:cur.w,   ok:true,  arrow:dir[0]},
-    {word:cur.bad, ok:false, arrow:dir[1]},
+    {word:cur.w,   ok:true,  side:side[0]},
+    {word:cur.bad, ok:false, side:side[1]},
   ];
   const box=$("choices"); box.innerHTML="";
-  opts.sort((a,b)=> a.arrow==="←" ? -1 : 1).forEach(o=>{    // ← on the left, → on the right
+  opts.sort((a,b)=> a.side==="L" ? -1 : 1).forEach(o=>{    // L = card on the left, R = card on the right
     const b=document.createElement("button"); b.className="ch"; b.dataset.ok=o.ok;
-    b.innerHTML='<span class="arr">'+o.arrow+'</span><span class="mt">'+o.word+'</span>';
+    b.innerHTML='<span class="mt">'+o.word+'</span><span class="side">'+(o.side==="L"?"ไปทางซ้าย":"ไปทางขวา")+'</span>';
     b.onclick=()=>pick(b,o); box.appendChild(b);
   });
   $("feedback").textContent=""; $("feedback").className="feedback";
@@ -191,9 +205,9 @@ function win(){
 
 function start(){ step=0; dead=0; cur=null; startMs=Date.now(); $("deadCnt").textContent=0; $("win").style.display="none"; $("game").style.display="";
   QUEUE=shuffle(POOL).slice(0,STEPS);
-  showScene(0); loadJunction(); }
+  showScene(0,true); loadJunction(); }
 
-$("restartBtn").onclick=()=>{ step=0; showScene(0); $("stepNum").textContent=0; loadJunction(); };
+$("restartBtn").onclick=()=>{ step=0; showScene(0,true); $("stepNum").textContent=0; loadJunction(); };
 $("againBtn").onclick=start;
 
 /* fullscreen + share QR */
