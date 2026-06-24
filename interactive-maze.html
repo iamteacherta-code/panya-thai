@@ -172,10 +172,10 @@ function walkMouse(dir){
     i++;
     if(i>=MFRAMES){ clearInterval(walkTimer); walkTimer=null; showFrame(MFRAMES-1); return; }
     showFrame(i);                 // play: face player → turn → back → walk
-    if(i===16){                   // it has turned its back — now walk off down the path: drift to the side, up, shrink + fade
-      m.style.transition="left 1s ease-in, bottom 1s ease-in, transform 1s ease-in, opacity 1s ease-in";
-      m.style.left=(50+sgn*26)+"%"; m.style.bottom="34%";
-      m.style.transform="translateX(-50%) scaleX("+face+") scale(.34)"; m.style.opacity="0";
+    if(i===13){                   // as it turns its back, start walking off early so the floor-heavy frames stay small + fading
+      m.style.transition="left 1s ease-in, bottom 1s ease-in, transform 1s ease-in, opacity .9s ease-in";
+      m.style.left=(50+sgn*26)+"%"; m.style.bottom="36%";
+      m.style.transform="translateX(-50%) scaleX("+face+") scale(.28)"; m.style.opacity="0";
     }
   }, 63);
 }
