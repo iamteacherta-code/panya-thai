@@ -21,11 +21,10 @@
   .maze svg{position:absolute;inset:0;width:100%;height:100%;display:block;}
   .maze .scene{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.06);transform-origin:center;transition:opacity 1s ease;z-index:0;}
   .maze .scene.hide{opacity:0;}
-  .walker{position:absolute;left:50%;bottom:1%;width:13%;max-width:66px;z-index:1;opacity:0;pointer-events:none;
-    transform:translateX(-50%);filter:drop-shadow(0 3px 3px rgba(0,0,0,.3));}
-  .walker svg{display:block;width:100%;height:auto;}
-  .walker.step svg{animation:walkbob .28s linear infinite;}
-  @keyframes walkbob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-3px) rotate(3deg)}}
+  .walker{position:absolute;left:50%;bottom:-4%;width:25%;max-width:138px;z-index:1;opacity:1;pointer-events:none;transform:translateX(-50%);}
+  .walker img{display:block;width:100%;height:auto;filter:drop-shadow(0 5px 4px rgba(0,0,0,.32));}
+  .walker.step img{animation:walkbob .26s linear infinite;}
+  @keyframes walkbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
   /* soft floating cards that fit the text, placed on the scene */
   .q-ov{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:2;width:max-content;max-width:84%;
     background:rgba(255,255,255,.95);border:2.5px solid #abc9de;border-radius:22px;padding:8px 20px;text-align:center;
@@ -102,7 +101,7 @@
       <div class="maze" id="maze">
         <img id="sceneA" class="scene" alt="" />
         <img id="sceneB" class="scene hide" alt="" />
-        <div class="walker" id="walker"><svg viewBox="0 0 60 72" xmlns="http://www.w3.org/2000/svg"><path d="M30 70 q15 5 19 -3" fill="none" stroke="#b58e84" stroke-width="3" stroke-linecap="round"/><ellipse cx="30" cy="45" rx="20" ry="25" fill="#6f655a" stroke="#4a4239" stroke-width="2"/><circle cx="16" cy="20" r="11" fill="#6f655a" stroke="#4a4239" stroke-width="2"/><circle cx="44" cy="20" r="11" fill="#6f655a" stroke="#4a4239" stroke-width="2"/><circle cx="16" cy="20" r="5" fill="#c89e96"/><circle cx="44" cy="20" r="5" fill="#c89e96"/><path d="M22 64 l-3 7 M38 64 l3 7" stroke="#c89e96" stroke-width="3" stroke-linecap="round"/></svg></div>
+        <div class="walker" id="walker"><img src="images/maze/mouse.png" alt="" /></div>
         <div class="q-ov" id="qw">—</div>
         <div class="hudchip" id="hudchip"></div>
         <div class="ch-ov" id="choices"></div>
@@ -157,17 +156,19 @@ let step=0, dead=0, cur=null, locked=false, startMs=null, QUEUE=[];
 
 // the 12 background scenes of the journey + the goal scene at the end (player art)
 const SCENES=["scene01","scene02","scene03","scene04","scene05","scene06","scene07","scene08","scene09","scene10","scene11","scene12","scene13","scene14","scene15","scene16","scene17","scene18"];
-const WINSCENE="scene18";
+const WINSCENE="scene20";
 let front="sceneA";
 function sceneFile(i){ return "images/maze/"+(SCENES[i]||WINSCENE)+".jpg"; }
 // the overlay mouse walks off toward the chosen side (the next scene shows it back at the start)
-function walkMouse(dir){
+function walkMouse(dir){    // mouse turns to face the chosen side, then walks off
   const m=$("walker"), sgn=dir==="L"?-1:dir==="R"?1:0;
-  m.style.transition="none"; m.style.left="50%"; m.style.opacity="0"; m.style.transform="translateX(-50%) scale(1)"; void m.offsetWidth;
   m.classList.add("step");
-  m.style.transition="opacity .3s ease, left 1.25s ease-in, transform 1.25s ease-in";
-  requestAnimationFrame(function(){ m.style.opacity="1"; m.style.left=(50+sgn*58)+"%"; m.style.transform="translateX(-50%) scale(.55)"; });
+  m.style.transition="opacity .3s ease, left 1.2s ease-in, transform 1.2s ease-in";
+  requestAnimationFrame(function(){ m.style.left=(50+sgn*55)+"%"; m.style.transform="translateX(-50%) scaleX("+sgn+") scale(.62)"; });
   setTimeout(function(){ m.style.transition="opacity .35s ease"; m.style.opacity="0"; m.classList.remove("step"); }, 1250);
+}
+function resetMouse(){     // mouse back at the start of the new scene, facing forward
+  const m=$("walker"); m.style.transition="none"; m.style.left="50%"; m.style.transform="translateX(-50%) scaleX(1) scale(1)"; m.style.opacity="1"; m.classList.remove("step"); void m.offsetWidth; m.style.transition="";
 }
 function showScene(i, instant, dir){
   $("hudchip").textContent="🐭 ก้าวที่ "+Math.min(i+1,STEPS)+"/"+STEPS;
@@ -184,7 +185,7 @@ function showScene(i, instant, dir){
 }
 
 function loadJunction(){
-  locked=false; cur=QUEUE[step];
+  locked=false; cur=QUEUE[step]; resetMouse();
   $("qw").innerHTML=cur.a+'<span class="blank">＿＿</span>'+cur.b;        // sentence with a blank
   const side=shuffle(["L","R"]);
   const opts=[
