@@ -340,7 +340,7 @@
   }
   function buildLevelMap(){
     const box=document.createElement('div');box.className='levelmap';
-    let h='<div class="lm-h">🧭 ตารางเทียบระดับ ↔ ชั้น<small>Levels &amp; grade bands — แตะแถวเพื่อกรองระดับนั้น</small></div>';
+    let h='<div class="lm-h">🧭 ตารางเทียบระดับ ↔ ชั้น<small>Levels &amp; year bands — แตะแถวเพื่อกรองระดับนั้น</small></div>';
     LEVELS.forEach(lv=>{
       const us=UNITS.filter(u=>u.level===lv.id);
       const cnt=us.reduce((n,u)=>n+lessonsByUnit[u.id].length,0);
