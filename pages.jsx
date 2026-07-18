@@ -399,7 +399,7 @@ const GAMES = [
   { en: "เลือกสระให้ถูก", th: "Y1 · สระพิเศษ & สระสั้น ไ ใ -ำ เ-า -ิ -ี -ุ (ตอบทันที)", level: "beginner", file: "interactive-vowel-pick.html" },
   { en: "มาตราตัวสะกด", th: "Y1 · แยกคำเข้ามาตรา กง/กน/กม/เกย/เกอว (ตอบทันที)", level: "beginner", file: "interactive-final-sort.html" },
   { en: "ตัวสะกดไม่ตรงมาตรา", th: "Y2 · แยกคำเข้ามาตรา กก/กด/กบ — ตัวสะกดไม่ตรงรูป (ตอบทันที + จับเวลา)", level: "intermediate", file: "interactive-dead-finals.html" },
-  { en: "เติมวรรณยุกต์", th: "Y2 · ดูภาพ แตะลูกโป่งวรรณยุกต์ ่ ้ ๊ ๋ ให้เป็นคำที่ถูก 🎈 (ตอบทันที)", level: "intermediate", file: "interactive-tone-mark.html" },
+  { en: "เติมวรรณยุกต์", th: "Y2 · ดูภาพ แตะลูกโป่งวรรณยุกต์ -่ -้ -๊ -๋ ให้เป็นคำที่ถูก 🎈 (ตอบทันที)", level: "intermediate", file: "interactive-tone-mark.html" },
   { en: "ผันเสียงไตรยางศ์", th: "Y2 · อ่านเสียงวรรณยุกต์ สามัญ/เอก/โท/ตรี/จัตวา (ท้าทาย)", level: "intermediate", file: "interactive-tone-rules.html" },
   { en: "Word Builder", th: "สร้างคำตามเป้าหมาย — ประสมอักษรแข่งเวลา มีเสียง 🔊 (ตอบทันที)", level: "intermediate", file: "interactive-word-builder.html" },
   { en: "Word Map", th: "ลากคำศัพท์วางในช่องให้ตรงมาตรา — 5 ด่าน ลากวาง มีเสียง 🔊", level: "advanced", file: "interactive-mindmap.html" },
