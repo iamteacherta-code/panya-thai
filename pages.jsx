@@ -159,22 +159,6 @@ function HomePage({ go }) {
         ))}
       </div>
 
-      <div className="page-head" style={{ marginBottom: 16, marginTop: 34 }}>
-        <span className="eyebrow">Resources · คลังบทเรียน</span>
-        <h2 className="page-title" style={{ fontSize: 24, marginTop: 6 }}>Lessons &amp; materials <span className="th">· สื่อการสอน</span></h2>
-      </div>
-      <div className="tool-grid">
-        {RESOURCES.map((t) => (
-          <button key={t.id} className="tool-card" onClick={() => go(t.id)}>
-            <span className="tool-ico" style={{ background: t.color }}><Ico name={t.icon} /></span>
-            <span className="t-en">{t.en}</span>
-            <span className="t-th">{t.th}</span>
-            <span className="t-desc">{t.desc}</span>
-            <span className="t-go">Open <Ico name="arrow" /></span>
-          </button>
-        ))}
-      </div>
-
       {/* แอปพี่น้อง — อยู่คนละเว็บ จึงแยกเป็นแถบของตัวเอง ไม่ปนกับการ์ดเครื่องมือด้านบน */}
       <a className="sister-app" href={window.CURRICULUM_APP_URL} target="_blank" rel="noopener">
         <span className="sa-ico"><Ico name="lesson" /></span>
@@ -194,6 +178,22 @@ function HomePage({ go }) {
         </span>
         <span className="sa-go">เปิด <Ico name="arrow" /></span>
       </a>
+
+      <div className="page-head" style={{ marginBottom: 16, marginTop: 34 }}>
+        <span className="eyebrow">Resources · คลังบทเรียน</span>
+        <h2 className="page-title" style={{ fontSize: 24, marginTop: 6 }}>Lessons &amp; materials <span className="th">· สื่อการสอน</span></h2>
+      </div>
+      <div className="tool-grid">
+        {RESOURCES.map((t) => (
+          <button key={t.id} className="tool-card" onClick={() => go(t.id)}>
+            <span className="tool-ico" style={{ background: t.color }}><Ico name={t.icon} /></span>
+            <span className="t-en">{t.en}</span>
+            <span className="t-th">{t.th}</span>
+            <span className="t-desc">{t.desc}</span>
+            <span className="t-go">Open <Ico name="arrow" /></span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
