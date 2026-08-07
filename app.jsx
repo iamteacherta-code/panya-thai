@@ -102,6 +102,12 @@ function NavBar({ page, go }) {
             <Ico name="reading" />
             <span>Curriculum</span>
           </a>
+          {/* แอปพี่น้อง (คนละเว็บ) — ที่อยู่ตั้งไว้ที่ต้นไฟล์ pages.jsx */}
+          <a className="nav-btn" href={window.CURRICULUM_APP_URL} target="_blank" rel="noopener"
+             title="หลักสูตรและแผนการสอน · เก็บคะแนนและรายงานผล (เปิดในแท็บใหม่)">
+            <Ico name="lesson" />
+            <span>Lesson Plans</span>
+          </a>
         </nav>
       </div>
     </header>

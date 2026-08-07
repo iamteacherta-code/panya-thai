@@ -2,6 +2,18 @@
 const Icons = window.Icons;
 const Placeholder = window.Placeholder;
 
+// ============================================================
+//  ★ ที่อยู่ของแอป "หลักสูตรและแผนการสอนภาษาไทย" (คนละเว็บกับ Panya Thai)
+//
+//  ตอนนี้ตั้งเป็นเครื่องตัวเอง — ใช้ได้เมื่อรัน `node serve.js`
+//  ในโฟลเดอร์ THAI CURRICULUM AND LESSON PLAN อยู่เท่านั้น
+//
+//  เมื่อ deploy ขึ้นเว็บจริงแล้ว ให้แก้แค่บรรทัดข้างล่างบรรทัดเดียว
+//  เป็นที่อยู่จริง เช่น "https://panyaden-thai-curriculum.web.app/"
+//  แล้วปุ่มทุกที่ในเว็บนี้จะชี้ไปที่ใหม่เองทั้งหมด
+// ============================================================
+window.CURRICULUM_APP_URL = "http://localhost:8090/";
+
 const DIGITAL_APPS = [
   { id: "mat", en: "Word Work Mat", th: "แผ่นฝึกคำ", icon: "activity", color: "var(--earth)", desc: "Build C+V and C+V+C words at the Beginner level (K2–Y2) — consonants, vowels, finals and tones." },
   { id: "board", en: "Blending Board", th: "กระดานประสมคำ", icon: "board", color: "var(--leaf)", desc: "Slide consonants, vowels and tones to blend syllables live — the UFLI blending drill." },
@@ -162,6 +174,26 @@ function HomePage({ go }) {
           </button>
         ))}
       </div>
+
+      {/* แอปพี่น้อง — อยู่คนละเว็บ จึงแยกเป็นแถบของตัวเอง ไม่ปนกับการ์ดเครื่องมือด้านบน */}
+      <a className="sister-app" href={window.CURRICULUM_APP_URL} target="_blank" rel="noopener">
+        <span className="sa-ico"><Ico name="lesson" /></span>
+        <span className="sa-copy">
+          <b>Curriculum &amp; Lesson Plans</b>
+          <span className="sa-th">หลักสูตรและแผนการสอนภาษาไทย · K2–Y6</span>
+          <span className="sa-desc">
+            กรอบหลักสูตร IB + UFLI, แม่แบบแผนการสอนรายสัปดาห์ และระบบเก็บคะแนนพร้อมรายงานผลรายบุคคล
+          </span>
+          {/* เตือนเฉพาะตอนที่ยังชี้ไปเครื่องตัวเอง — พอแก้เป็นที่อยู่จริงแล้วบรรทัดนี้จะหายเอง */}
+          {/localhost|127\.0\.0\.1/.test(window.CURRICULUM_APP_URL) && (
+            <span className="sa-hint">
+              ยังใช้ได้เฉพาะบนเครื่องนี้ — ต้องเปิดโปรแกรมของแอปนั้นไว้ก่อน
+              (รัน <code>node serve.js</code> ในโฟลเดอร์ THAI CURRICULUM AND LESSON PLAN)
+            </span>
+          )}
+        </span>
+        <span className="sa-go">เปิด <Ico name="arrow" /></span>
+      </a>
     </div>
   );
 }
