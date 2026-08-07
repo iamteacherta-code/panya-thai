@@ -12,7 +12,7 @@ const Placeholder = window.Placeholder;
 //  เป็นที่อยู่จริง เช่น "https://panyaden-thai-curriculum.web.app/"
 //  แล้วปุ่มทุกที่ในเว็บนี้จะชี้ไปที่ใหม่เองทั้งหมด
 // ============================================================
-window.CURRICULUM_APP_URL = "http://localhost:8090/";
+window.CURRICULUM_APP_URL = "http://localhost:8095/";
 
 const DIGITAL_APPS = [
   { id: "mat", en: "Word Work Mat", th: "แผ่นฝึกคำ", icon: "activity", color: "var(--earth)", desc: "Build C+V and C+V+C words at the Beginner level (K2–Y2) — consonants, vowels, finals and tones." },
