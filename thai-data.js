@@ -298,16 +298,15 @@
   function finalTemplate(f) {
     return f.ch ? DOT + f.ch : DOT;
   }
-  // Bare glyphs (no dotted-circle placeholder) for clean tile display.
-  // Combining marks need *something* to sit on, so we use a non-breaking
-  // space (invisible) as a neutral stand-in for the consonant slot —
-  // no circle, no dash, just the mark in its natural position.
+  // Glyphs for tile / slot display. Every standalone vowel or tone mark gets a
+  // dash "-" as the consonant slot, so above/below marks have a base to sit on
+  // and the position reads clearly (-ี, -ู, เ-, แ-, -่) — matching the dash
+  // notation used across the lessons and curriculum.
   function vowelBare(v) {
-    const carrier = v.above ? "\u00A0" : "";
-    return v.before + carrier + v.above + v.after;
+    return v.before + "-" + v.above + v.after;   // dash = consonant slot (-\u0E35, \u0E40-, -\u0E32)
   }
   function toneBare(t) {
-    return t.mark ? "\u00A0" + t.mark : "";
+    return t.mark ? "-" + t.mark : "";           // dash slot for the tone mark (-\u0E48)
   }
   // Short vowels that LOSE or CHANGE their written form when a final consonant
   // is added (สระลดรูป / สระเปลี่ยนรูป). Keyed by vowel id; values override the
