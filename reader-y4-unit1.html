@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · หนังสือเรียน Y4 หน่วยที่ 1 — ชุมชนและบทบาทหน้าที่</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="activity-base.css" />
+<style>
+  /* ---------- โครงหน้าเฉพาะของหนังสือเรียนเล่มนี้ ---------- */
+  .sheet{ padding:14mm 13mm 11mm; }
+  .bk-head{display:flex;align-items:flex-start;gap:14px;padding-bottom:9px;border-bottom:2px solid var(--leaf-l);margin-bottom:12px;}
+  .bk-head .wk{flex:none;width:52px;height:52px;border-radius:14px;background:var(--leaf);color:#fff;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;
+    box-shadow:inset 0 -3px 0 rgba(0,0,0,.15);}
+  .bk-head .wk small{font-size:9px;letter-spacing:.1em;opacity:.85;}
+  .bk-head .wk b{font-size:24px;font-family:var(--font-thai);}
+  .bk-head .ttl{flex:1;}
+  .bk-head .ttl .kicker{font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--earth-d);}
+  .bk-head .ttl h2{margin:3px 0 1px;font-family:var(--font-thai);font-size:25px;font-weight:700;letter-spacing:-.01em;}
+  .bk-head .ttl .sub{font-family:var(--font-thai);font-size:15px;color:var(--ink-3);}
+  .bk-head .pg{flex:none;font-size:11px;color:var(--ink-3);font-weight:700;}
+
+  .hero{border:1.6px solid var(--line);border-radius:16px;background:var(--surface);padding:8px 8px 4px;}
+  .hero svg{width:100%;height:auto;display:block;}
+  .hero .cap{font-family:var(--font-thai);font-size:13px;color:var(--ink-3);text-align:center;padding:4px 6px 6px;}
+
+  .facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+  .fact{border:1.5px solid var(--line);border-radius:12px;background:#fff;padding:8px 12px;}
+  .fact .fl{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--earth-d);}
+  .fact .fv{font-family:var(--font-thai);font-size:14.5px;color:var(--ink-2);line-height:1.55;margin-top:2px;}
+  .fact.wide{grid-column:1 / -1;}
+
+  .bank{margin-top:12px;border:1.6px solid var(--line);border-radius:14px;background:var(--leaf-l);padding:10px 14px 12px;}
+  .bank .bh{font-family:var(--font-thai);font-weight:700;font-size:14px;color:var(--leaf-d);margin-bottom:7px;}
+  .bank .words{display:flex;flex-wrap:wrap;gap:6px;}
+  .bank .w{font-family:var(--font-thai);font-size:16px;background:#fff;border:1.4px solid var(--line-2);
+    border-radius:999px;padding:3px 12px;color:var(--ink);}
+  .bank .w.h{background:#fff3f1;border-color:#e6b7ad;color:#8c3b2c;}
+  .bank .w.h::after{content:" ♥";font-size:11px;color:#c05a45;}
+
+  /* ---------- เนื้อเรื่อง ---------- */
+  .ep{margin-bottom:13px;break-inside:avoid;}
+  .ep .eh{display:flex;align-items:baseline;gap:9px;margin-bottom:4px;}
+  .ep .eh .no{flex:none;font-size:11px;font-weight:800;letter-spacing:.08em;color:#fff;background:var(--earth);
+    border-radius:999px;padding:2px 10px;}
+  .ep .eh h3{margin:0;font-family:var(--font-thai);font-size:19px;font-weight:700;color:var(--ink);}
+  .ep p{margin:0 0 5px;font-family:var(--font-thai);font-size:20px;line-height:1.92;color:var(--ink);text-indent:0;}
+  .vc{color:var(--leaf-d);font-weight:700;border-bottom:2px solid #bcd3a8;}
+  .hw{color:#8c3b2c;font-weight:700;background:#fdeeea;border-radius:5px;padding:0 3px;}
+  .hw::after{content:"♥";font-size:.62em;vertical-align:super;margin-left:1px;color:#c05a45;}
+  .legend{font-family:var(--font-thai);font-size:12px;color:var(--ink-3);margin-top:auto;padding-top:8px;border-top:1px dashed var(--line-2);}
+
+  /* ---------- คำถาม ---------- */
+  .qgrp{margin-bottom:12px;}
+  .qgrp .gh{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+  .qgrp .gh .chip{font-size:11px;font-weight:800;padding:3px 11px;border-radius:999px;background:var(--earth-l);color:var(--earth-d);}
+  .qgrp .gh .gt{font-family:var(--font-thai);font-size:13px;color:var(--ink-3);}
+  .qi{display:flex;gap:9px;margin-bottom:9px;break-inside:avoid;}
+  .qi .n{flex:none;width:23px;height:23px;border-radius:7px;background:var(--leaf-l);color:var(--leaf-d);
+    font-weight:800;font-size:12.5px;display:grid;place-items:center;margin-top:2px;}
+  .qi .qb{flex:1;}
+  .qi .qt{font-family:var(--font-thai);font-size:17.5px;line-height:1.6;}
+  .qi .ln{border-bottom:1.8px dotted var(--line-2);height:24px;margin-top:3px;}
+  .qi .ln + .ln{margin-top:0;}
+
+  /* ---------- ถอดบทเรียน ---------- */
+  .think{border:1.8px solid var(--leaf);border-radius:16px;background:var(--leaf-l);padding:11px 15px 13px;margin-bottom:12px;}
+  .think .th-h{font-family:var(--font-thai);font-size:17px;font-weight:700;color:var(--leaf-d);}
+  .think .th-v{font-family:var(--font-thai);font-size:13px;color:var(--ink-3);margin-top:1px;}
+  .chain{display:flex;flex-direction:column;gap:7px;margin-top:10px;}
+  .chain .st{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:7px 12px;}
+  .chain .st .sl{font-family:var(--font-thai);font-size:13px;font-weight:700;color:var(--earth-d);}
+  .chain .st .sh{font-family:var(--font-thai);font-size:16px;color:var(--ink-3);margin-top:2px;}
+  .chain .arw{text-align:center;color:var(--leaf);font-size:15px;line-height:.6;}
+  .fo{border:1.6px solid var(--line);border-radius:14px;background:#fff;padding:10px 14px 12px;margin-bottom:11px;}
+  .fo .fh{font-family:var(--font-thai);font-size:14.5px;font-weight:700;color:var(--earth-d);margin-bottom:7px;}
+  .fo .fi{display:flex;gap:9px;align-items:center;margin-bottom:7px;font-family:var(--font-thai);font-size:17px;}
+  .fo .fi .box{flex:none;width:30px;height:26px;border:1.6px solid var(--line-2);border-radius:7px;background:var(--surface);}
+  .deep{border-left:5px solid var(--earth);background:var(--earth-l);border-radius:0 12px 12px 0;padding:9px 14px;
+    font-family:var(--font-thai);font-size:16.5px;line-height:1.7;color:var(--ink-2);}
+
+  /* ---------- ใบงาน 15 นาที ---------- */
+  .ws{border:1.8px solid var(--line);border-radius:16px;background:#fff;padding:11px 15px 14px;margin-bottom:12px;
+      display:flex;flex-direction:column;break-inside:avoid;}
+  .ws .wh{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:5px;}
+  .ws .wh .day{font-size:12px;font-weight:800;padding:3px 12px;border-radius:999px;background:var(--leaf);color:#fff;
+    font-family:var(--font-thai);}
+  .ws .wh h4{margin:0;font-family:var(--font-thai);font-size:18px;font-weight:700;}
+  .ws .wh .min{margin-left:auto;font-size:11px;font-weight:800;color:var(--earth-d);background:var(--earth-l);
+    border-radius:999px;padding:3px 10px;}
+  .ws .wi{font-family:var(--font-thai);font-size:14.5px;color:var(--ink-2);line-height:1.6;margin-bottom:8px;}
+  .ws .wnote{font-family:var(--font-thai);font-size:14px;color:var(--earth-d);background:var(--earth-l);
+    border-radius:9px;padding:5px 10px;margin-bottom:8px;}
+  .wtable{width:100%;border-collapse:collapse;font-family:var(--font-thai);}
+  .wtable th,.wtable td{border:1.5px solid var(--line);padding:6px 10px;font-size:16px;}
+  .wtable th{background:var(--leaf-l);color:var(--leaf-d);font-weight:700;font-size:14px;text-align:left;}
+  .wtable td{height:31px;}
+  .wtable td.seed{background:var(--surface);font-weight:600;width:38%;}
+  .wlist{display:flex;flex-direction:column;gap:8px;font-family:var(--font-thai);font-size:17px;}
+  .wlist .it{display:flex;gap:8px;align-items:baseline;}
+  .wlist .it .b{flex:none;color:var(--earth-d);font-weight:800;font-size:13px;}
+  .wmatch{display:flex;gap:54px;justify-content:space-between;font-family:var(--font-thai);font-size:16.5px;}
+  .wmatch .col{flex:1;display:flex;flex-direction:column;gap:9px;}
+  .wmatch .col .m{border:1.5px solid var(--line);border-radius:10px;background:var(--surface);padding:6px 11px;}
+  .wmatch .col.r .m{background:#fff;}
+  .wlines2{display:flex;flex-direction:column;gap:23px;margin-top:4px;}
+  .wlines2 .l{border-bottom:1.9px dotted var(--line-2);}
+  .frayer{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1.8px solid var(--line);border-radius:12px;overflow:hidden;}
+  .frayer .fb{border:1px solid var(--line);padding:7px 11px;min-height:82px;}
+  .frayer .fb .lb{font-family:var(--font-thai);font-size:12.5px;font-weight:700;color:var(--earth-d);}
+
+  /* ---------- ปก / คำนำ / ตัวละคร / สารบัญ / เฉลย ---------- */
+  .cover{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px;}
+  .cover .school{font-family:var(--font-thai);font-size:15px;color:var(--ink-3);letter-spacing:.02em;}
+  .cover .kick{font-size:11px;font-weight:800;letter-spacing:.24em;text-transform:uppercase;color:var(--earth-d);margin-top:4px;}
+  .cover h1{font-family:var(--font-thai);font-size:43px;font-weight:700;margin:2px 0 0;line-height:1.22;}
+  .cover .en{font-size:14px;color:var(--ink-3);letter-spacing:.05em;}
+  .cover .art{width:88%;margin:14px 0 10px;border:1.8px solid var(--line);border-radius:20px;background:var(--surface);padding:10px;}
+  .cover .art svg{width:100%;height:auto;display:block;}
+  .cover .strip{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:4px;}
+  .cover .strip span{font-family:var(--font-thai);font-size:13.5px;background:var(--leaf-l);color:var(--leaf-d);
+    border-radius:999px;padding:4px 14px;font-weight:600;}
+  .cover .foot{margin-top:14px;font-family:var(--font-thai);font-size:14px;color:var(--ink-2);}
+
+  .prose p{font-family:var(--font-thai);font-size:17px;line-height:1.85;color:var(--ink-2);margin:0 0 10px;}
+  .howto{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:6px;}
+  .howto .h{border:1.5px solid var(--line);border-radius:12px;background:var(--surface);padding:9px 13px;}
+  .howto .h b{font-family:var(--font-thai);font-size:14.5px;color:var(--leaf-d);display:block;margin-bottom:2px;}
+  .howto .h span{font-family:var(--font-thai);font-size:13.5px;color:var(--ink-3);line-height:1.6;}
+
+  .castgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:6px;}
+  .castcard{display:flex;gap:11px;border:1.6px solid var(--line);border-radius:14px;background:var(--surface);padding:9px 12px;}
+  .castcard .pic{flex:none;width:76px;}
+  .castcard .pic svg{width:100%;height:auto;display:block;}
+  .castcard .nm{font-family:var(--font-thai);font-size:19px;font-weight:700;}
+  .castcard .rl{font-family:var(--font-thai);font-size:12.5px;color:var(--earth-d);font-weight:700;margin-bottom:3px;}
+  .castcard .ds{font-family:var(--font-thai);font-size:13.5px;color:var(--ink-3);line-height:1.55;}
+
+  .toc{width:100%;border-collapse:collapse;font-family:var(--font-thai);margin-top:6px;}
+  .toc th,.toc td{border:1.5px solid var(--line);padding:8px 11px;font-size:15px;vertical-align:top;}
+  .toc th{background:var(--leaf-l);color:var(--leaf-d);font-weight:700;font-size:13.5px;text-align:left;}
+  .toc td.w{width:52px;text-align:center;font-weight:700;color:var(--earth-d);}
+  .toc td b{font-size:16.5px;}
+  .toc td small{display:block;color:var(--ink-3);font-size:13px;margin-top:2px;}
+
+  .ans{border:1.5px solid var(--line);border-radius:12px;background:var(--surface);padding:9px 13px;margin-bottom:9px;break-inside:avoid;}
+  .ans .ah{font-family:var(--font-thai);font-size:15px;font-weight:700;color:var(--leaf-d);margin-bottom:4px;}
+  .ans li{font-family:var(--font-thai);font-size:14px;color:var(--ink-2);line-height:1.65;margin-bottom:3px;}
+  .ans ul{margin:0;padding-left:18px;}
+
+  .scratch{flex:1;min-height:60px;margin-top:2px;border:1.9px dashed var(--line-2);border-radius:16px;
+    background:repeating-linear-gradient(45deg,transparent 0 12px,rgba(170,140,90,.045) 12px 24px);
+    padding:9px 15px 12px;display:flex;flex-direction:column;}
+  .scratch .sh-t{font-family:var(--font-thai);font-size:14.5px;font-weight:700;color:var(--earth-d);}
+  .scratch .sh-hint{font-family:var(--font-thai);font-size:13px;color:var(--ink-3);margin-top:1px;}
+  .scratch .sh-sp{flex:1;min-height:20px;}
+
+  .footline{margin-top:auto;padding-top:8px;border-top:1px solid var(--line);display:flex;justify-content:space-between;
+    align-items:center;font-size:10.5px;color:var(--ink-3);}
+  .footline .th{font-family:var(--font-thai);font-size:12px;}
+  .fill{flex:1;}
+  .hide-ans .ans-sheet{display:none !important;}
+
+  /* ---------- แถบเครื่องมือ · บีบให้อยู่บรรทัดเดียว ---------- */
+  .toolbar{gap:9px;padding:10px 16px;}
+  .toolbar .tb-title{flex:1 1 200px;min-width:0;font-size:15px;}
+  .toolbar .tb-title small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .toolbar .btn{padding:9px 13px;font-size:13px;white-space:nowrap;}
+  .toolbar .btn:disabled{opacity:.55;cursor:progress;}
+  .toolbar .jump{max-width:230px;}
+
+  /* ---------- ปุ่มบันทึก PNG ประจำหน้า (โผล่เมื่อชี้เมาส์) ---------- */
+  .png-grab{position:absolute;top:7px;right:7px;z-index:5;opacity:0;transition:opacity .15s;
+    border:1.4px solid var(--line-2);background:rgba(255,255,255,.96);border-radius:999px;
+    font-family:var(--font-ui);font-weight:800;font-size:11px;color:var(--ink-2);
+    padding:5px 12px;cursor:pointer;box-shadow:0 2px 8px rgba(60,48,28,.14);}
+  .sheet:hover .png-grab,.png-grab:focus{opacity:1;}
+  .png-grab:hover{background:var(--leaf);color:#fff;border-color:var(--leaf-d);}
+
+  /* ---------- ข้อความแจ้งเตือนสั้น ๆ ---------- */
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(8px);z-index:99;
+    max-width:min(560px,92vw);background:var(--ink);color:#fff;font-family:var(--font-thai);
+    font-size:15px;line-height:1.5;padding:11px 20px;border-radius:16px;text-align:center;
+    box-shadow:0 10px 30px rgba(40,32,18,.35);opacity:0;pointer-events:none;
+    transition:opacity .2s,transform .2s;}
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
+  .toast-cancel{margin-left:14px;border:1.4px solid rgba(255,255,255,.5);background:transparent;color:#fff;
+    font-family:var(--font-thai);font-size:14px;font-weight:700;border-radius:999px;padding:3px 14px;cursor:pointer;}
+  .toast-cancel:hover{background:rgba(255,255,255,.16);}
+
+  /* ---------- เมนูเลือกขอบเขตของ PDF ---------- */
+  .pdf-menu{position:fixed;z-index:60;display:none;flex-direction:column;gap:2px;min-width:250px;
+    background:var(--surface);border:1.5px solid var(--line-2);border-radius:14px;padding:6px;
+    box-shadow:0 14px 34px rgba(60,48,28,.24);}
+  .pdf-menu.on{display:flex;}
+  .pdf-menu button{border:none;background:transparent;text-align:right;cursor:pointer;
+    font-family:var(--font-thai);font-size:15px;color:var(--ink);padding:9px 14px;border-radius:10px;}
+  .pdf-menu button:hover{background:var(--leaf-l);color:var(--leaf-d);}
+
+  @media print{ .jump,.png-grab,.toast,.pdf-menu{display:none !important;} }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <a class="btn btn-home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก</a>
+  <div class="tb-title">PANYA · หนังสือเรียน Year 4
+    <small>หน่วยที่ 1 · ชุมชนและบทบาทหน้าที่ — เรื่องอ่าน คำถาม ถอดบทเรียน และใบงาน 15 นาที</small></div>
+  <span class="spacer"></span>
+  <select class="btn jump" id="jump" title="ข้ามไปยังบท"></select>
+  <button class="btn" id="toggleAns">ซ่อนเฉลย</button>
+  <button class="btn" id="savePng" title="บันทึกหน้าที่กำลังดูอยู่เป็นไฟล์ภาพ PNG">🖼️ บันทึก PNG</button>
+  <button class="btn" id="savePdf" title="สร้างไฟล์ PDF และบันทึกลงเครื่องทันที">📄 บันทึก PDF ▾</button>
+  <button class="btn btn-primary" onclick="window.print()">🖨️ พิมพ์</button>
+</div>
+<div class="pdf-menu" id="pdfMenu">
+  <button type="button" data-r="all">ทั้งเล่ม</button>
+  <button type="button" data-r="group">เฉพาะช่วงนี้</button>
+  <button type="button" data-r="page">เฉพาะหน้านี้</button>
+</div>
+<div class="toast" id="toast"></div>
+
+<div class="sheets" id="sheets"></div>
+
+<script src="unit1-book-data.js"></script>
+<script src="unit1-book-art.js"></script>
+<script>
+(function () {
+  const BOOK = window.UNIT1_BOOK, ART = window.UNIT1_ART;
+  const root = document.getElementById("sheets");
+  const M = BOOK.meta;
+  const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+  /* *คำ* → คำศัพท์ประจำสัปดาห์ · ~คำ~ → Heart Word */
+  function mark(s) {
+    return esc(s)
+      .replace(/\*([^*]+)\*/g, '<span class="vc">$1</span>')
+      .replace(/~([^~]+)~/g, '<span class="hw">$1</span>');
+  }
+
+  const sheets = [];
+  let pageNo = 0;
+  function sheet(inner, opts) {
+    opts = opts || {};
+    pageNo++;
+    const foot = opts.noFoot ? "" :
+      `<div class="footline"><span class="th">${M.school} · ภาษาไทย ${M.grade} · หน่วยที่ ${M.unitNo} ${M.unitTitle}</span><span>${pageNo}</span></div>`;
+    sheets.push(`<section class="sheet${opts.cls ? " " + opts.cls : ""}"${opts.id ? ` id="${opts.id}"` : ""}>${inner}${foot}</section>`);
+  }
+
+  /* กล่องพื้นที่เขียนอิสระ — ยืดเต็มที่ว่างที่เหลือของหน้า */
+  function scratch(title, hint) {
+    return `<div class="scratch"><div class="sh-t">${esc(title)}</div>
+      <div class="sh-hint">${esc(hint)}</div><div class="sh-sp"></div></div>`;
+  }
+
+  function head(c, kicker, pgHint) {
+    return `<div class="bk-head">
+      <div class="wk"><small>สัปดาห์</small><b>${c.week}</b></div>
+      <div class="ttl"><div class="kicker">${kicker}</div>
+        <h2>${esc(c.title)}</h2><div class="sub">${esc(c.subtitle)}</div></div>
+      ${pgHint ? `<div class="pg">${pgHint}</div>` : ""}
+    </div>`;
+  }
+
+  /* ============ ปก ============ */
+  sheet(`<div class="cover">
+      <div class="school">${M.school}</div>
+      <div class="kick">${M.subject} · ${M.grade} · ${M.year}</div>
+      <h1>${M.unitTitle}</h1>
+      <div class="en">Unit ${M.unitNo} · ${M.unitTitleEn}</div>
+      <div class="art">${ART.scene("cover", 11)}</div>
+      <div class="strip"><span>6 สัปดาห์ · 6 บท</span><span>คำถามท้ายเรื่อง</span><span>ถอดบทเรียนเชิงคิดวิเคราะห์</span><span>ใบงาน 5 วัน วันละ 15 นาที</span></div>
+      <div class="foot">${M.tagline}</div>
+    </div>`, { noFoot: true, id: "cover" });
+
+  /* ============ คำนำ + วิธีใช้ ============ */
+  sheet(`<div class="bk-head"><div class="wk"><small>คำนำ</small><b>◆</b></div>
+      <div class="ttl"><div class="kicker">For teachers &amp; parents</div>
+      <h2>คำนำ และวิธีใช้หนังสือเล่มนี้</h2>
+      <div class="sub">กรณีศึกษา: ${esc(M.caseStudy)}</div></div></div>
+    <div class="prose">${BOOK.foreword.map((p) => `<p>${esc(p)}</p>`).join("")}</div>
+    <div class="howto">
+      <div class="h"><b>1 · ภาพหลักและเรื่องสั้น</b><span>เปิดบทด้วยภาพหลัก ชวนเด็กทายว่าเกิดอะไรขึ้น แล้วจึงอ่านเรื่อง 5 ตอนทีละตอน ตอนละประมาณ 3 นาที</span></div>
+      <div class="h"><b>2 · คำศัพท์ในเรื่อง</b><span>คำที่ขีดเส้นใต้สีเขียวคือคำประจำสัปดาห์ คำพื้นสีชมพูที่มี ♥ คือ Heart Word ที่ต้องจำด้วยใจ</span></div>
+      <div class="h"><b>3 · คำถามท้ายเรื่อง</b><span>ไล่จากจับใจความ → คิดต่อจากเรื่อง → โยงถึงตัวเอง ใช้ในวง Guided Reading วันจันทร์ได้ทันที</span></div>
+      <div class="h"><b>4 · ถอดบทเรียน</b><span>โซ่ความคิดตามแนวโยนิโสมนสิการ แยกข้อเท็จจริงกับข้อคิดเห็น และคำถามชวนคิดลึกหนึ่งข้อ</span></div>
+      <div class="h"><b>5 · ใบงาน 15 นาที</b><span>วันละหนึ่งใบ จันทร์ถึงศุกร์ ทำช่วงต้นคาบหรือเป็นการบ้านเบา ๆ ไม่ควรเกิน 15 นาที</span></div>
+      <div class="h"><b>6 · เฉลยท้ายเล่ม</b><span>ข้อปลายเปิดเป็นแนวคำตอบ ครูรับคำตอบอื่นที่นักเรียนอ้างอิงจากเรื่องได้เสมอ</span></div>
+    </div>
+    <div class="fill"></div>
+    <div class="legend">${esc(BOOK.glossaryNote)}</div>`, { id: "foreword" });
+
+  /* ============ ตัวละคร ============ */
+  sheet(`<div class="bk-head"><div class="wk"><small>ตัวละคร</small><b>♣</b></div>
+      <div class="ttl"><div class="kicker">Meet the characters</div>
+      <h2>ตัวละครประจำเล่ม</h2>
+      <div class="sub">หกคนนี้จะอยู่กับเราตลอดหกสัปดาห์</div></div></div>
+    <div class="castgrid">${BOOK.cast.map((p, i) => `
+      <div class="castcard"><div class="pic">${ART.cast(p.art, i + 2)}</div>
+        <div><div class="nm">${esc(p.name)}</div><div class="rl">${esc(p.role)}</div>
+        <div class="ds">${esc(p.desc)}</div></div></div>`).join("")}</div>
+    <div class="fill"></div>
+    <div class="legend">ฉากหลังของทุกบทคือโรงเรียนปัญญาเด่น อาคารดิน ศาลาสมาคม ต้นไผ่หลังห้อง และบ่อปลาหลังหลังคารับน้ำฝน</div>`,
+    { id: "cast" });
+
+  /* ============ สารบัญ ============ */
+  sheet(`<div class="bk-head"><div class="wk"><small>สารบัญ</small><b>≡</b></div>
+      <div class="ttl"><div class="kicker">Contents</div>
+      <h2>สารบัญ</h2><div class="sub">${esc(M.concept)}</div></div></div>
+    <table class="toc"><thead><tr><th style="width:52px">สัปดาห์</th><th>บท</th><th style="width:33%">จุดเน้นอักขรวิธี</th><th style="width:20%">คุณธรรม</th></tr></thead>
+    <tbody>${BOOK.chapters.map((c) => `<tr>
+      <td class="w">${c.week}</td>
+      <td><b>${esc(c.title)}</b><small>${esc(c.subtitle)}</small></td>
+      <td>${esc(c.ortho)}</td>
+      <td>${esc(c.virtue.split("·")[0].trim())}</td></tr>`).join("")}</tbody></table>
+    <div class="fill"></div>
+    <div class="legend">แต่ละบทใช้เวลา 1 สัปดาห์ · ประกอบด้วยเรื่องสั้น 5 ตอน คำถามท้ายเรื่อง การถอดบทเรียน และใบงาน 5 วัน</div>`,
+    { id: "toc" });
+
+  /* ============ รายบท ============ */
+  BOOK.chapters.forEach((c, ci) => {
+    const seed = ci + 3;
+
+    /* -- หน้าเปิดบท -- */
+    sheet(head(c, `บทที่ ${c.week} · Chapter ${c.week}`) + `
+      <div class="hero">${ART.scene(c.art, seed)}<div class="cap">${esc(c.artCaption)}</div></div>
+      <div class="facts">
+        <div class="fact wide"><div class="fl">เป้าหมายการเรียนรู้</div><div class="fv">${esc(c.objective)}</div></div>
+        <div class="fact"><div class="fl">จุดเน้นอักขรวิธี</div><div class="fv">${esc(c.ortho)}</div></div>
+        <div class="fact"><div class="fl">หลักภาษา</div><div class="fv">${esc(c.grammar)}</div></div>
+        <div class="fact wide"><div class="fl">คุณธรรมประจำสัปดาห์</div><div class="fv">${esc(c.virtue)}</div></div>
+      </div>
+      <div class="bank"><div class="bh">คลังคำประจำสัปดาห์ · 20 คำ</div><div class="words">${
+        c.vocab.map((w) => `<span class="w">${esc(w)}</span>`).join("") +
+        c.heart.map((w) => `<span class="w h">${esc(w)}</span>`).join("")
+      }</div></div>
+      <div class="fill"></div>
+      <div class="legend">${esc(BOOK.glossaryNote)}</div>`,
+      { id: "ch" + c.week });
+
+    /* -- เนื้อเรื่อง แบ่งหน้าตามจำนวนบรรทัดจริง -- */
+    const ep = (s) => `<div class="ep"><div class="eh"><span class="no">ตอนที่ ${s.no}</span><h3>${esc(s.title)}</h3></div>
+      ${s.paras.map((p) => `<p>${mark(p)}</p>`).join("")}</div>`;
+
+    BOOK.paginateStory(c, 23.0, 90).forEach((page, pi) => {
+      const span = page.length > 1 ? `ตอนที่ ${page[0].no}–${page[page.length - 1].no}` : `ตอนที่ ${page[0].no}`;
+      sheet(head(c, `เรื่องอ่าน · Reading${pi ? " (ต่อ)" : ""}`, span) +
+        page.map(ep).join("") +
+        `<div class="fill"></div><div class="legend">${esc(BOOK.glossaryNote)}</div>`);
+    });
+
+    /* -- คำถามท้ายเรื่อง -- */
+    let n = 0;
+    const grp = (chip, hint, arr, lines) => `<div class="qgrp">
+      <div class="gh"><span class="chip">${chip}</span><span class="gt">${hint}</span></div>
+      ${arr.map((q) => { n++; return `<div class="qi"><span class="n">${n}</span><div class="qb">
+        <div class="qt">${esc(q)}</div>${'<div class="ln"></div>'.repeat(lines)}</div></div>`; }).join("")}</div>`;
+
+    sheet(head(c, `คำถามท้ายเรื่อง · Comprehension`) +
+      grp("จับใจความ", "ตอบจากเรื่องโดยตรง", c.questions.literal, 1) +
+      grp("คิดต่อจากเรื่อง", "ต้องอ้างหลักฐานจากเนื้อเรื่องประกอบ", c.questions.inferential, 2) +
+      grp("โยงถึงตัวเอง", "ไม่มีคำตอบถูกผิด แต่ต้องมีเหตุผล", c.questions.self, 2) +
+      `<div class="fill"></div>`);
+
+    /* -- ถอดบทเรียน -- */
+    const t = c.think;
+    sheet(head(c, `ถอดบทเรียน · Thinking Deeper`) + `
+      <div class="think">
+        <div class="th-h">${esc(t.heading)}</div>
+        <div class="th-v">${esc(t.virtueLine)}</div>
+        <div class="th-v" style="margin-top:6px">${esc(t.chain.prompt)}</div>
+        <div class="chain">${t.chain.steps.map((s, i) => `${i ? '<div class="arw">▼</div>' : ""}
+          <div class="st"><div class="sl">${esc(s.label)}</div><div class="sh">${esc(s.hint)}</div></div>`).join("")}</div>
+      </div>
+      <div class="fo"><div class="fh">${esc(t.factOpinion.prompt)}</div>
+        ${t.factOpinion.items.map((it) => `<div class="fi"><span class="box"></span><span>${esc(it)}</span></div>`).join("")}</div>
+      <div class="deep">${esc(t.deep)}</div>
+      ${scratch("คิดแล้วจดไว้ตรงนี้", "จดคำตอบของคำถามชวนคิดลึก หรือวาดภาพความคิดของเธอ")}`);
+
+    /* -- ใบงาน 5 วัน · 2 ใบต่อหน้า -- */
+    const wsHtml = (w) => {
+      let body = "";
+      if (w.kind === "table") {
+        const cols = w.cols, rows = w.rows || 4;
+        body = `<table class="wtable"><thead><tr>${cols.map((h) => `<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>` +
+          Array.from({ length: rows }, (_, r) =>
+            `<tr>${cols.map((_, ci2) =>
+              (ci2 === 0 && w.seed && w.seed[r]) ? `<td class="seed">${esc(w.seed[r])}</td>` : "<td></td>").join("")}</tr>`
+          ).join("") + `</tbody></table>`;
+      } else if (w.kind === "list") {
+        body = `<div class="wlist">${w.items.map((it, i) =>
+          `<div class="it"><span class="b">${i + 1}.</span><span>${esc(it)}</span></div>`).join("")}</div>`;
+      } else if (w.kind === "match") {
+        body = `<div class="wmatch"><div class="col">${w.left.map((x) => `<div class="m">${esc(x)}</div>`).join("")}</div>
+          <div class="col r">${w.right.map((x) => `<div class="m">${esc(x)}</div>`).join("")}</div></div>`;
+      } else if (w.kind === "frayer") {
+        body = `<div class="frayer">${w.boxes.map((b) => `<div class="fb"><div class="lb">${esc(b)}</div></div>`).join("")}</div>`;
+      } else {
+        body = `<div class="wlines2">${'<span class="l"></span>'.repeat(w.lines || 3)}</div>`;
+      }
+      return `<div class="ws">
+        <div class="wh"><span class="day">${esc(w.day)}</span><h4>${esc(w.title)}</h4><span class="min">15 นาที</span></div>
+        <div class="wi">${esc(w.instruction)}</div>
+        ${w.note ? `<div class="wnote">${esc(w.note)}</div>` : ""}
+        ${body}</div>`;
+    };
+    const pairs = [[0, 1], [2, 3], [4]];
+    const scratchHint = [
+      "ทำเสร็จแล้วยังเหลือเวลา ลองเขียนคำใหม่ที่เจอในสัปดาห์นี้",
+      "ทำเสร็จแล้วยังเหลือเวลา ลองแต่งประโยคของตัวเองจากคำที่เพิ่งฝึก",
+      "ใช้เขียนต่อ วาดภาพประกอบ หรือจดสิ่งที่อยากถามครูในสัปดาห์นี้",
+    ];
+    pairs.forEach((pair, pi) => {
+      sheet(head(c, `ใบงาน 15 นาที · Daily 15`, `วัน${pair.map((i) => c.worksheets[i].day).join(" · วัน")}`) +
+        pair.map((i) => wsHtml(c.worksheets[i])).join("") +
+        scratch("พื้นที่เขียนและวาดอิสระ", scratchHint[pi]));
+    });
+  });
+
+  /* ============ เฉลย ============ */
+  const ansGroups = [];
+  for (let g = 0; g < BOOK.chapters.length; g += 2) ansGroups.push([g, Math.min(g + 2, BOOK.chapters.length)]);
+  ansGroups.forEach((rg, i) => {
+    sheet(`<div class="bk-head"><div class="wk"><small>เฉลย</small><b>✓</b></div>
+      <div class="ttl"><div class="kicker">Answer key · for teachers</div>
+      <h2>เฉลยและแนวคำตอบ${i ? " (ต่อ)" : ""}</h2>
+      <div class="sub">บทที่ ${rg[0] + 1}–${rg[1]} · ข้อปลายเปิดเป็นแนวคำตอบ ไม่ใช่คำตอบตายตัว</div></div></div>` +
+      BOOK.chapters.slice(rg[0], rg[1]).map((c) => `<div class="ans">
+        <div class="ah">บทที่ ${c.week} · ${esc(c.title)}</div>
+        <ul>${c.answers.map((a) => `<li>${esc(a)}</li>`).join("")}</ul></div>`).join("") +
+      `<div class="fill"></div>`, { cls: "ans-sheet" });
+  });
+
+  root.innerHTML = sheets.join("");
+
+  /* ---------- เมนูข้าม + ปุ่มซ่อนเฉลย ---------- */
+  const jump = document.getElementById("jump");
+  const opts = [["cover", "ปก"], ["foreword", "คำนำ"], ["cast", "ตัวละคร"], ["toc", "สารบัญ"]]
+    .concat(BOOK.chapters.map((c) => ["ch" + c.week, "บทที่ " + c.week + " · " + c.title]));
+  jump.innerHTML = opts.map((o) => `<option value="${o[0]}">${o[1]}</option>`).join("");
+  jump.onchange = () => { const el = document.getElementById(jump.value); if (el) el.scrollIntoView({ behavior: "smooth" }); };
+
+  const btn = document.getElementById("toggleAns");
+  btn.onclick = () => {
+    const on = document.body.classList.toggle("hide-ans");
+    btn.textContent = on ? "แสดงเฉลย" : "ซ่อนเฉลย";
+  };
+
+  /* ============================================================
+     บันทึกเป็นภาพ PNG · บันทึกเป็น PDF
+     ============================================================ */
+  const FILE_STEM = "หนังสือเรียน-Y4-หน่วยที่1-ชุมชนและบทบาทหน้าที่";
+
+  /* ---- ข้อความแจ้งเตือนสั้น ๆ ---- */
+  const toastEl = document.getElementById("toast");
+  let toastTimer = null;
+  function toast(msg, ms, onCancel) {
+    toastEl.textContent = "";
+    toastEl.appendChild(document.createTextNode(msg));
+    if (onCancel) {
+      const c = document.createElement("button");
+      c.className = "toast-cancel";
+      c.type = "button";
+      c.textContent = "ยกเลิก";
+      c.onclick = onCancel;
+      toastEl.appendChild(c);
+    }
+    toastEl.classList.add("on");
+    clearTimeout(toastTimer);
+    if (ms !== 0) toastTimer = setTimeout(() => toastEl.classList.remove("on"), ms || 2600);
+  }
+
+  /* ---- รวม CSS + ฝังฟอนต์เป็น data URI ----
+     ภาพที่วาดผ่าน <foreignObject> อยู่ในบริบทปิด โหลดไฟล์ภายนอกไม่ได้
+     จึงต้องฝังทั้งสไตล์ชีตและไฟล์ฟอนต์ลงไปในตัว SVG เอง            */
+  let cssCache = null;
+  const fileToDataUrl = (blob) => new Promise((res) => {
+    const fr = new FileReader();
+    fr.onload = () => res(fr.result);
+    fr.readAsDataURL(blob);
+  });
+
+  async function collectCss() {
+    if (cssCache) return cssCache;
+    const [base, reg, bold] = await Promise.all([
+      fetch("activity-base.css").then((r) => r.text()),
+      fetch("fonts/Sarabun-Regular.ttf").then((r) => r.blob()).then(fileToDataUrl),
+      fetch("fonts/Sarabun-Bold.ttf").then((r) => r.blob()).then(fileToDataUrl),
+    ]);
+    const face = (fam, url, w) =>
+      `@font-face{font-family:"${fam}";src:url(${url}) format("truetype");font-weight:${w};font-style:normal;}`;
+    const faces = ["Sarabun", "TH Sarabun", "Mali"].map((f) =>
+      face(f, reg, "100 500") + face(f, bold, "501 900")).join("");
+    // ตัด @font-face เดิมที่ชี้ไฟล์ภายนอกทิ้ง แล้วให้ตัวแปรสีมีผลกับกล่องหุ้มด้วย
+    const cleaned = base.replace(/@font-face\{[^}]*\}/g, "").replace(":root{", ":root,.pngroot{");
+    const own = document.querySelector("head style").textContent;
+    cssCache = (faces + cleaned + own + `
+      .pngroot{background:#fff;
+        --font-ui:"Sarabun","Segoe UI",Arial,sans-serif;
+        --font-thai:"TH Sarabun","Sarabun","Leelawadee UI","Segoe UI",Arial,sans-serif;
+        --font-hand:"Mali","TH Sarabun","Sarabun","Segoe UI",Arial,sans-serif;}
+      .pngroot .sheet{font-family:var(--font-ui);margin:0;border:none;border-radius:0;box-shadow:none;}
+      .pngroot .png-grab{display:none;}`)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;");
+    return cssCache;
+  }
+
+  /* ---- วาดหนึ่งหน้าลง canvas ---- */
+  async function sheetToCanvas(sheet, scale) {
+    const css = await collectCss();
+    const w = sheet.offsetWidth, h = sheet.offsetHeight;
+    const clone = sheet.cloneNode(true);
+    clone.querySelectorAll(".png-grab").forEach((n) => n.remove());
+
+    const xml = new XMLSerializer().serializeToString(clone);
+    const svg =
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">` +
+      `<foreignObject x="0" y="0" width="${w}" height="${h}">` +
+      `<div xmlns="http://www.w3.org/1999/xhtml" class="pngroot" style="width:${w}px;height:${h}px">` +
+      `<style>${css}</style>${xml}</div></foreignObject></svg>`;
+
+    const img = new Image();
+    img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    await new Promise((res, rej) => {
+      img.onload = res;
+      img.onerror = () => rej(new Error("วาดภาพไม่สำเร็จ"));
+    });
+
+    const cv = document.createElement("canvas");
+    cv.width = Math.round(w * scale);
+    cv.height = Math.round(h * scale);
+    const ctx = cv.getContext("2d");
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.drawImage(img, 0, 0, cv.width, cv.height);
+    return cv;
+  }
+
+  function download(blob, name) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }
+
+  /* ---- หน้าที่กำลังอยู่กลางจอที่สุด ---- */
+  function currentSheet() {
+    const mid = window.innerHeight / 2;
+    let best = null, bestD = Infinity;
+    document.querySelectorAll(".sheet").forEach((s) => {
+      const r = s.getBoundingClientRect();
+      if (r.bottom < 60 || r.top > window.innerHeight) return;
+      const d = Math.abs((r.top + r.bottom) / 2 - mid);
+      if (d < bestD) { bestD = d; best = s; }
+    });
+    return best || document.querySelector(".sheet");
+  }
+
+  const ALL = () => [...document.querySelectorAll(".sheet")];
+  const pgNum = (sheet) => String(ALL().indexOf(sheet) + 1).padStart(2, "0");
+
+  let busy = false;
+  const setBusy = (on) => {
+    busy = on;
+    ["savePng", "savePdf"].forEach((id) => { document.getElementById(id).disabled = on; });
+  };
+
+  async function savePng(sheet) {
+    if (busy) return;
+    setBusy(true);
+    const no = pgNum(sheet);
+    toast("กำลังสร้างภาพหน้า " + no + " …", 0);
+    try {
+      const cv = await sheetToCanvas(sheet, 2);   // 2 เท่า ≈ 1588×2246 px คมพอสำหรับพิมพ์และสไลด์
+      const blob = await new Promise((res) => cv.toBlob(res, "image/png"));
+      download(blob, `${FILE_STEM}-หน้า${no}.png`);
+      toast("บันทึกภาพหน้า " + no + " แล้ว");
+    } catch (e) {
+      toast("บันทึกภาพไม่สำเร็จ · " + e.message, 4000);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /* ปุ่มเล็กประจำแต่ละหน้า */
+  document.querySelectorAll(".sheet").forEach((s) => {
+    const b = document.createElement("button");
+    b.className = "png-grab";
+    b.type = "button";
+    b.textContent = "🖼️ PNG";
+    b.title = "บันทึกหน้านี้เป็นไฟล์ภาพ";
+    b.onclick = () => savePng(s);
+    s.insertBefore(b, s.firstChild);
+  });
+
+  document.getElementById("savePng").onclick = () => savePng(currentSheet());
+
+  /* ============================================================
+     สร้างไฟล์ PDF เองในหน้าเว็บ — ไม่ผ่านกล่องพิมพ์
+     แต่ละหน้าถูกวาดเป็นภาพแล้วฝังลงหน้า A4 ของ PDF โดยตรง
+     ============================================================ */
+  const A4W = 595.276, A4H = 841.89;             // ขนาด A4 หน่วย point
+  const hasDeflate = typeof CompressionStream === "function";
+
+  async function zlibDeflate(u8) {
+    const s = new Blob([u8]).stream().pipeThrough(new CompressionStream("deflate"));
+    return new Uint8Array(await new Response(s).arrayBuffer());
+  }
+
+  async function buildPdf(sheets, scale, onStep) {
+    const enc = new TextEncoder();
+    const parts = [];
+    let len = 0;
+    const push = (b) => { parts.push(b); len += b.length; };
+    const put = (s) => push(enc.encode(s));
+    const offs = [];
+
+    push(new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x34, 0x0a,
+                         0x25, 0xe2, 0xe3, 0xcf, 0xd3, 0x0a]));   // %PDF-1.4 + ธงไบนารี
+
+    const kids = [];
+    let id = 3;                                   // 1 = Catalog, 2 = Pages
+    for (let i = 0; i < sheets.length; i++) {
+      if (onStep && (await onStep(i, sheets.length)) === false) return null;
+
+      const cv = await sheetToCanvas(sheets[i], scale);
+      const iw = cv.width, ih = cv.height;
+      let data, filter;
+      if (hasDeflate) {
+        const px = cv.getContext("2d").getImageData(0, 0, iw, ih).data;
+        const rgb = new Uint8Array(iw * ih * 3);
+        for (let p = 0, q = 0; p < px.length; p += 4) {
+          rgb[q++] = px[p]; rgb[q++] = px[p + 1]; rgb[q++] = px[p + 2];
+        }
+        data = await zlibDeflate(rgb);
+        filter = "/FlateDecode";
+      } else {
+        const jpg = await new Promise((r) => cv.toBlob(r, "image/jpeg", 0.92));
+        data = new Uint8Array(await jpg.arrayBuffer());
+        filter = "/DCTDecode";
+      }
+      cv.width = cv.height = 0;                   // คืนหน่วยความจำ
+
+      const imgId = id++, cntId = id++, pgId = id++;
+
+      offs[imgId] = len;
+      put(`${imgId} 0 obj\n<< /Type /XObject /Subtype /Image /Width ${iw} /Height ${ih}` +
+          ` /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter ${filter} /Length ${data.length} >>\nstream\n`);
+      push(data);
+      put("\nendstream\nendobj\n");
+
+      const content = enc.encode(`q ${A4W} 0 0 ${A4H} 0 0 cm /Im0 Do Q\n`);
+      offs[cntId] = len;
+      put(`${cntId} 0 obj\n<< /Length ${content.length} >>\nstream\n`);
+      push(content);
+      put("\nendstream\nendobj\n");
+
+      offs[pgId] = len;
+      put(`${pgId} 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${A4W} ${A4H}]` +
+          ` /Resources << /XObject << /Im0 ${imgId} 0 R >> /ProcSet [/PDF /ImageC] >>` +
+          ` /Contents ${cntId} 0 R >>\nendobj\n`);
+      kids.push(`${pgId} 0 R`);
+    }
+
+    offs[1] = len;
+    put("1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+    offs[2] = len;
+    put(`2 0 obj\n<< /Type /Pages /Kids [${kids.join(" ")}] /Count ${kids.length} >>\nendobj\n`);
+
+    const size = id, xref = len;
+    let x = `xref\n0 ${size}\n0000000000 65535 f \n`;
+    for (let n = 1; n < size; n++) x += String(offs[n]).padStart(10, "0") + " 00000 n \n";
+    put(x);
+    put(`trailer\n<< /Size ${size} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`);
+
+    return new Blob(parts, { type: "application/pdf" });
+  }
+
+  /* ---- ช่วงหน้าที่หน้าปัจจุบันสังกัดอยู่ ----
+         ส่วนหน้าเล่ม · บทที่ 1–6 (นับจากหน้าเปิดบทถึงก่อนบทถัดไป) · เฉลยท้ายเล่ม */
+  function groupOf(sheet) {
+    const all = ALL();
+    const i = all.indexOf(sheet);
+    const marks = [{ at: 0, label: "ส่วนหน้าเล่ม" }];
+    BOOK.chapters.forEach((c) => {
+      const el = document.getElementById("ch" + c.week);
+      if (el) marks.push({ at: all.indexOf(el), label: "บทที่ " + c.week + " · " + c.title });
+    });
+    const firstAns = all.findIndex((s) => s.classList.contains("ans-sheet"));
+    if (firstAns > 0) marks.push({ at: firstAns, label: "เฉลยท้ายเล่ม" });
+    marks.sort((a, b) => a.at - b.at);
+
+    let cur = marks[0];
+    marks.forEach((m) => { if (m.at <= i) cur = m; });
+    const next = marks.find((m) => m.at > i);
+    return { sheets: all.slice(cur.at, next ? next.at : all.length), label: cur.label };
+  }
+
+  async function savePdf(sheets, name) {
+    if (busy) return;
+    setBusy(true);
+    let cancelled = false;
+    const t0 = Date.now();
+    try {
+      const blob = await buildPdf(sheets, 2, async (i, n) => {
+        toast(`กำลังสร้าง PDF · หน้า ${i + 1} จาก ${n}`, 0, () => { cancelled = true; });
+        await new Promise((r) => setTimeout(r, 0));   // ปล่อยให้จอวาดความคืบหน้า
+        return !cancelled;
+      });
+      if (!blob) { toast("ยกเลิกการสร้าง PDF แล้ว"); return; }
+      download(blob, name);
+      toast(`บันทึก ${name} แล้ว · ${sheets.length} หน้า · ` +
+            `${(blob.size / 1048576).toFixed(1)} MB · ใช้เวลา ${Math.round((Date.now() - t0) / 1000)} วินาที`, 5000);
+    } catch (e) {
+      toast("สร้าง PDF ไม่สำเร็จ · " + e.message, 5000);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /* ---- เมนูเลือกขอบเขตของ PDF ---- */
+  const pdfBtn = document.getElementById("savePdf");
+  const menu = document.getElementById("pdfMenu");
+  const closeMenu = () => menu.classList.remove("on");
+
+  pdfBtn.onclick = (e) => {
+    e.stopPropagation();
+    if (menu.classList.contains("on")) { closeMenu(); return; }
+
+    const cur = currentSheet();
+    const grp = groupOf(cur);
+    menu.querySelector('[data-r="all"]').textContent = `ทั้งเล่ม · ${ALL().length} หน้า`;
+    menu.querySelector('[data-r="group"]').textContent =
+      `${grp.label} · ${grp.sheets.length} หน้า (${pgNum(grp.sheets[0])}–${pgNum(grp.sheets[grp.sheets.length - 1])})`;
+    menu.querySelector('[data-r="page"]').textContent = `เฉพาะหน้านี้ · หน้า ${pgNum(cur)}`;
+
+    menu.classList.add("on");                       // ต้องแสดงก่อนจึงวัดขนาดได้
+    const r = pdfBtn.getBoundingClientRect();
+    const mw = menu.offsetWidth, mh = menu.offsetHeight;
+    const left = Math.max(8, Math.min(r.right - mw, window.innerWidth - mw - 8));
+    const top = Math.min(r.bottom + 8, window.innerHeight - mh - 8);
+    menu.style.left = left + "px";
+    menu.style.right = "auto";
+    menu.style.top = Math.max(8, top) + "px";
+  };
+  document.addEventListener("click", closeMenu);
+  menu.addEventListener("click", (e) => e.stopPropagation());
+
+  menu.querySelectorAll("button").forEach((b) => {
+    b.onclick = () => {
+      closeMenu();
+      const cur = currentSheet();
+      const r = b.dataset.r;
+      if (r === "all") savePdf(ALL(), `${FILE_STEM}.pdf`);
+      else if (r === "page") savePdf([cur], `${FILE_STEM}-หน้า${pgNum(cur)}.pdf`);
+      else {
+        const grp = groupOf(cur);
+        savePdf(grp.sheets,
+          `${FILE_STEM}-หน้า${pgNum(grp.sheets[0])}-${pgNum(grp.sheets[grp.sheets.length - 1])}.pdf`);
+      }
+    };
+  });
+
+  /* ตั้งชื่อไฟล์ตั้งต้นให้ปุ่ม "พิมพ์" ด้วย เผื่อครูเลือก Save as PDF จากกล่องพิมพ์เอง */
+  const ORIG_TITLE = document.title;
+  window.addEventListener("beforeprint", () => { document.title = FILE_STEM; });
+  window.addEventListener("afterprint", () => { document.title = ORIG_TITLE; });
+})();
+</script>
+</body>
+</html>

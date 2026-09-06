@@ -671,6 +671,7 @@ function ReadingMode({ passage, onClose }) {
 
 // Comprehension (Y4–6) "read to learn" texts — link into the Reading & Writing pack.
 const READING_COMP = [
+  { en: "หนังสือเรียน Y4 · หน่วยที่ 1", th: "ชุมชนและบทบาทหน้าที่ · 6 บท + ใบงาน 15 นาที", file: "reader-y4-unit1.html", feature: true },
   { en: "Fluency · อ่านคล่อง", th: "อ่านซ้ำ จับจังหวะ (C1–C8)", file: "activity-reading-comprehension.html#s1" },
   { en: "Vocabulary · คลังคำ", th: "คำพ้อง คำยาก (C9–C18)", file: "activity-reading-comprehension.html#s6" },
   { en: "Comprehension · จับใจความ", th: "ใจความสำคัญ สรุป (C19–C28)", file: "activity-reading-comprehension.html#s12" },
@@ -766,7 +767,10 @@ function ReadingPage() {
         <div className="grid-2">
           {READING_COMP.map((r, i) => (
             <div className="item-card" key={i}>
-              <div className="item-meta"><span className="tag">Y4–6</span><span className="tag earth">Read to Learn</span></div>
+              <div className="item-meta">
+                <span className="tag">{r.feature ? "Year 4" : "Y4–6"}</span>
+                <span className="tag earth">{r.feature ? "Unit Reader" : "Read to Learn"}</span>
+              </div>
               <h3>{r.en}<span className="th">{r.th}</span></h3>
               <div className="item-actions">
                 <a className="btn btn-sm btn-leaf" href={r.file}><Ico name="reading" style={{ width: 15, height: 15 }} /> อ่าน · Read</a>
