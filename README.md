@@ -171,6 +171,25 @@ Its own topic under *Lessons & materials · สื่อการสอน*: fou
   every word with a space so beginners can see word boundaries, so the lines are copied exactly
   and rendered with `white-space: pre-wrap`. Tidying those spaces away would undo the point of
   the exercise.
+- **Level 02 is word-spaced, 03 is not.** The booklet for 02 puts a space between every word so a
+  beginner can see where words end; that level carries `spaced: true` and the reader splits on
+  whitespace alone. It must keep doing so — the recorded clip filenames are keyed to exactly that
+  split. From 03 the text runs on as ordinary sentences, so the reader segments each chunk further
+  with `Intl.Segmenter("th")`; otherwise a whole clause would underline and be spoken as one lump.
+- `tools/pdf-text.js` pulls the text out of the *THAI READING PASSAGE* PDFs (Canva exports: classic
+  xref, FlateDecode, Type0/Identity-H). It reads `/Span << /ActualText >>` first, because Canva
+  draws one glyph at a time and lifts tone marks onto their own baseline — sort those by position
+  and `บ้าน` comes out `บาน`. ActualText carries the correct logical string.
+
+  ```
+  node tools/pdf-text.js "THAI Reading Passage 3.pdf" > out.json
+  ```
+
+  It is a **draft, not the source of truth**: a few clusters carry no ActualText span and lose their
+  tone marks, and it dropped a whole line on two pages. Every page of Level 03 was read against a
+  render of the PDF before the text was kept. Do the same for 04 and 05.
+- `audio/words/รายการอัดเสียง-level-03.txt` — the words in Level 03 that have no clip yet (224 of
+  338; the other 114 are already recorded). Paste the whole file into the studio's **เพิ่มคำเอง** box.
 - `books/short-stories-level-02.pdf` — the original booklet, linked from the level heading for
   teachers who want to print it.
 - `StoryReader` in `pages.jsx` — the fullscreen reader behind each story's **เปิด** button:

@@ -798,6 +798,26 @@ function ReadingClubPage() {
    word-audio-index.js (สร้างจาก audio-studio.html) บอกว่าคำไหนมีและเป็นไฟล์อะไร
    ถ้าไม่มีในรายการก็ลอง .mp3 ไปตรง ๆ แบบเดียวกับที่เกมอื่นทำ แล้วค่อยถอยไปใช้
    เสียงสังเคราะห์ คำที่หาไม่เจอจะถูกจำไว้ ไม่ให้ยิงซ้ำทุกครั้งที่อ่าน       */
+/* แบ่งบรรทัดเป็นคำ
+   ระดับ 02 ต้นฉบับเว้นวรรคให้ทีละคำอยู่แล้ว (spaced: true) จึงตัดตามช่องว่างพอ
+   และต้องตัดแบบนั้นเท่านั้น เพราะชื่อไฟล์เสียงที่คุณครูอัดไว้ผูกกับการตัดแบบนี้
+   ระดับ 03 ขึ้นไปเขียนติดกันเป็นประโยค ถ้าตัดตามช่องว่างจะได้ทั้งวลีเป็นก้อนเดียว
+   เส้นใต้กับเสียงอ่านจะไม่ตรงคำ จึงให้ Intl.Segmenter ซอยต่ออีกชั้น         */
+let SEG = null;
+function segThai(chunk) {
+  if (SEG === null) {
+    try { SEG = new Intl.Segmenter("th", { granularity: "word" }); } catch (e) { SEG = false; }
+  }
+  if (!SEG) return [chunk];
+  const out = [];
+  for (const p of SEG.segment(chunk)) if (p.segment.trim()) out.push(p.segment);
+  return out.length ? out : [chunk];
+}
+function splitWords(line, spaced) {
+  const chunks = line.split(/\s+/).filter(Boolean);
+  return spaced ? chunks : chunks.reduce((a, c) => a.concat(segThai(c)), []);
+}
+
 const CLIP_MISS = new Set();
 function clipUrl(w) {
   if (CLIP_MISS.has(w)) return null;
@@ -805,7 +825,7 @@ function clipUrl(w) {
   return "audio/words/" + encodeURIComponent(w) + "." + ((idx && idx[w]) || "mp3");
 }
 
-function StoryReader({ story, levelLabel, onClose }) {
+function StoryReader({ story, levelLabel, spaced, onClose }) {
   const shellRef = React.useRef(null);
   const stopRef = React.useRef(false);
   const gapRef = React.useRef(null);      // ตัวจับเวลาช่องว่างระหว่างคำ
@@ -815,10 +835,10 @@ function StoryReader({ story, levelLabel, onClose }) {
   const words = React.useMemo(() => {
     const out = [];
     story.lines.forEach((line, li) => {
-      line.split(/\s+/).filter(Boolean).forEach((w) => out.push({ li, text: w }));
+      splitWords(line, spaced).forEach((w) => out.push({ li, text: w }));
     });
     return out;
-  }, [story]);
+  }, [story, spaced]);
 
   /* จังหวะการอ่าน — ตัวแปรสำคัญคือ "ช่องว่างระหว่างคำ" ไม่ใช่แค่ rate
      ถ้าสั่งพูดติดกันรวดเดียว คำจะเกยกันจนฟังไม่ทัน แม้จะลด rate แล้วก็ตาม
@@ -992,7 +1012,7 @@ function StoryReader({ story, levelLabel, onClose }) {
         <div className="ss-lines">
           {story.lines.map((line, li) => (
             <p key={li}>
-              {line.split(/\s+/).filter(Boolean).map((w, k) => {
+              {splitWords(line, spaced).map((w, k) => {
                 counter++;
                 const idx = counter;
                 return (
@@ -1085,7 +1105,7 @@ function ShortStoriesPage() {
       )}
 
       {open && (
-        <StoryReader story={open} levelLabel={current.en + " · " + current.th}
+        <StoryReader story={open} levelLabel={current.en + " · " + current.th} spaced={!!current.spaced}
                      onClose={() => setOpen(null)} />
       )}
     </div>
