@@ -117,3 +117,31 @@ hide that, the page works in two explicit steps:
 
 The generated file is plain data, so it round-trips: what the back office writes is exactly what
 `reading-club-data.js` looks like by hand.
+
+### 14 Short Stories · 14 เรื่องสั้น
+
+Its own topic under *Lessons & materials · สื่อการสอน*: fourteen passages per level, graded
+**02 → 05**, transcribed from the teacher's *THAI READING PASSAGE* booklets. Level 02 is in;
+03–05 carry a note saying their booklets exist and are waiting to be transcribed.
+
+- `short-stories-data.js` — data only, same shape as the Reading Club file: `status: "ready"` or
+  `"pending"` per level, then the stories as arrays of lines.
+
+  **The spacing inside each line is content, not formatting.** The Level 02 booklet separates
+  every word with a space so beginners can see word boundaries, so the lines are copied exactly
+  and rendered with `white-space: pre-wrap`. Tidying those spaces away would undo the point of
+  the exercise.
+- `books/short-stories-level-02.pdf` — the original booklet, linked from the level heading for
+  teachers who want to print it.
+- `StoryReader` in `pages.jsx` — the fullscreen reader behind each story's **เปิด** button:
+  - **Read-aloud with a green underline under the current word.** It speaks one word per
+    utterance and underlines on `onstart`, rather than speaking whole lines and following
+    `onboundary` — boundary events are unreliable for Thai, and word-by-word matches how this
+    level is meant to be read anyway. Speed is selectable; tapping any word speaks from there.
+  - **A timer**, which runs while reading and freezes when paused.
+  - Real fullscreen via `requestFullscreen`, and Esc closes. Speech is always cancelled on
+    unmount so nothing keeps talking after the reader closes.
+
+  If the device has no Thai voice the reader says so and carries on — the underline still tracks.
+  `.ss-lines` centres with `margin: auto` rather than `justify-content: center`, because the
+  latter clips the first line of a story taller than the screen and it cannot be scrolled back.

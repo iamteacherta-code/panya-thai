@@ -25,6 +25,7 @@ const RESOURCES = [
   { id: "lesson", en: "Lessons", th: "บทเรียน", icon: "lesson", color: "var(--clay)", desc: "Explicit, systematic phonics units in a UFLI-style scope & sequence." },
   { id: "reading", en: "Reading Passages", th: "บทอ่าน", icon: "reading", color: "var(--sky)", desc: "Decodable passages matched to the sounds taught in each lesson." },
   { id: "readingclub", en: "Reading Club", th: "ชมรมนักอ่าน", icon: "reading", color: "#3f7f93", desc: "Levelled story books pupils read aloud on screen, by year group — Y1 to Y4." },
+  { id: "shortstories", en: "14 Short Stories", th: "14 เรื่องสั้น", icon: "reading", color: "#a2603f", desc: "Fourteen short passages per level (02–05), word-spaced for beginners and building to full paragraphs." },
   { id: "activity", en: "Activity Sheets", th: "แผ่นกิจกรรม", icon: "worksheet", color: "#8a6f3a", desc: "Hands-on practice for letter forms, sound sorts and matching." },
   { id: "worksheet", en: "Worksheets", th: "ใบงาน", icon: "worksheet", color: "#7a5fb0", desc: "Printable worksheets, dictation and quick checks for mastery." },
   { id: "game", en: "Game", th: "เกม", icon: "play", color: "var(--leaf)", desc: "Play-on-screen blending, word-building, sorting and reading games." },
@@ -783,6 +784,258 @@ function ReadingClubPage() {
   );
 }
 
+/* ---------------- ตัวอ่านเต็มจอของ 14 เรื่องสั้น ----------------
+   สามอย่างที่ต้องมี
+     1. เปิดอ่านเต็มจอ ตัวใหญ่ อ่านจากไกลได้
+     2. มีเสียงอ่าน และคำที่กำลังอ่านมีเส้นสีเขียวอยู่ใต้คำ
+     3. จับเวลาการอ่าน
+
+   เรื่องเสียง — ตั้งใจอ่าน "ทีละคำ" ไม่ใช่ทีละบรรทัด
+   เพราะต้นฉบับระดับนี้แบ่งคำด้วยการเว้นวรรคอยู่แล้ว และการรอให้
+   เบราว์เซอร์บอกตำแหน่งคำ (onboundary) ยังไม่น่าเชื่อถือกับภาษาไทย
+   สั่งอ่านทีละคำแล้วขีดเส้นตอน onstart จึงตรงกันแน่นอนทุกครั้ง     */
+function StoryReader({ story, levelLabel, onClose }) {
+  const shellRef = React.useRef(null);
+  const stopRef = React.useRef(false);
+
+  /* แตกเป็นคำ พร้อมจำว่าอยู่บรรทัดไหน */
+  const words = React.useMemo(() => {
+    const out = [];
+    story.lines.forEach((line, li) => {
+      line.split(/\s+/).filter(Boolean).forEach((w) => out.push({ li, text: w }));
+    });
+    return out;
+  }, [story]);
+
+  const [wi, setWi] = React.useState(-1);        // คำที่กำลังอ่าน
+  const [playing, setPlaying] = React.useState(false);
+  const [rate, setRate] = React.useState(0.75);  // ช้าไว้ก่อน เด็กอ่านตามทัน
+  const [secs, setSecs] = React.useState(0);
+  const [ticking, setTicking] = React.useState(false);
+  const [voiceMissing, setVoiceMissing] = React.useState(false);
+
+  const synth = typeof window !== "undefined" ? window.speechSynthesis : null;
+
+  const thaiVoice = () => {
+    if (!synth) return null;
+    const list = synth.getVoices() || [];
+    return list.find((v) => /^th(-|_|$)/i.test(v.lang)) || null;
+  };
+
+  /* นาฬิกาจับเวลา */
+  React.useEffect(() => {
+    if (!ticking) return;
+    const id = setInterval(() => setSecs((s) => s + 1), 1000);
+    return () => clearInterval(id);
+  }, [ticking]);
+
+  /* เรื่องยาวกว่าจอ — เลื่อนให้คำที่กำลังอ่านอยู่กลางจอเสมอ */
+  React.useEffect(() => {
+    if (wi < 0 || !shellRef.current) return;
+    const el = shellRef.current.querySelector(".ss-w.on");
+    if (el && el.scrollIntoView) el.scrollIntoView({ block: "center", behavior: "smooth" });
+  }, [wi]);
+
+  /* ปิดด้วย Esc และหยุดเสียงเสมอเมื่อออกจากหน้า */
+  React.useEffect(() => {
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      stopRef.current = true;
+      if (synth) synth.cancel();
+    };
+  }, [onClose]);
+
+  function speakFrom(start) {
+    if (!synth) { setVoiceMissing(true); return; }
+    stopRef.current = false;
+    synth.cancel();
+    const voice = thaiVoice();
+    if (!voice) setVoiceMissing(true);
+    setPlaying(true);
+    setTicking(true);
+
+    let i = start;
+    const next = () => {
+      if (stopRef.current || i >= words.length) {
+        setPlaying(false);
+        setTicking(false);
+        if (!stopRef.current) setWi(-1);        // อ่านจบแล้วเอาเส้นออก
+        return;
+      }
+      const u = new SpeechSynthesisUtterance(words[i].text);
+      u.lang = "th-TH";
+      u.rate = rate;
+      if (voice) u.voice = voice;
+      const here = i;
+      u.onstart = () => setWi(here);
+      u.onend = () => { i++; next(); };
+      u.onerror = () => { i++; next(); };
+      synth.speak(u);
+    };
+    next();
+  }
+
+  function pause() {
+    stopRef.current = true;
+    if (synth) synth.cancel();
+    setPlaying(false);
+    setTicking(false);
+  }
+
+  function restart() {
+    pause();
+    setWi(-1);
+    setSecs(0);
+  }
+
+  function toggleFull() {
+    const el = shellRef.current;
+    const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+    if (!fsEl && el) {
+      const r = el.requestFullscreen || el.webkitRequestFullscreen;
+      if (r) try { const p = r.call(el); if (p && p.catch) p.catch(() => {}); } catch (e) {}
+    } else {
+      const x = document.exitFullscreen || document.webkitExitFullscreen;
+      if (x) try { x.call(document); } catch (e) {}
+    }
+  }
+
+  const mmss = String(Math.floor(secs / 60)).padStart(2, "0") + ":" + String(secs % 60).padStart(2, "0");
+
+  /* วาดทีละบรรทัด แต่ยังนับดัชนีคำต่อเนื่องทั้งเรื่อง */
+  let counter = -1;
+
+  return (
+    <div className="ss-reader" ref={shellRef} role="dialog" aria-label={"อ่านเรื่อง " + story.title}>
+      <div className="ss-bar">
+        <span className="ss-bar-t"><b>{story.no}. {story.title}</b><span>{levelLabel}</span></span>
+        <span className="ss-timer" title="เวลาที่ใช้อ่าน">⏱ {mmss}</span>
+        <span className="ss-sp"></span>
+        <label className="ss-rate">
+          เสียง
+          <select value={rate} onChange={(e) => setRate(Number(e.target.value))}>
+            <option value="0.6">ช้ามาก</option>
+            <option value="0.75">ช้า</option>
+            <option value="1">ปกติ</option>
+          </select>
+        </label>
+        {playing
+          ? <button className="btn btn-sm" onClick={pause}>⏸ หยุด</button>
+          : <button className="btn btn-sm btn-leaf" onClick={() => speakFrom(wi < 0 ? 0 : wi)}>▶ อ่านออกเสียง</button>}
+        <button className="btn btn-sm" onClick={restart}>↺ เริ่มใหม่</button>
+        <button className="btn btn-sm" onClick={toggleFull}>⛶ เต็มจอ</button>
+        <button className="btn btn-sm" onClick={onClose}>✕ ปิด</button>
+      </div>
+
+      {voiceMissing && (
+        <p className="ss-warn">
+          เครื่องนี้ยังไม่มีเสียงอ่านภาษาไทย ระบบจะใช้เสียงที่มีอยู่แทน — คำยังขีดเส้นตามปกติ
+          (Windows เพิ่มเสียงไทยได้ที่ Settings → Time &amp; language → Speech)
+        </p>
+      )}
+
+      {/* .ss-lines ใช้ margin:auto จัดกลาง แทน justify-content:center
+          เพราะแบบหลังจะตัดบรรทัดแรกทิ้งเมื่อเรื่องยาวเกินจอ เลื่อนขึ้นไปดูไม่ได้ */}
+      <div className="ss-stage">
+        <div className="ss-lines">
+          {story.lines.map((line, li) => (
+            <p key={li}>
+              {line.split(/\s+/).filter(Boolean).map((w, k) => {
+                counter++;
+                const idx = counter;
+                return (
+                  <span key={k} className={"ss-w" + (idx === wi ? " on" : "")}
+                        onClick={() => speakFrom(idx)} title="แตะเพื่อฟังคำนี้">{w}</span>
+                );
+              })}
+            </p>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- 14 SHORT STORIES ----------------
+   ชุดฝึกอ่าน 14 เรื่องต่อระดับ ไล่ Level 02 → 05
+   ข้อความคัดมาจากต้นฉบับตามเดิม รวมถึงการเว้นวรรคทีละคำ
+   ระดับที่ยังไม่ได้ถอดข้อความจะขึ้นกล่องบอกสถานะ ไม่ใช่หน้าว่าง */
+function ShortStoriesPage() {
+  const FILE = window.SHORT_STORIES_FILE;
+  const first = (FILE.levels.find((l) => l.status === "ready") || FILE.levels[0]).id;
+  const [lv, setLv] = React.useState(first);
+  const [open, setOpen] = React.useState(null);   // เรื่องที่กำลังเปิดอ่านเต็มจอ
+  const current = FILE.levels.find((l) => l.id === lv) || FILE.levels[0];
+
+  return (
+    <div>
+      <PageHead eyebrow="Short Stories · เรื่องสั้น" en="14 Short Stories" th="14 เรื่องสั้น"
+        sub="ชุดฝึกอ่านระดับละ 14 เรื่อง ไล่จากประโยคสั้นเว้นวรรคทีละคำ ไปจนถึงย่อหน้าเต็มพร้อมคำถามชวนคิด" />
+
+      <div className="level-bar">
+        <span className="lvl-lead">ระดับ <span className="en">· Level</span></span>
+        <div className="lvl-seg">
+          {FILE.levels.map((l) => (
+            <button key={l.id} className={lv === l.id ? "on" : ""} onClick={() => setLv(l.id)}>
+              <span className="lvl-step">{l.n}</span>
+              <span className="lvl-txt">
+                <b>{l.en}</b>
+                <span className="th">{l.status === "ready" ? l.stories.length + " เรื่อง" : "รอถอดข้อความ"}</span>
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="ss-head">
+        <div>
+          <span className="eyebrow">{current.en} · {current.th}</span>
+          <p className="page-sub" style={{ marginTop: 4 }}>{current.blurb}</p>
+        </div>
+        {current.pdf && (
+          <a className="btn btn-sm btn-ghost" href={current.pdf} target="_blank" rel="noopener">
+            <Ico name="print" style={{ width: 15, height: 15 }} /> ต้นฉบับ PDF · พิมพ์ได้
+          </a>
+        )}
+      </div>
+
+      {current.status !== "ready" ? (
+        <div className="rc-empty">
+          <Ico name="leaf" style={{ width: 22, height: 22, flex: "none" }} />
+          <div>
+            <b>{current.en} · ยังไม่ได้ถอดข้อความ</b>
+            <span>{current.note}</span>
+          </div>
+        </div>
+      ) : (
+        <div className="ss-grid">
+          {current.stories.map((s) => (
+            <article className="ss-card" key={s.no}>
+              <header>
+                <span className="ss-no">{s.no}</span>
+                <h3>{s.title}</h3>
+                <button className="ss-open" onClick={() => setOpen(s)}
+                        title="เปิดอ่านเต็มจอ พร้อมเสียงอ่านและจับเวลา">เปิด <Ico name="arrow" /></button>
+              </header>
+              {/* เว้นวรรคทีละคำตามต้นฉบับ — ห้ามรวบช่องไฟ */}
+              <div className="ss-text">
+                {s.lines.map((line, i) => <p key={i}>{line}</p>)}
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+
+      {open && (
+        <StoryReader story={open} levelLabel={current.en + " · " + current.th}
+                     onClose={() => setOpen(null)} />
+      )}
+    </div>
+  );
+}
+
 function ReadingPage() {
   const [lvl, setLvl] = React.useState("beginner");
   const [reader, setReader] = React.useState(null);
@@ -1107,5 +1360,5 @@ window.DIGITAL_APPS = DIGITAL_APPS;
 window.RESOURCES = RESOURCES;
 window.LESSON_ITEMS = LESSON_ITEMS;
 window.MAT_ITEMS = MAT_ITEMS;
-window.Pages = { HomePage, ActivityPage, LessonsPage, ReadingPage, ReadingClubPage, WorksheetsPage, GamesPage };
+window.Pages = { HomePage, ActivityPage, LessonsPage, ReadingPage, ReadingClubPage, ShortStoriesPage, WorksheetsPage, GamesPage };
 window.Ico = Ico;
