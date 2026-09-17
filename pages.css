@@ -128,6 +128,13 @@
   padding: 11px 20px; border-radius: 999px;
 }
 .sister-app .sa-go svg { width: 16px; height: 16px; }
+
+/* แถบแอปพี่น้องใบที่สอง (Thai Reading Club) — ใช้สีน้ำ --sky ของชุดสีเดิม
+   ไม่ได้ใช้สีประจำแอปนั้น เพื่อให้หน้าแรกยังเป็นชุดสีเดียวกันทั้งหน้า */
+.sister-app.sky { background: var(--sky-l); border-color: var(--sky); }
+.sister-app.sky .sa-ico,
+.sister-app.sky .sa-go { background: var(--sky); }
+
 @media (max-width: 620px) {
   .sister-app { flex-wrap: wrap; gap: 14px; }
   .sister-app .sa-go { margin-left: 0; width: 100%; justify-content: center; }

@@ -25,6 +25,7 @@
   --earth-l:   #f6e8d2;
   --clay:      #b05c3c;   /* terracotta accent */
   --sky:       #6f9bb0;   /* soft water blue */
+  --sky-l:     #e2ecf1;   /* พื้นอ่อนของสีน้ำ — ค่าเดียวกับใน activity-base.css */
 
   /* consonant class colors (high/mid/low) */
   --cls-H: #b05c3c;  /* terracotta */

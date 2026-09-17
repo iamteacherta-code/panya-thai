@@ -73,3 +73,19 @@ node tools/build-unit1-docx.js ["โฟลเดอร์ปลายทาง"]
 
 Default output: `D:\2026-2027 WORK\THAI FL\U1\หนังสือเรียน-Y4-หน่วยที่1 ชุมชนและบทบาทหน้าที่.docx`
 (55 A4 pages). Edit the content in `unit1-book-data.js` and both outputs follow.
+
+### Sister apps (separate websites)
+
+Two companion apps live on their own domains, so they are **not** mixed into the tool-card
+grids — a site on another domain gets a full-width `.sister-app` banner instead, so nobody
+mistakes it for a tool that runs here. Each one's address is a single `window.*` constant at
+the top of `pages.jsx`; move the site and only that line changes.
+
+| Banner | Constant | What it is |
+| --- | --- | --- |
+| Curriculum & Lesson Plans (leaf) | `CURRICULUM_APP_URL` | Teacher back office — IB + UFLI framework, weekly plan templates, marks and reports (K2–Y6). Sits under *Interactive tools*. |
+| Thai Reading Club (sky) | `READING_CLUB_URL` | The six Unit 1 books as an on-screen reader for pupils: sign in by name + 4-digit PIN, read aloud and each word turns green or red, end-of-book quiz, per-pupil progress. Sits at the end of *Lessons & materials · สื่อการสอน*, and is cross-linked from Reading Passages → Comprehension beside the printable reader, because both hold the same six books. |
+
+The Reading Club banner uses `--sky` / `--sky-l` from the shared palette rather than that app's
+own brand blue, so the home page stays one colour system. `--sky-l` was already defined in
+`activity-base.css`; it is now in `styles.css` too, with the same value.

@@ -14,6 +14,16 @@ const Placeholder = window.Placeholder;
 // ============================================================
 window.CURRICULUM_APP_URL = "https://panyaden-thai-curriculum.web.app/";
 
+// ============================================================
+//  ★ ที่อยู่ของแอป "THAI READING CLUB" (คนละเว็บกับ Panya Thai เช่นกัน)
+//
+//  โปรแกรมฝึกอ่านออกเสียงของนักเรียน Year 4 — หนังสือ 6 เล่มของหน่วยที่ 1
+//  ฉบับอ่านบนจอ นักเรียนเข้าด้วยชื่อตัวเอง + รหัส 4 หลัก ติดตั้งลงมือถือได้
+//
+//  ย้ายเว็บเมื่อไร แก้แค่บรรทัดข้างล่างบรรทัดเดียว
+// ============================================================
+window.READING_CLUB_URL = "https://thai-reading-club-year4.p-aumporn.chatgpt.site/";
+
 const DIGITAL_APPS = [
   { id: "mat", en: "Word Work Mat", th: "แผ่นฝึกคำ", icon: "activity", color: "var(--earth)", desc: "Build C+V and C+V+C words at the Beginner level (K2–Y2) — consonants, vowels, finals and tones." },
   { id: "board", en: "Blending Board", th: "กระดานประสมคำ", icon: "board", color: "var(--leaf)", desc: "Slide consonants, vowels and tones to blend syllables live — the UFLI blending drill." },
@@ -194,6 +204,21 @@ function HomePage({ go }) {
           </button>
         ))}
       </div>
+
+      {/* แอปพี่น้องใบที่สอง — อยู่คนละเว็บเหมือนกัน จึงใช้แถบเต็มความกว้างตามแบบเดิม
+          ไม่ปนกับการ์ดด้านบน วางไว้ท้ายหมวดสื่อการสอนเพราะเป็นสื่อสำหรับนักเรียนอ่านเอง */}
+      <a className="sister-app sky" href={window.READING_CLUB_URL} target="_blank" rel="noopener">
+        <span className="sa-ico"><Ico name="reading" /></span>
+        <span className="sa-copy">
+          <b>Thai Reading Club</b>
+          <span className="sa-th">ชมรมนักอ่านภาษาไทย · Year 4 · หน่วยที่ 1</span>
+          <span className="sa-desc">
+            หนังสือ 6 เล่มของหน่วย “ชุมชนและบทบาทหน้าที่” ฉบับอ่านบนจอ · นักเรียนเข้าด้วยชื่อตัวเองและรหัส 4 หลัก
+            ฝึกอ่านออกเสียงแล้วขึ้นสีทันทีว่าคำไหนถูกคำไหนผิด พร้อมบันทึกความก้าวหน้ารายคน
+          </span>
+        </span>
+        <span className="sa-go">เปิด <Ico name="arrow" /></span>
+      </a>
     </div>
   );
 }
@@ -672,6 +697,8 @@ function ReadingMode({ passage, onClose }) {
 // Comprehension (Y4–6) "read to learn" texts — link into the Reading & Writing pack.
 const READING_COMP = [
   { en: "หนังสือเรียน Y4 · หน่วยที่ 1", th: "ชุมชนและบทบาทหน้าที่ · 6 บท + ใบงาน 15 นาที", file: "reader-y4-unit1.html", feature: true },
+  // หนังสือชุดเดียวกันนี้ ฉบับให้นักเรียนอ่านออกเสียงเองบนจอ — อยู่คนละเว็บ จึงเปิดแท็บใหม่
+  { en: "Thai Reading Club", th: "หนังสือ 6 เล่มชุดเดียวกัน · นักเรียนฝึกอ่านออกเสียงเอง", file: null, ext: "READING_CLUB_URL", feature: true },
   { en: "Fluency · อ่านคล่อง", th: "อ่านซ้ำ จับจังหวะ (C1–C8)", file: "activity-reading-comprehension.html#s1" },
   { en: "Vocabulary · คลังคำ", th: "คำพ้อง คำยาก (C9–C18)", file: "activity-reading-comprehension.html#s6" },
   { en: "Comprehension · จับใจความ", th: "ใจความสำคัญ สรุป (C19–C28)", file: "activity-reading-comprehension.html#s12" },
@@ -765,18 +792,24 @@ function ReadingPage() {
       <LevelBar value={lvl} onChange={setLvl} extra={[{ key: "comprehension", n: "4", en: "Comprehension", th: "Y4–6" }]} />
       {lvl === "comprehension" ? (
         <div className="grid-2">
-          {READING_COMP.map((r, i) => (
-            <div className="item-card" key={i}>
-              <div className="item-meta">
-                <span className="tag">{r.feature ? "Year 4" : "Y4–6"}</span>
-                <span className="tag earth">{r.feature ? "Unit Reader" : "Read to Learn"}</span>
+          {READING_COMP.map((r, i) => {
+            const ext = r.ext ? window[r.ext] : null;   // ปลายทางอยู่คนละเว็บ → เปิดแท็บใหม่
+            return (
+              <div className="item-card" key={i}>
+                <div className="item-meta">
+                  <span className="tag">{r.feature ? "Year 4" : "Y4–6"}</span>
+                  <span className="tag earth">{ext ? "อ่านบนจอ · คนละเว็บ" : r.feature ? "Unit Reader" : "Read to Learn"}</span>
+                </div>
+                <h3>{r.en}<span className="th">{r.th}</span></h3>
+                <div className="item-actions">
+                  <a className="btn btn-sm btn-leaf" href={ext || r.file}
+                     {...(ext ? { target: "_blank", rel: "noopener" } : {})}>
+                    <Ico name="reading" style={{ width: 15, height: 15 }} /> {ext ? "เปิด · Open" : "อ่าน · Read"}
+                  </a>
+                </div>
               </div>
-              <h3>{r.en}<span className="th">{r.th}</span></h3>
-              <div className="item-actions">
-                <a className="btn btn-sm btn-leaf" href={r.file}><Ico name="reading" style={{ width: 15, height: 15 }} /> อ่าน · Read</a>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div className="grid-2">

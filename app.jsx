@@ -108,6 +108,11 @@ function NavBar({ page, go }) {
             <Ico name="lesson" />
             <span>Lesson Plans</span>
           </a>
+          <a className="nav-btn" href={window.READING_CLUB_URL} target="_blank" rel="noopener"
+             title="Thai Reading Club · ฝึกอ่านออกเสียงสำหรับนักเรียน Year 4 (เปิดในแท็บใหม่)">
+            <Ico name="reading" />
+            <span>Reading Club</span>
+          </a>
         </nav>
       </div>
     </header>
