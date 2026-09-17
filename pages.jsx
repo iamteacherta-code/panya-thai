@@ -709,6 +709,16 @@ function ReadingClubPage() {
         <span className="rc-open-go">เปิด <Ico name="arrow" /></span>
       </a>
 
+      {/* แถบครู — เข้าหลังบ้านได้เลยไม่ต้องล็อกอิน และบอกตรง ๆ ถ้ากำลังดูข้อมูลที่แก้ค้างไว้ */}
+      <div className="rc-admin-bar">
+        <span className="rc-admin-note">
+          {RC.edited
+            ? "กำลังแสดงข้อมูลที่แก้ไว้ในเครื่องนี้ — เครื่องอื่นยังเห็นข้อมูลตามไฟล์เดิม"
+            : "ข้อมูลตรงกับไฟล์ในโปรเจกต์"}
+        </span>
+        <a className="btn btn-sm" href={RC.adminUrl}>⚙ หลังบ้าน · แก้ชั้นวางหนังสือ</a>
+      </div>
+
       {/* ตัวเลือกชั้นเรียน ใช้หน้าตาเดียวกับแถบระดับของหน้าอื่น */}
       <div className="level-bar">
         <span className="lvl-lead">ชั้นเรียน <span className="en">· Year</span></span>

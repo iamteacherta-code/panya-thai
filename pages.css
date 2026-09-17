@@ -362,3 +362,14 @@
   .rc-open { flex-wrap: wrap; }
   .rc-open-go { margin-left: 0; width: 100%; justify-content: center; }
 }
+
+/* แถบครูบนหน้า Reading Club — เข้าหลังบ้านได้ทันที ไม่มีขั้นตอนล็อกอิน
+   และบอกตรง ๆ ว่ากำลังดูข้อมูลของไฟล์ หรือข้อมูลที่แก้ค้างไว้ในเครื่องนี้ */
+.rc-admin-bar {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  margin: -10px 0 20px; padding: 10px 14px;
+  border: 1.4px dashed var(--line-2); border-radius: 14px; background: var(--surface);
+}
+.rc-admin-note { font-family: var(--font-thai); font-size: 13.5px; color: var(--ink-3); }
+.rc-admin-bar .btn { margin-left: auto; }
+@media (max-width: 620px) { .rc-admin-bar .btn { margin-left: 0; width: 100%; justify-content: center; } }

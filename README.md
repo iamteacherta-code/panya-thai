@@ -88,13 +88,32 @@ aloud on screen, **organised by year group**. The reading itself happens in a se
 in by name + 4-digit PIN, each word turns green or red as it is read, per-pupil progress), so
 every book card opens that app in a new tab.
 
-- `reading-club-data.js` — the whole shelf: which years exist, which already have books, and the
-  books themselves. Each year carries `status: "ready"` or `"pending"`; a pending year shows a
-  panel saying its books are still to come from the back office, rather than an empty page. Only
-  **Y4** is filled today (Unit 1, six books); **Y1–Y3** are waiting. To add a year, flip its
-  `status` and drop the books into `units` — nothing else changes, the page reads this file alone.
-  The app's address lives here too, as `READING_CLUB_URL`.
+- `reading-club-data.js` — **data only**, no logic: the app's address plus the whole shelf. Each
+  year carries `status: "ready"` or `"pending"`; a pending year shows a panel saying its books are
+  still to come, rather than an empty page. Only **Y4** is filled today (Unit 1, six books);
+  **Y1–Y3** are waiting. This is the file the back office writes, so keep it plain.
+- `reading-club-store.js` — sits between that file and whatever the teacher has edited locally,
+  and exposes `RC.years` / `RC.save()` / `RC.reset()` / `RC.toFileSource()`.
 - `ReadingClubPage` in `pages.jsx` renders it. The year switcher reuses the same `.level-bar`
   markup as the other pages, and covers are pulled live from the Reading Club site.
 - The printable reader for a unit is linked from that unit's heading, so the on-screen and paper
   versions of the same six books sit together.
+
+#### Back office — `reading-club-admin.html`
+
+Open it and edit; there is no sign-in, because there is nothing to sign in to. Add and remove
+units and books, switch a year between *รอข้อมูล* and *มีหนังสือแล้ว*, edit every field inline.
+Edits save as you type.
+
+Panya Thai is a static site, so a back office cannot write to shared storage — and rather than
+hide that, the page works in two explicit steps:
+
+1. **Edits land in this browser** (`localStorage`) and the Reading Club page reflects them at once,
+   which is enough to try a change out. The Reading Club page says plainly when it is showing
+   locally-edited data, so nobody mistakes it for what everyone else sees.
+2. **ดาวน์โหลดไฟล์ข้อมูล** regenerates `reading-club-data.js` from the current state. Drop that over
+   the file in the project and deploy, and every device sees it. *คืนค่าตามไฟล์* throws the local
+   edits away.
+
+The generated file is plain data, so it round-trips: what the back office writes is exactly what
+`reading-club-data.js` looks like by hand.

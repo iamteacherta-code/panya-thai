@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · หลังบ้าน Reading Club</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="activity-base.css" />
+<style>
+  body{background:var(--bg);}
+  .wrap{max-width:1120px;margin:0 auto;padding:22px 18px 70px;}
+
+  /* ---------- หัวเรื่อง ---------- */
+  .bo-head{margin-bottom:18px;}
+  .bo-head .kick{font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--earth-d);}
+  .bo-head h1{margin:4px 0 2px;font-family:var(--font-thai);font-size:30px;font-weight:700;color:var(--ink);}
+  .bo-head p{margin:0;font-family:var(--font-thai);font-size:15px;color:var(--ink-3);}
+
+  /* ---------- กล่องอธิบายวิธีทำงาน ---------- */
+  .bo-how{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0 22px;}
+  .bo-how div{border:1.5px solid var(--line);border-radius:14px;background:var(--surface);padding:12px 16px;}
+  .bo-how b{display:block;font-family:var(--font-thai);font-size:15px;color:var(--leaf-d);margin-bottom:2px;}
+  .bo-how span{font-family:var(--font-thai);font-size:13.5px;color:var(--ink-3);line-height:1.6;}
+
+  /* ---------- แถบสถานะ + ปุ่มหลัก ---------- */
+  .bo-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    border:1.5px solid var(--line);border-radius:16px;background:var(--surface);padding:12px 16px;margin-bottom:22px;}
+  .bo-state{font-family:var(--font-thai);font-size:14px;color:var(--ink-2);display:flex;align-items:center;gap:8px;}
+  .bo-dot{width:10px;height:10px;border-radius:50%;background:var(--ink-3);flex:none;}
+  .bo-dot.on{background:var(--earth);}
+  .bo-bar .spacer{margin-left:auto;}
+
+  /* ---------- แถบเลือกชั้นเรียน ---------- */
+  .yr-bar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px;}
+  .yr{flex:1 1 200px;text-align:left;border:1.6px solid var(--line);background:var(--surface);
+    border-radius:16px;padding:13px 16px;cursor:pointer;font-family:var(--font-thai);color:var(--ink);
+    transition:border-color .15s,background .15s,transform .1s;}
+  .yr:hover{border-color:var(--line-2);transform:translateY(-1px);}
+  .yr.on{background:var(--leaf);border-color:var(--leaf-d);color:#fff;box-shadow:inset 0 -3px 0 rgba(0,0,0,.14);}
+  .yr b{display:block;font-size:18px;font-weight:700;}
+  .yr small{display:block;font-size:13px;opacity:.85;margin-top:1px;}
+  .yr .cnt{display:inline-block;margin-top:7px;font-size:12.5px;font-weight:700;
+    background:rgba(0,0,0,.07);border-radius:999px;padding:2px 10px;}
+  .yr.on .cnt{background:rgba(255,255,255,.22);}
+
+  /* ---------- กล่องแก้ไข ---------- */
+  .card{border:1.6px solid var(--line);border-radius:18px;background:var(--surface);padding:18px 20px;margin-bottom:16px;}
+  .card > h2{margin:0 0 4px;font-family:var(--font-thai);font-size:20px;font-weight:700;}
+  .card > .hint{font-family:var(--font-thai);font-size:13.5px;color:var(--ink-3);margin:0 0 14px;}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px;}
+  .f{display:flex;flex-direction:column;gap:4px;flex:1 1 200px;min-width:0;}
+  .f.sm{flex:0 0 108px;}
+  .f.xs{flex:0 0 86px;}
+  .f label{font-family:var(--font-thai);font-size:13px;font-weight:700;color:var(--earth-d);}
+  .f input,.f textarea,.f select{font-family:var(--font-thai);font-size:15px;color:var(--ink);
+    border:1.5px solid var(--line-2);border-radius:11px;background:#fff;padding:9px 12px;outline:none;width:100%;}
+  .f input:focus,.f textarea:focus,.f select:focus{border-color:var(--leaf);box-shadow:0 0 0 3px var(--leaf-l);}
+  .f textarea{resize:vertical;min-height:62px;line-height:1.6;}
+  /* ช่องเลือกสีต้องกำหนดความสูงเอง ไม่งั้นจะแบนเป็นเส้น */
+  .f input[type=color]{height:40px;padding:4px;cursor:pointer;}
+
+  /* ---------- รายการหนังสือ ---------- */
+  .unit{border:1.5px dashed var(--line-2);border-radius:16px;padding:15px 16px;margin-bottom:14px;background:#fff;}
+  .unit-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+  .unit-top b{font-family:var(--font-thai);font-size:17px;}
+  .unit-top .spacer{margin-left:auto;}
+  .book{display:flex;gap:12px;border:1.4px solid var(--line);border-radius:14px;background:var(--surface);
+    padding:12px 14px;margin-bottom:10px;align-items:flex-start;}
+  .book .thumb{width:62px;height:47px;border-radius:9px;flex:none;overflow:hidden;background:var(--line);}
+  .book .thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .book .fields{flex:1;min-width:0;}
+  .book .del{flex:none;}
+
+  .btn.btn-danger{background:#fff;color:#b3402f;border-color:#e6bdb4;}
+  .btn.btn-danger:hover{background:#fdf1ee;}
+  .btn.tiny{padding:7px 12px;font-size:12.5px;}
+  .empty{font-family:var(--font-thai);font-size:14.5px;color:var(--ink-3);
+    border:1.5px dashed var(--line-2);border-radius:14px;padding:18px;text-align:center;background:#fff;}
+
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(8px);z-index:99;
+    background:var(--ink);color:#fff;font-family:var(--font-thai);font-size:15px;
+    padding:11px 20px;border-radius:14px;box-shadow:0 10px 30px rgba(40,32,18,.35);
+    opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:min(560px,92vw);text-align:center;}
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  @media (max-width:720px){ .bo-how{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <a class="btn btn-home" href="./Panyaden%20Thai%20Literacy.html">← หน้าหลัก</a>
+  <div class="tb-title">PANYA · หลังบ้าน Reading Club
+    <small>แก้ชั้นวางหนังสือรายชั้นเรียน — เปิดใช้ได้เลย ไม่ต้องล็อกอิน</small></div>
+  <span class="spacer"></span>
+  <button class="btn" id="btnReset">คืนค่าตามไฟล์</button>
+  <button class="btn btn-primary" id="btnDownload">⬇ ดาวน์โหลดไฟล์ข้อมูล</button>
+</div>
+
+<div class="wrap">
+  <div class="bo-head">
+    <div class="kick">Teacher back office</div>
+    <h1>จัดการชั้นวางหนังสือ Reading Club</h1>
+    <p>เลือกชั้นเรียนก่อน แล้วเพิ่มหรือแก้หนังสือได้เลย · หน้านี้ไม่ต้องเชื่อมบัญชีใดทั้งสิ้น</p>
+  </div>
+
+  <div class="bo-how">
+    <div>
+      <b>1 · แก้แล้วเห็นผลทันที</b>
+      <span>ทุกอย่างที่แก้จะถูกเก็บไว้ในเครื่องนี้ และหน้า Reading Club จะแสดงตามที่แก้ทันที ใช้ลองดูก่อนได้ไม่ต้องกลัวพัง</span>
+    </div>
+    <div>
+      <b>2 · ให้ทุกเครื่องเห็นตรงกัน</b>
+      <span>กด “ดาวน์โหลดไฟล์ข้อมูล” จะได้ไฟล์ <code>reading-club-data.js</code> เอาไปวางทับไฟล์เดิมในโปรเจกต์ แล้วอัปขึ้นเว็บ</span>
+    </div>
+  </div>
+
+  <div class="bo-bar">
+    <span class="bo-state"><span class="bo-dot" id="dot"></span><span id="stateText">กำลังอ่านข้อมูล…</span></span>
+    <span class="spacer"></span>
+    <button class="btn btn-sm" id="btnPreview">ดูหน้า Reading Club</button>
+  </div>
+
+  <div class="yr-bar" id="yrBar"></div>
+  <div id="panel"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="reading-club-data.js"></script>
+<script src="reading-club-store.js"></script>
+<script>
+(function () {
+  const RC = window.READING_CLUB;
+  let years = RC.clone(RC.years);      // สำเนาที่กำลังแก้อยู่
+  let current = years.findIndex(y => y.status === "ready");
+  if (current < 0) current = 0;
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+  let toastTimer = null;
+  function toast(msg, ms) {
+    const t = $("toast");
+    t.textContent = msg; t.classList.add("on");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove("on"), ms || 2600);
+  }
+
+  const bookCount = (y) => (y.units || []).reduce((n, u) => n + (u.books || []).length, 0);
+
+  /* บันทึกทุกครั้งที่แก้ — ไม่มีปุ่ม "บันทึก" ให้ลืมกด */
+  function commit(msg) {
+    RC.save(years);
+    paint();
+    if (msg) toast(msg);
+  }
+
+  function paintState() {
+    const edited = RC.edited;
+    $("dot").className = "bo-dot" + (edited ? " on" : "");
+    $("stateText").textContent = edited
+      ? "มีการแก้ไขเก็บไว้ในเครื่องนี้" + (RC.savedAt ? " · ล่าสุด " + new Date(RC.savedAt).toLocaleString("th-TH", { dateStyle: "medium", timeStyle: "short" }) : "") + " — ยังไม่ได้วางทับไฟล์"
+      : "ตรงกับไฟล์ข้อมูลในโปรเจกต์ ยังไม่มีการแก้ไขค้างไว้";
+  }
+
+  function paintYears() {
+    $("yrBar").innerHTML = years.map((y, i) => `
+      <button class="yr${i === current ? " on" : ""}" data-i="${i}">
+        <b>${esc(y.en)}</b>
+        <small>${esc(y.th)} · ${y.status === "ready" ? "มีหนังสือแล้ว" : "รอข้อมูล"}</small>
+        <span class="cnt">${bookCount(y)} เล่ม</span>
+      </button>`).join("");
+    $("yrBar").querySelectorAll(".yr").forEach(b => {
+      b.onclick = () => { current = Number(b.dataset.i); paint(); };
+    });
+  }
+
+  function paintPanel() {
+    const y = years[current];
+    const p = $("panel");
+
+    let html = `
+      <div class="card">
+        <h2>${esc(y.en)} · ${esc(y.th)}</h2>
+        <p class="hint">ตั้งค่าพื้นฐานของชั้นเรียนนี้</p>
+        <div class="row">
+          <div class="f sm">
+            <label>สถานะ</label>
+            <select data-k="status">
+              <option value="pending"${y.status === "pending" ? " selected" : ""}>รอข้อมูล</option>
+              <option value="ready"${y.status === "ready" ? " selected" : ""}>มีหนังสือแล้ว</option>
+            </select>
+          </div>
+          <div class="f"><label>ชื่ออังกฤษ</label><input data-k="en" value="${esc(y.en)}"></div>
+          <div class="f sm"><label>ชื่อไทย</label><input data-k="th" value="${esc(y.th)}"></div>
+        </div>
+        <div class="row" style="margin-bottom:0">
+          <div class="f"><label>ข้อความตอนยังไม่มีหนังสือ</label>
+            <textarea data-k="note">${esc(y.note)}</textarea></div>
+        </div>
+      </div>`;
+
+    (y.units || []).forEach((u, ui) => {
+      html += `
+      <div class="card">
+        <div class="unit-top">
+          <b>หน่วยที่ ${u.no} · ${esc(u.title)}</b>
+          <span class="spacer"></span>
+          <button class="btn btn-sm btn-danger tiny" data-del-unit="${ui}">ลบหน่วยนี้</button>
+        </div>
+        <div class="row">
+          <div class="f xs"><label>หน่วยที่</label><input type="number" min="1" data-u="${ui}" data-k="no" value="${esc(u.no)}"></div>
+          <div class="f"><label>ชื่อหน่วย</label><input data-u="${ui}" data-k="title" value="${esc(u.title)}"></div>
+          <div class="f"><label>ชื่ออังกฤษ</label><input data-u="${ui}" data-k="titleEn" value="${esc(u.titleEn)}"></div>
+        </div>
+        <div class="row">
+          <div class="f"><label>คำอธิบายหน่วย</label><textarea data-u="${ui}" data-k="desc">${esc(u.desc)}</textarea></div>
+          <div class="f"><label>ไฟล์ฉบับพิมพ์ (เว้นว่างได้)</label><input data-u="${ui}" data-k="reader" value="${esc(u.reader)}" placeholder="reader-y4-unit1.html"></div>
+        </div>
+
+        <div class="unit-top" style="margin-top:6px">
+          <b style="font-size:15px;color:var(--earth-d)">หนังสือ ${(u.books || []).length} เล่ม</b>
+          <span class="spacer"></span>
+          <button class="btn btn-sm tiny" data-add-book="${ui}">+ เพิ่มหนังสือ</button>
+        </div>`;
+
+      if (!(u.books || []).length) {
+        html += `<div class="empty">ยังไม่มีหนังสือในหน่วยนี้ — กด “เพิ่มหนังสือ” เพื่อเริ่ม</div>`;
+      } else {
+        u.books.forEach((b, bi) => {
+          const cov = RC.coverUrl(b);
+          html += `
+          <div class="book">
+            <span class="thumb" style="background:${esc(b.color) || "var(--line)"}">
+              ${cov ? `<img src="${esc(cov)}" alt="" onerror="this.style.display='none'">` : ""}
+            </span>
+            <div class="fields">
+              <div class="row">
+                <div class="f xs"><label>เล่มที่</label><input type="number" min="1" data-u="${ui}" data-b="${bi}" data-k="level" value="${esc(b.level)}"></div>
+                <div class="f"><label>ชื่อเรื่อง</label><input data-u="${ui}" data-b="${bi}" data-k="title" value="${esc(b.title)}"></div>
+                <div class="f sm"><label>รหัสเล่ม</label><input data-u="${ui}" data-b="${bi}" data-k="id" value="${esc(b.id)}"></div>
+              </div>
+              <div class="row">
+                <div class="f"><label>หัวข้อสัปดาห์</label><input data-u="${ui}" data-b="${bi}" data-k="subtitle" value="${esc(b.subtitle)}"></div>
+                <div class="f"><label>ที่อยู่รูปปก</label><input data-u="${ui}" data-b="${bi}" data-k="cover" value="${esc(b.cover)}" placeholder="/books/cover-1.webp"></div>
+                <div class="f xs"><label>สี</label><input type="color" data-u="${ui}" data-b="${bi}" data-k="color" value="${esc(b.color) || "#cccccc"}"></div>
+              </div>
+              <div class="row" style="margin-bottom:0">
+                <div class="f xs"><label>หน้า</label><input type="number" min="0" data-u="${ui}" data-b="${bi}" data-k="pages" value="${esc(b.pages)}"></div>
+                <div class="f xs"><label>คำศัพท์</label><input type="number" min="0" data-u="${ui}" data-b="${bi}" data-k="words" value="${esc(b.words)}"></div>
+                <div class="f xs"><label>คำถาม</label><input type="number" min="0" data-u="${ui}" data-b="${bi}" data-k="questions" value="${esc(b.questions)}"></div>
+              </div>
+            </div>
+            <span class="del"><button class="btn btn-sm btn-danger tiny" data-del-book="${ui}:${bi}">ลบ</button></span>
+          </div>`;
+        });
+      }
+      html += `</div>`;
+    });
+
+    html += `<button class="btn" id="btnAddUnit">+ เพิ่มหน่วยการเรียนรู้</button>`;
+    p.innerHTML = html;
+
+    /* ---- ผูกเหตุการณ์ ---- */
+    p.querySelectorAll("[data-k]").forEach(el => {
+      const k = el.dataset.k;
+      const ui = el.dataset.u, bi = el.dataset.b;
+      const handler = () => {
+        let v = el.type === "number" ? Number(el.value) : el.value;
+        if (ui == null) y[k] = v;
+        else if (bi == null) y.units[+ui][k] = v;
+        else y.units[+ui].books[+bi][k] = v;
+        RC.save(years);
+        paintState();
+        if (k === "status" || k === "en" || k === "th") paintYears();
+      };
+      el.addEventListener("change", handler);
+      if (el.tagName !== "SELECT" && el.type !== "color") el.addEventListener("blur", handler);
+    });
+
+    p.querySelectorAll("[data-add-book]").forEach(b => b.onclick = () => {
+      const u = y.units[+b.dataset.addBook];
+      u.books = u.books || [];
+      u.books.push({
+        id: "book-" + (u.books.length + 1), level: u.books.length + 1,
+        title: "หนังสือเล่มใหม่", subtitle: "", color: "#8fbf7f",
+        cover: "", pages: 0, words: 0, questions: 0,
+      });
+      commit("เพิ่มหนังสือแล้ว");
+    });
+
+    p.querySelectorAll("[data-del-book]").forEach(b => b.onclick = () => {
+      const [ui2, bi2] = b.dataset.delBook.split(":").map(Number);
+      const name = y.units[ui2].books[bi2].title || "เล่มนี้";
+      if (!confirm("ลบ “" + name + "” ออกจากชั้นวางหรือไม่?")) return;
+      y.units[ui2].books.splice(bi2, 1);
+      commit("ลบหนังสือแล้ว");
+    });
+
+    p.querySelectorAll("[data-del-unit]").forEach(b => b.onclick = () => {
+      const ui2 = +b.dataset.delUnit;
+      if (!confirm("ลบหน่วยที่ " + y.units[ui2].no + " พร้อมหนังสือทั้งหมดในหน่วยหรือไม่?")) return;
+      y.units.splice(ui2, 1);
+      commit("ลบหน่วยแล้ว");
+    });
+
+    const addUnit = $("btnAddUnit");
+    if (addUnit) addUnit.onclick = () => {
+      y.units = y.units || [];
+      y.units.push({
+        no: y.units.length + 1, title: "หน่วยการเรียนรู้ใหม่", titleEn: "",
+        desc: "", reader: "", books: [],
+      });
+      if (y.status !== "ready") y.status = "ready";
+      commit("เพิ่มหน่วยแล้ว");
+    };
+  }
+
+  function paint() { paintState(); paintYears(); paintPanel(); }
+
+  /* ---- ปุ่มบนแถบเครื่องมือ ---- */
+  $("btnDownload").onclick = () => {
+    const src = RC.toFileSource(years, RC.appUrl);
+    const blob = new Blob([src], { type: "text/javascript;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "reading-club-data.js";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    toast("ดาวน์โหลดแล้ว — นำไฟล์ไปวางทับ reading-club-data.js ในโปรเจกต์", 6000);
+  };
+
+  $("btnReset").onclick = () => {
+    if (!confirm("ทิ้งสิ่งที่แก้ไว้ในเครื่องนี้ แล้วกลับไปใช้ข้อมูลตามไฟล์หรือไม่?")) return;
+    RC.reset();
+    years = RC.clone(RC.fileYears);
+    if (current >= years.length) current = 0;
+    paint();
+    toast("กลับไปใช้ข้อมูลตามไฟล์แล้ว");
+  };
+
+  $("btnPreview").onclick = () => {
+    try { localStorage.setItem("panyaden_page", "readingclub"); } catch (e) {}
+    window.open("./Panyaden%20Thai%20Literacy.html", "_blank", "noopener");
+  };
+
+  paint();
+})();
+</script>
+</body>
+</html>
