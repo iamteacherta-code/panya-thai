@@ -138,6 +138,16 @@ fourteen stories are 202 distinct words, so the whole set is one sitting.
   the stories. There is also a free-text box for words that are not in any story.
 - `Space` records and stops, the clip plays straight back so you hear whether it was clear, and it
   moves on to the next word by itself. A level meter shows the microphone is actually picking up.
+- `Space` toggles, and the handler **ignores auto-repeat** (`e.repeat`). Without that guard, holding
+  the key down made the keyboard fire `keydown` over and over, flipping record on and off until the
+  only thing left in the clip was the sound of the key itself — which is exactly what happened the
+  first time this was used. กด Space ค้างไว้ จึงไม่ทำอะไรทั้งนั้น
+- Every clip is decoded with `decodeAudioData` before it is kept, for its **real duration and peak**.
+  A MediaRecorder WebM carries no duration in its header, so an `<audio>` element reports `Infinity`
+  and there is no other way to tell a good take from a 0.1-second one. Under 0.35 s or quieter than
+  0.02 peak is **not saved** — a bad clip must not turn the word green. **ตรวจเสียงที่อัดไว้** runs the
+  same test over everything already stored and outlines the failures in orange.
+  It measures length and loudness, not *what was said*, so a wrong word still needs an ear.
 - Clips are held in **IndexedDB**, not `localStorage` — a `Blob` cannot go in `localStorage` and
   200 clips would blow the quota anyway. They survive a refresh, so recording can stop and resume.
 - **ดาวน์โหลดเสียงทั้งหมด** writes a `.zip` byte by byte in the page (CRC32 + *stored* entries; Opus

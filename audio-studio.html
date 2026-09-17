@@ -79,6 +79,7 @@
   .chip:hover{border-color:var(--leaf);}
   .chip.done{background:var(--leaf-l);border-color:var(--leaf);color:var(--leaf-d);font-weight:700;}
   .chip.here{outline:3px solid var(--earth);outline-offset:1px;}
+  .chip.bad{background:var(--clay-l);border-color:var(--clay);color:var(--ink);font-weight:700;}
 
   .card{border:1.6px solid var(--line);border-radius:18px;background:var(--surface);padding:18px 20px;margin-bottom:16px;}
   .card > h2{margin:0 0 4px;font-family:var(--font-thai);font-size:20px;font-weight:700;}
@@ -115,6 +116,7 @@
     <span class="st-count" id="count">—</span>
     <span class="spacer"></span>
     <button class="btn" id="btnMic">เปิดไมโครโฟน</button>
+    <button class="btn" id="btnCheck">ตรวจเสียงที่อัดไว้</button>
     <button class="btn" id="btnZip">ดาวน์โหลดเสียงทั้งหมด (.zip)</button>
     <button class="btn" id="btnClear">ล้างเสียงที่อัดไว้</button>
     <a class="btn btn-home" href="Panyaden Thai Literacy.html">กลับหน้าหลัก</a>
@@ -134,7 +136,7 @@
       <button class="btn" id="btnNext">ถัดไป ▶</button>
     </div>
     <div class="keys">
-      <kbd>Space</kbd> เริ่ม/หยุดอัด · <kbd>P</kbd> ฟัง · <kbd>←</kbd> <kbd>→</kbd> เปลี่ยนคำ ·
+      <kbd>Space</kbd> กดหนึ่งครั้งเริ่ม กดอีกครั้งหยุด (<b>อย่ากดค้าง</b>) · <kbd>P</kbd> ฟัง · <kbd>←</kbd> <kbd>→</kbd> เปลี่ยนคำ ·
       อัดเสร็จจะเลื่อนไปคำถัดไปให้เอง
     </div>
   </div>
@@ -231,7 +233,7 @@
   }
 
   /* ---------- สถานะหน้าจอ ---------- */
-  var setIx = 0, wordIx = 0, done = {}, stream = null, rec = null, chunks = [], recording = false;
+  var setIx = 0, wordIx = 0, done = {}, bad = {}, stream = null, rec = null, chunks = [], recording = false;
   var EXT = "webm", MIME = "";
   var analyser = null, rafId = 0;
 
@@ -258,7 +260,7 @@
     var g = $("grid"); g.innerHTML = "";
     cur().words.forEach(function (w, i) {
       var b = document.createElement("button");
-      b.className = "chip" + (done[w] ? " done" : "") + (i === wordIx ? " here" : "");
+      b.className = "chip" + (done[w] ? " done" : "") + (bad[w] ? " bad" : "") + (i === wordIx ? " here" : "");
       b.textContent = w;
       b.onclick = function () { wordIx = i; renderGrid(); renderBooth(); };
       g.appendChild(b);
@@ -270,7 +272,7 @@
     $("pos").textContent = n ? "คำที่ " + (wordIx + 1) + " จาก " + n : "ชุดนี้ยังไม่มีคำ";
     $("word").textContent = w || "—";
     $("word").className = "word" + (done[w] ? " done" : "");
-    $("sub").textContent = !w ? "" : done[w] ? "อัดไว้แล้ว — อัดใหม่ทับได้" : "ยังไม่ได้อัด";
+    $("sub").textContent = !w ? "" : bad[w] ? bad[w] : done[w] ? "อัดไว้แล้ว — อัดใหม่ทับได้" : "ยังไม่ได้อัด";
     var total = 0, got = 0;
     SETS.forEach(function (s) { s.words.forEach(function (x) { total++; if (done[x]) got++; }); });
     $("count").textContent = "อัดแล้ว " + got + " / " + total + " คำ";
@@ -327,6 +329,28 @@
     });
   }
 
+  /* ---------- ตรวจว่าคลิปใช้ได้จริงไหม ----------
+     MediaRecorder เขียน WebM โดยไม่ใส่ความยาวไว้ในหัวไฟล์ ถาม <audio> จะได้ Infinity
+     ต้องถอดเป็นคลื่นเสียงจริงถึงจะรู้ทั้งความยาวและความดัง                        */
+  var decodeCtx = null;
+  function analyse(blob) {
+    return blob.arrayBuffer().then(function (ab) {
+      if (!decodeCtx) decodeCtx = new (window.AudioContext || window.webkitAudioContext)();
+      return decodeCtx.decodeAudioData(ab);
+    }).then(function (buf) {
+      var d = buf.getChannelData(0), peak = 0;
+      for (var i = 0; i < d.length; i++) { var v = d[i] < 0 ? -d[i] : d[i]; if (v > peak) peak = v; }
+      return { dur: buf.duration, peak: peak };
+    }).catch(function () { return null; });
+  }
+  var MIN_DUR = 0.35, MIN_PEAK = 0.02;
+  function verdict(a) {
+    if (!a) return null;                       // ถอดไฟล์ไม่ได้ ก็ยังไม่ตัดสินว่าเสีย
+    if (a.dur < MIN_DUR) return "สั้นเกินไป (" + a.dur.toFixed(2) + " วินาที) — กด Space ครั้งเดียวเพื่อเริ่ม พูด แล้วกดอีกครั้งเพื่อหยุด อย่ากดค้างไว้";
+    if (a.peak < MIN_PEAK) return "แทบไม่มีเสียง — ไมโครโฟนอาจถูกปิด หรือเบราว์เซอร์เลือกไมค์ผิดตัว";
+    return null;
+  }
+
   function startRec() {
     if (!stream) { openMic(); return; }
     if (recording || !curWord()) return;
@@ -340,13 +364,19 @@
       $("btnRec").textContent = "● อัดเสียง";
       $("btnRec").className = "rec-btn";
       $("meter").className = "meter";
-      if (!blob.size) { setState("ไม่ได้ยินเสียงเลย ลองใหม่อีกครั้ง", "on"); return; }
-      putClip(w, blob).then(function () {
-        done[w] = 1;
-        setState("เก็บเสียงคำ “" + w + "” แล้ว", "on");
-        renderGrid(); renderBooth();
-        // ฟังซ้ำทันทีเพื่อตรวจว่าชัดไหม แล้วค่อยเลื่อนไปคำถัดไป
-        play(blob, function () { if (wordIx < cur().words.length - 1) { wordIx++; renderGrid(); renderBooth(); } });
+      if (!blob.size) { setState("ไม่ได้ยินเสียงเลย ลองใหม่อีกครั้ง"); return; }
+      analyse(blob).then(function (a) {
+        // คลิปที่ใช้ไม่ได้ไม่เก็บ ไม่งั้นคำจะขึ้นเขียวว่าเสร็จแล้วทั้งที่ฟังไม่รู้เรื่อง
+        var no = verdict(a);
+        if (no) { bad[w] = no; setState(no); renderGrid(); renderBooth(); return; }
+        delete bad[w];
+        return putClip(w, blob).then(function () {
+          done[w] = 1;
+          setState("เก็บเสียงคำ “" + w + "” แล้ว" + (a ? " · " + a.dur.toFixed(2) + " วินาที" : ""), "on");
+          renderGrid(); renderBooth();
+          // ฟังซ้ำทันทีเพื่อตรวจว่าชัดไหม แล้วค่อยเลื่อนไปคำถัดไป
+          play(blob, function () { if (wordIx < cur().words.length - 1) { wordIx++; renderGrid(); renderBooth(); } });
+        });
       });
     };
     rec.start();
@@ -354,7 +384,7 @@
     $("btnRec").textContent = "■ หยุดอัด";
     $("btnRec").className = "rec-btn stop";
     $("meter").className = "meter rec";
-    setState("กำลังอัด “" + curWord() + "” — พูดให้ชัด แล้วกด Space อีกครั้ง", "rec");
+    setState("กำลังอัด “" + curWord() + "” — พูดให้ชัด แล้วกด Space อีกครั้งเพื่อหยุด (อย่ากดค้าง)", "rec");
   }
 
   function stopRec() { if (recording && rec) try { rec.stop(); } catch (e) {} }
@@ -365,7 +395,8 @@
     if (au) { try { au.pause(); } catch (e) {} URL.revokeObjectURL(au.src); }
     au = new Audio(URL.createObjectURL(blob));
     au.onended = function () { if (after) after(); };
-    au.play().catch(function () { if (after) after(); });
+    au.onerror = function () { setState("เล่นไฟล์เสียงไม่ได้ — ลองอัดคำนี้ใหม่"); if (after) after(); };
+    au.play().catch(function () { setState("เบราว์เซอร์ยังไม่ยอมเล่นเสียง — ลองกดปุ่ม “ฟังที่อัด”"); if (after) after(); });
   }
 
   /* ---------- ส่งออกเป็น .zip ---------- */
@@ -443,6 +474,29 @@
   /* ---------- ปุ่มและแป้นพิมพ์ ---------- */
   $("btnMic").onclick = openMic;
   $("btnZip").onclick = exportZip;
+  $("btnCheck").onclick = function () {
+    allKeys().then(function (keys) {
+      if (!keys.length) { setState("ยังไม่มีเสียงให้ตรวจ"); return; }
+      setState("กำลังตรวจ " + keys.length + " คำ…");
+      bad = {};
+      var seen = 0, chain = Promise.resolve();
+      keys.forEach(function (w) {
+        chain = chain.then(function () {
+          return getClip(w).then(function (b) {
+            if (!b) return;
+            return analyse(b).then(function (a) { seen++; var no = verdict(a); if (no) bad[w] = no; });
+          });
+        });
+      });
+      chain.then(function () {
+        var n = Object.keys(bad).length;
+        renderGrid(); renderBooth();
+        setState(n
+          ? "ตรวจ " + seen + " คำ · ใช้ไม่ได้ " + n + " คำ (ขอบสีส้ม) แตะคำนั้นแล้วอัดใหม่ได้เลย"
+          : "ตรวจ " + seen + " คำ ใช้ได้ทั้งหมด", n ? "" : "on");
+      });
+    });
+  };
   $("btnClear").onclick = function () {
     if (!confirm("ลบเสียงที่อัดไว้ทั้งหมดในเบราว์เซอร์นี้? กู้คืนไม่ได้")) return;
     clearAll().then(function () { done = {}; renderGrid(); renderBooth(); setState("ล้างแล้ว", "on"); });
@@ -460,6 +514,8 @@
 
   document.addEventListener("keydown", function (e) {
     if (e.target && /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+    // กดค้างไว้ คีย์บอร์ดจะยิง keydown ซ้ำรัว ๆ สลับเริ่ม/หยุดจนได้แต่เสียงกดปุ่ม
+    if (e.repeat) return;
     if (e.code === "Space") { e.preventDefault(); recording ? stopRec() : startRec(); }
     else if (e.key === "ArrowRight") { $("btnNext").click(); }
     else if (e.key === "ArrowLeft") { $("btnPrev").click(); }
