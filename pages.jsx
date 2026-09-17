@@ -797,6 +797,7 @@ function ReadingClubPage() {
 function StoryReader({ story, levelLabel, onClose }) {
   const shellRef = React.useRef(null);
   const stopRef = React.useRef(false);
+  const gapRef = React.useRef(null);      // ตัวจับเวลาช่องว่างระหว่างคำ
 
   /* แตกเป็นคำ พร้อมจำว่าอยู่บรรทัดไหน */
   const words = React.useMemo(() => {
@@ -807,9 +808,18 @@ function StoryReader({ story, levelLabel, onClose }) {
     return out;
   }, [story]);
 
+  /* จังหวะการอ่าน — ตัวแปรสำคัญคือ "ช่องว่างระหว่างคำ" ไม่ใช่แค่ rate
+     ถ้าสั่งพูดติดกันรวดเดียว คำจะเกยกันจนฟังไม่ทัน แม้จะลด rate แล้วก็ตาม
+     จึงเว้นจังหวะเงียบคั่นทุกคำ และเว้นยาวขึ้นอีกเมื่อจบบรรทัด             */
+  const PACE = {
+    slow:   { label: "ช้ามาก",  rate: 0.55, gap: 500, lineGap: 850 },
+    normal: { label: "ช้า",     rate: 0.70, gap: 300, lineGap: 650 },
+    fast:   { label: "ปกติ",    rate: 0.88, gap: 150, lineGap: 400 },
+  };
+
   const [wi, setWi] = React.useState(-1);        // คำที่กำลังอ่าน
   const [playing, setPlaying] = React.useState(false);
-  const [rate, setRate] = React.useState(0.75);  // ช้าไว้ก่อน เด็กอ่านตามทัน
+  const [pace, setPace] = React.useState("normal");
   const [secs, setSecs] = React.useState(0);
   const [ticking, setTicking] = React.useState(false);
   const [voiceMissing, setVoiceMissing] = React.useState(false);
@@ -843,6 +853,7 @@ function StoryReader({ story, levelLabel, onClose }) {
     return () => {
       document.removeEventListener("keydown", onKey);
       stopRef.current = true;
+      if (gapRef.current) clearTimeout(gapRef.current);
       if (synth) synth.cancel();
     };
   }, [onClose]);
@@ -850,12 +861,14 @@ function StoryReader({ story, levelLabel, onClose }) {
   function speakFrom(start) {
     if (!synth) { setVoiceMissing(true); return; }
     stopRef.current = false;
+    if (gapRef.current) { clearTimeout(gapRef.current); gapRef.current = null; }
     synth.cancel();
     const voice = thaiVoice();
     if (!voice) setVoiceMissing(true);
     setPlaying(true);
     setTicking(true);
 
+    const p = PACE[pace] || PACE.normal;
     let i = start;
     const next = () => {
       if (stopRef.current || i >= words.length) {
@@ -866,12 +879,20 @@ function StoryReader({ story, levelLabel, onClose }) {
       }
       const u = new SpeechSynthesisUtterance(words[i].text);
       u.lang = "th-TH";
-      u.rate = rate;
+      u.rate = p.rate;
+      u.pitch = 1;
       if (voice) u.voice = voice;
       const here = i;
       u.onstart = () => setWi(here);
-      u.onend = () => { i++; next(); };
-      u.onerror = () => { i++; next(); };
+      const after = () => {
+        // ขึ้นบรรทัดใหม่ให้หยุดนานกว่าปกติ เหมือนคนอ่านจริงที่หายใจท้ายวรรค
+        const endOfLine = words[i + 1] && words[i + 1].li !== words[i].li;
+        const wait = i + 1 >= words.length ? 0 : (endOfLine ? p.lineGap : p.gap);
+        i++;
+        gapRef.current = setTimeout(next, wait);
+      };
+      u.onend = after;
+      u.onerror = after;
       synth.speak(u);
     };
     next();
@@ -879,6 +900,8 @@ function StoryReader({ story, levelLabel, onClose }) {
 
   function pause() {
     stopRef.current = true;
+    // ต้องล้างตัวจับเวลาช่องว่างด้วย ไม่งั้นคำถัดไปจะโผล่มาพูดเองหลังกดหยุด
+    if (gapRef.current) { clearTimeout(gapRef.current); gapRef.current = null; }
     if (synth) synth.cancel();
     setPlaying(false);
     setTicking(false);
@@ -914,11 +937,9 @@ function StoryReader({ story, levelLabel, onClose }) {
         <span className="ss-timer" title="เวลาที่ใช้อ่าน">⏱ {mmss}</span>
         <span className="ss-sp"></span>
         <label className="ss-rate">
-          เสียง
-          <select value={rate} onChange={(e) => setRate(Number(e.target.value))}>
-            <option value="0.6">ช้ามาก</option>
-            <option value="0.75">ช้า</option>
-            <option value="1">ปกติ</option>
+          จังหวะ
+          <select value={pace} onChange={(e) => { const v = e.target.value; setPace(v); if (playing) { pause(); } }}>
+            {Object.keys(PACE).map((k) => <option key={k} value={k}>{PACE[k].label}</option>)}
           </select>
         </label>
         {playing

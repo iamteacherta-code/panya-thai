@@ -137,7 +137,12 @@ Its own topic under *Lessons & materials · สื่อการสอน*: fou
   - **Read-aloud with a green underline under the current word.** It speaks one word per
     utterance and underlines on `onstart`, rather than speaking whole lines and following
     `onboundary` — boundary events are unreliable for Thai, and word-by-word matches how this
-    level is meant to be read anyway. Speed is selectable; tapping any word speaks from there.
+    level is meant to be read anyway. Tapping any word speaks from there.
+  - **Three named paces** (`PACE` in `pages.jsx`): ช้ามาก / ช้า / ปกติ. Each sets the utterance
+    rate *and* a deliberate silence after the word — a longer one at the end of a line, so the
+    lines do not run together. `rate` alone is not enough: a Thai voice at a low rate slurs,
+    whereas the gap is what makes a beginner able to follow. Changing the pace stops the reading,
+    since the current utterance cannot be re-rated mid-word.
   - **A timer**, which runs while reading and freezes when paused.
   - Real fullscreen via `requestFullscreen`, and Esc closes. Speech is always cancelled on
     unmount so nothing keeps talking after the reader closes.
