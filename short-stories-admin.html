@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · หลังบ้าน 14 เรื่องสั้น</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="activity-base.css" />
+<style>
+  body{background:var(--bg);}
+  .wrap{max-width:1120px;margin:0 auto;padding:22px 18px 70px;}
+
+  .bo-head{margin-bottom:16px;}
+  .bo-head .kick{font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--earth-d);}
+  .bo-head h1{margin:4px 0 2px;font-family:var(--font-thai);font-size:30px;font-weight:700;color:var(--ink);}
+  .bo-head p{margin:0;font-family:var(--font-thai);font-size:15px;color:var(--ink-3);line-height:1.65;}
+
+  .bo-how{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0 20px;}
+  .bo-how div{border:1.5px solid var(--line);border-radius:14px;background:var(--surface);padding:12px 16px;}
+  .bo-how b{display:block;font-family:var(--font-thai);font-size:15px;color:var(--leaf-d);margin-bottom:2px;}
+  .bo-how span{font-family:var(--font-thai);font-size:13.5px;color:var(--ink-3);line-height:1.6;}
+  @media (max-width:720px){.bo-how{grid-template-columns:1fr;}}
+
+  .bo-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    border:1.5px solid var(--line);border-radius:16px;background:var(--surface);padding:12px 16px;margin-bottom:18px;}
+  .bo-state{font-family:var(--font-thai);font-size:14px;color:var(--ink-2);display:flex;align-items:center;gap:8px;}
+  .bo-dot{width:10px;height:10px;border-radius:50%;background:var(--ink-3);flex:none;}
+  .bo-dot.on{background:var(--earth);}
+  .bo-bar .spacer{margin-left:auto;}
+  .cnt{font-family:var(--font-thai);font-size:13.5px;font-weight:700;color:var(--earth-d);
+    background:var(--earth-l);border-radius:999px;padding:4px 13px;}
+
+  .seg{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:16px;}
+  .seg button{flex:1 1 150px;text-align:left;border:1.6px solid var(--line);background:var(--surface);
+    border-radius:16px;padding:11px 15px;cursor:pointer;font-family:var(--font-thai);color:var(--ink);
+    transition:border-color .15s,background .15s,transform .1s;}
+  .seg button:hover{border-color:var(--line-2);transform:translateY(-1px);}
+  .seg button.on{background:var(--leaf);border-color:var(--leaf-d);color:#fff;box-shadow:inset 0 -3px 0 rgba(0,0,0,.14);}
+  .seg b{display:block;font-size:16px;font-weight:700;}
+  .seg small{display:block;font-size:12.5px;opacity:.85;margin-top:1px;}
+
+  .card{border:1.6px solid var(--line);border-radius:18px;background:var(--surface);padding:16px 18px;margin-bottom:14px;}
+  .card h2{margin:0 0 3px;font-family:var(--font-thai);font-size:19px;font-weight:700;}
+  .card .hint{font-family:var(--font-thai);font-size:13px;color:var(--ink-3);margin:0 0 12px;line-height:1.6;}
+
+  .ln{border-top:1px dashed var(--line);padding:12px 0 4px;}
+  .ln:first-of-type{border-top:none;}
+  .ln .no{font-family:var(--font-ui);font-size:11px;font-weight:700;color:var(--ink-3);letter-spacing:.08em;}
+  .ln input{font-family:var(--font-thai);font-size:16px;color:var(--ink);width:100%;
+    border:1.5px solid var(--line-2);border-radius:10px;background:#fff;padding:8px 11px;outline:none;margin:4px 0 8px;}
+  .ln input:focus{border-color:var(--leaf);box-shadow:0 0 0 3px var(--leaf-l);}
+
+  /* แถวตัดคำ — ช่องว่างระหว่างตัวอักษรกดได้ */
+  .cut{font-family:var(--font-thai);font-size:26px;line-height:2.1;color:var(--ink);
+    background:var(--ghost);border-radius:12px;padding:8px 10px;user-select:none;}
+  .cut .ch{white-space:pre;}
+  .cut .gap{display:inline-block;width:8px;height:1.35em;vertical-align:-.32em;cursor:pointer;position:relative;}
+  .cut .gap::after{content:"";position:absolute;left:3px;top:6%;width:2px;height:88%;border-radius:2px;background:transparent;}
+  .cut .gap:hover::after{background:var(--line-2);}
+  .cut .gap.cutp::after{background:var(--leaf);}
+  .cut .sp{display:inline-block;width:.55em;}
+
+  .wl{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;}
+  .wl span{font-family:var(--font-thai);font-size:14px;border:1.5px solid var(--leaf);background:var(--leaf-l);
+    color:var(--leaf-d);border-radius:9px;padding:2px 9px;font-weight:700;}
+  .wl span.no-audio{border-color:var(--clay);background:var(--clay-l);color:var(--ink);}
+
+  .warn{font-family:var(--font-thai);font-size:14px;line-height:1.7;color:var(--ink-2);
+    border:1.5px solid var(--earth);background:var(--earth-l);border-radius:14px;padding:12px 16px;margin-bottom:18px;}
+  .warn b{color:var(--ink);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="bo-head">
+    <div class="kick">PANYA · Thai Foundation</div>
+    <h1>หลังบ้าน · 14 เรื่องสั้น</h1>
+    <p>แก้ข้อความที่พิมพ์ผิด และแก้ตำแหน่งตัดคำให้ถูก<br>
+       ตัดคำตรงไหน เสียงอ่านและเส้นใต้ก็ไปตามนั้น และชื่อไฟล์เสียงที่ต้องอัดก็เปลี่ยนตาม</p>
+  </div>
+
+  <div class="bo-how">
+    <div><b>๑ · แก้ในหน้านี้</b><span>พิมพ์แก้ข้อความได้ตรง ๆ และ<b>กดที่ช่องว่างระหว่างตัวอักษร</b>เพื่อเพิ่มหรือเอาจุดตัดคำออก เส้นเขียวคือจุดตัด บันทึกให้อัตโนมัติ</span></div>
+    <div><b>๒ · ดาวน์โหลดแล้ววางทับ</b><span>กด <b>ดาวน์โหลดไฟล์ข้อมูล</b> จะได้ <code>short-stories-data.js</code> วางทับไฟล์เดิมในโปรเจกต์แล้ว deploy</span></div>
+  </div>
+
+  <div class="warn" id="warn"></div>
+
+  <div class="bo-bar">
+    <span class="bo-state"><span class="bo-dot" id="dot"></span><span id="state">กำลังโหลด…</span></span>
+    <span class="cnt" id="cnt">—</span>
+    <span class="spacer"></span>
+    <button class="btn" id="btnData">ดาวน์โหลดไฟล์ข้อมูล</button>
+    <button class="btn" id="btnWords">ดาวน์โหลดรายการคำที่ต้องอัด</button>
+    <button class="btn" id="btnReset">คืนค่าตามไฟล์</button>
+    <a class="btn btn-home" href="Panyaden Thai Literacy.html">กลับหน้าหลัก</a>
+  </div>
+
+  <div class="seg" id="levels"></div>
+  <div class="seg" id="stories"></div>
+  <div id="edit"></div>
+
+</div>
+
+<script src="short-stories-data.js"></script>
+<script src="word-audio-index.js"></script>
+<script>
+/* ============================================================
+   หลังบ้าน 14 เรื่องสั้น — แก้ข้อความและจุดตัดคำ
+   จุดตัดคำเก็บด้วยอักขระ | ในบรรทัด มองไม่เห็นตอนแสดงผล
+   ช่องว่างจริงในต้นฉบับยังเป็นช่องว่าง และนับเป็นขอบเขตคำอยู่แล้ว
+   ระดับที่ติดธง spaced (ระดับ 02) ต้นฉบับเว้นวรรคทีละคำ จึงไม่มีจุดตัด
+   ให้แก้ — และห้ามมี ไม่งั้นชื่อไฟล์เสียงที่อัดไว้จะไม่ตรง
+   ============================================================ */
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = "panyaden_short_stories_v1";
+  var FILE = window.SHORT_STORIES_FILE;
+  var AUDIO = window.WORD_AUDIO || {};
+
+  var data, lvIx = 0, stIx = 0, edited = false;
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (raw) { data = JSON.parse(raw); edited = true; return; }
+    } catch (e) {}
+    data = JSON.parse(JSON.stringify(FILE));
+    edited = false;
+  }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(data)); edited = true; } catch (e) {}
+    paint();
+  }
+
+  var lv = function () { return data.levels[lvIx] || data.levels[0]; };
+  var st = function () { return (lv().stories || [])[stIx]; };
+
+  /* ---------- คำในบรรทัด ---------- */
+  function wordsOf(line) { return line.split(/[|\s]+/).filter(Boolean); }
+  function allWords(level) {
+    var s = {};
+    (level.stories || []).forEach(function (x) {
+      x.lines.forEach(function (l) { wordsOf(l).forEach(function (w) { s[w] = 1; }); });
+    });
+    return Object.keys(s);
+  }
+
+  /* ---------- แถบเลือก ---------- */
+  function paintLevels() {
+    $("levels").innerHTML = "";
+    data.levels.forEach(function (l, i) {
+      var b = document.createElement("button");
+      b.className = i === lvIx ? "on" : "";
+      var n = (l.stories || []).length;
+      b.innerHTML = "<b>Level " + l.n + "</b><small>" + (n ? n + " เรื่อง" : "ยังไม่มีข้อความ") + "</small>";
+      b.onclick = function () { lvIx = i; stIx = 0; paint(); };
+      $("levels").appendChild(b);
+    });
+  }
+  function paintStories() {
+    $("stories").innerHTML = "";
+    (lv().stories || []).forEach(function (s, i) {
+      var b = document.createElement("button");
+      b.className = i === stIx ? "on" : "";
+      b.style.flex = "0 1 auto";
+      b.innerHTML = "<b>" + s.no + ". " + s.title + "</b>";
+      b.onclick = function () { stIx = i; paint(); };
+      $("stories").appendChild(b);
+    });
+  }
+
+  /* ---------- ตัวแก้บรรทัด ---------- */
+  function paintEdit() {
+    var box = $("edit"); box.innerHTML = "";
+    var s = st();
+    if (!s) {
+      box.innerHTML = '<div class="card"><h2>ระดับนี้ยังไม่มีข้อความ</h2>' +
+        '<p class="hint">ถอดข้อความจากต้นฉบับเข้ามาก่อน แล้วค่อยมาแก้จุดตัดคำที่นี่</p></div>';
+      return;
+    }
+    var spaced = !!lv().spaced;
+    var card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = "<h2>" + s.no + ". " + s.title + "</h2>" +
+      '<p class="hint">' + (spaced
+        ? "ระดับนี้ต้นฉบับเว้นวรรคทีละคำอยู่แล้ว ช่องว่างคือจุดตัดคำ แก้ได้จากช่องข้อความโดยตรง"
+        : "กดที่ช่องว่างระหว่างตัวอักษรเพื่อเพิ่มหรือเอาจุดตัดคำออก · คำที่ยังไม่มีเสียงอ่านจะขึ้นสีส้ม") +
+      "</p>";
+    box.appendChild(card);
+
+    s.lines.forEach(function (line, li) {
+      var row = document.createElement("div");
+      row.className = "ln";
+
+      var no = document.createElement("div");
+      no.className = "no"; no.textContent = "บรรทัด " + (li + 1);
+      row.appendChild(no);
+
+      var inp = document.createElement("input");
+      inp.value = line.split("|").join("");
+      inp.oninput = function () {
+        // พิมพ์แก้ข้อความ — รักษาจุดตัดเดิมไม่ได้ จึงตัดใหม่ตามช่องว่างไปก่อน
+        s.lines[li] = inp.value;
+        save();
+      };
+      row.appendChild(inp);
+
+      if (!spaced) row.appendChild(cutRow(s, li));
+
+      var wl = document.createElement("div");
+      wl.className = "wl";
+      wordsOf(s.lines[li]).forEach(function (w) {
+        var e = document.createElement("span");
+        e.textContent = w;
+        if (!AUDIO[w]) e.className = "no-audio";
+        wl.appendChild(e);
+      });
+      row.appendChild(wl);
+
+      card.appendChild(row);
+    });
+  }
+
+  // แถวตัวอักษรพร้อมช่องกดตัดคำ
+  function cutRow(s, li) {
+    var wrap = document.createElement("div");
+    wrap.className = "cut";
+    var raw = s.lines[li];
+    // ไล่ทีละตัวอักษรของข้อความจริง จำไว้ว่าตำแหน่งไหนมี | คั่น
+    var chars = [], cuts = {};
+    for (var i = 0, n = 0; i < raw.length; i++) {
+      if (raw[i] === "|") { cuts[n] = 1; continue; }
+      chars.push(raw[i]); n++;
+    }
+    var rebuild = function () {
+      var out = "";
+      for (var k = 0; k < chars.length; k++) { if (cuts[k]) out += "|"; out += chars[k]; }
+      s.lines[li] = out;
+      save();
+    };
+    chars.forEach(function (ch, k) {
+      if (k > 0 && !/\s/.test(ch) && !/\s/.test(chars[k - 1])) {
+        var g = document.createElement("span");
+        g.className = "gap" + (cuts[k] ? " cutp" : "");
+        g.title = cuts[k] ? "เอาจุดตัดออก" : "ตัดคำตรงนี้";
+        g.onclick = function () { if (cuts[k]) delete cuts[k]; else cuts[k] = 1; rebuild(); };
+        wrap.appendChild(g);
+      }
+      var c = document.createElement("span");
+      c.className = /\s/.test(ch) ? "sp" : "ch";
+      c.textContent = /\s/.test(ch) ? " " : ch;
+      wrap.appendChild(c);
+    });
+    return wrap;
+  }
+
+  function paint() {
+    paintLevels(); paintStories(); paintEdit();
+    var ws = allWords(lv());
+    var miss = ws.filter(function (w) { return !AUDIO[w]; });
+    $("cnt").textContent = "Level " + lv().n + " · คำไม่ซ้ำ " + ws.length + " · ยังไม่มีเสียง " + miss.length;
+    $("dot").className = "bo-dot" + (edited ? " on" : "");
+    $("state").textContent = edited
+      ? "กำลังแสดงข้อมูลที่แก้ในเบราว์เซอร์นี้ ยังไม่ได้ลงไฟล์จริง"
+      : "ตรงกับไฟล์ short-stories-data.js";
+  }
+
+  /* ---------- ส่งออก ---------- */
+  function q(s) { return '"' + String(s).replace(/\\/g, "\\\\").replace(/"/g, '\\"') + '"'; }
+  function toSource() {
+    var out = "/* 14 เรื่องสั้น — ข้อมูลล้วน ไม่มีตรรกะ\n" +
+      "   ระดับ 02 ต้นฉบับเว้นวรรคทีละคำ (spaced: true) ช่องว่างคือขอบเขตคำ ห้ามซอยซ้ำ\n" +
+      "   ระดับ 03 ขึ้นไปเขียนติดกัน ขอบเขตคำเก็บด้วย | ซึ่งไม่แสดงผล\n" +
+      "   ไฟล์นี้สร้างทับได้จาก short-stories-admin.html */\n" +
+      "window.SHORT_STORIES_FILE = {\n  levels: [\n";
+    data.levels.forEach(function (l) {
+      out += "    {\n";
+      out += "      id: " + q(l.id) + ", n: " + q(l.n) + ", en: " + q(l.en) + ", th: " + q(l.th) + ",\n";
+      if (l.spaced) out += "      spaced: true,   // ต้นฉบับเว้นวรรคทีละคำ ห้ามซอยคำซ้ำ ชื่อไฟล์เสียงผูกกับการตัดแบบนี้\n";
+      out += "      status: " + q(l.status) + ",\n";
+      out += "      blurb: " + q(l.blurb) + ",\n";
+      out += "      pdf: " + q(l.pdf || "") + ",\n";
+      if (l.note) out += "      note: " + q(l.note) + ",\n";
+      out += "      stories: [\n";
+      (l.stories || []).forEach(function (s) {
+        out += "        { no: " + s.no + ", title: " + q(s.title) + ", lines: [\n";
+        s.lines.forEach(function (ln, i) {
+          out += "          " + q(ln) + (i === s.lines.length - 1 ? " ] }," : ",") + "\n";
+        });
+      });
+      out += "      ],\n    },\n";
+    });
+    out += "  ],\n};\n";
+    return out;
+  }
+  function save1(text, name, type) {
+    var b = new Blob([text], { type: type || "text/plain;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(b); a.download = name;
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+  }
+
+  $("btnData").onclick = function () { save1(toSource(), "short-stories-data.js", "application/javascript;charset=utf-8"); };
+  $("btnWords").onclick = function () {
+    var need = [];
+    data.levels.forEach(function (l) {
+      allWords(l).forEach(function (w) { if (!AUDIO[w] && need.indexOf(w) < 0) need.push(w); });
+    });
+    if (!need.length) { $("state").textContent = "ทุกคำมีเสียงครบแล้ว"; return; }
+    save1("# คำที่ยังไม่มีเสียงคุณครู (" + need.length + " คำ)\n" +
+          "# วางทั้งไฟล์ในช่อง \"เพิ่มคำเอง\" ของ audio-studio.html\n\n" + need.join(" ") + "\n",
+          "รายการอัดเสียง.txt");
+  };
+  $("btnReset").onclick = function () {
+    if (!confirm("ทิ้งสิ่งที่แก้ในเบราว์เซอร์นี้ แล้วกลับไปใช้ข้อมูลตามไฟล์?")) return;
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    load(); paint();
+  };
+
+  $("warn").innerHTML = Object.keys(AUDIO).length
+    ? "<b>ย้ายจุดตัดคำแล้วชื่อไฟล์เสียงจะเปลี่ยนตาม</b> — เช่น แยก <code>สีเขียว</code> เป็น <code>สี|เขียว</code> เสียงที่อัดไว้ชื่อ “สีเขียว” จะไม่ถูกเรียกใช้อีก คำที่ยังไม่มีเสียงจะขึ้นสีส้มให้เห็นทันที"
+    : "<b>ยังไม่พบสารบัญเสียง</b> (word-audio-index.js) — แก้ข้อความและจุดตัดคำได้ตามปกติ แต่จะไม่รู้ว่าคำไหนมีเสียงแล้ว";
+
+  load(); paint();
+})();
+</script>
+</body>
+</html>

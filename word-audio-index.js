@@ -177,7 +177,7 @@ window.WORD_AUDIO = {
   "เห็น": "webm",
   "เอง": "webm",
   "เอา": "webm",
-  "เฮนรี": "webm",
+  "เฮนรี่": "webm",
   "แก่": "webm",
   "แก้ว": "webm",
   "แซน": "webm",

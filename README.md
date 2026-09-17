@@ -172,10 +172,34 @@ Its own topic under *Lessons & materials · สื่อการสอน*: fou
   and rendered with `white-space: pre-wrap`. Tidying those spaces away would undo the point of
   the exercise.
 - **Level 02 is word-spaced, 03 is not.** The booklet for 02 puts a space between every word so a
-  beginner can see where words end; that level carries `spaced: true` and the reader splits on
-  whitespace alone. It must keep doing so — the recorded clip filenames are keyed to exactly that
-  split. From 03 the text runs on as ordinary sentences, so the reader segments each chunk further
-  with `Intl.Segmenter("th")`; otherwise a whole clause would underline and be spoken as one lump.
+  beginner can see where words end; that level carries `spaced: true`, the space *is* the word
+  boundary, and it must stay that way — the recorded clip filenames are keyed to exactly that split.
+- **From Level 03 the text runs on**, so the word boundaries are written into the data as `|`:
+
+  ```js
+  "รุ้ง|เกิด|ขึ้น|หลัง|จาก|ฝน|ตก และ|ประกอบ|ด้วย|สี"
+  ```
+
+  `|` never renders — the reader joins the words back up, so the page shows the sentence exactly as
+  the booklet prints it (`.ss-lines.tight` removes the chip padding). A real space is still a real
+  space and is still a boundary. The split is *data*, not something computed at read time:
+  `Intl.Segmenter` only produced the first draft and it gets names wrong (`โร·บิน`, `เป·โต้`), makes
+  punctuation its own word, and is inconsistent (`สีน้ำเงิน` whole but `สี·เขียว` split). Since every
+  word is an audio filename, that inconsistency would be baked into the recordings.
+
+#### Back office — `short-stories-admin.html`
+
+No sign-in, same two steps as the Reading Club one. Pick a level and a story, then per line:
+
+- the **text** is an ordinary input — fix a typo and it saves as you type;
+- underneath, the line is laid out character by character with a **clickable gap between each pair**.
+  A green bar is a word boundary; click to add or remove one. Word-spaced levels don't show this,
+  because there the spaces already are the boundaries.
+- the words for that line are listed below, and a word with **no recorded clip yet shows in orange**,
+  so moving a boundary immediately shows what it costs in re-recording.
+
+**ดาวน์โหลดไฟล์ข้อมูล** rewrites `short-stories-data.js`; **ดาวน์โหลดรายการคำที่ต้องอัด** writes the word
+list to paste into the recording studio's *เพิ่มคำเอง* box.
 - `tools/pdf-text.js` pulls the text out of the *THAI READING PASSAGE* PDFs (Canva exports: classic
   xref, FlateDecode, Type0/Identity-H). It reads `/Span << /ActualText >>` first, because Canva
   draws one glyph at a time and lifts tone marks onto their own baseline — sort those by position

@@ -803,19 +803,21 @@ function ReadingClubPage() {
    และต้องตัดแบบนั้นเท่านั้น เพราะชื่อไฟล์เสียงที่คุณครูอัดไว้ผูกกับการตัดแบบนี้
    ระดับ 03 ขึ้นไปเขียนติดกันเป็นประโยค ถ้าตัดตามช่องว่างจะได้ทั้งวลีเป็นก้อนเดียว
    เส้นใต้กับเสียงอ่านจะไม่ตรงคำ จึงให้ Intl.Segmenter ซอยต่ออีกชั้น         */
-let SEG = null;
-function segThai(chunk) {
-  if (SEG === null) {
-    try { SEG = new Intl.Segmenter("th", { granularity: "word" }); } catch (e) { SEG = false; }
-  }
-  if (!SEG) return [chunk];
+/* คืนบรรทัดเป็นชิ้น ๆ — { w: "คำ" } หรือ { sp: "ช่องว่างจริงในต้นฉบับ" }
+   ระดับ 02 เว้นวรรคทีละคำอยู่แล้ว ช่องว่างจึงเป็นทั้งขอบเขตคำและระยะที่ต้องเห็น
+   ระดับ 03 ขึ้นไปเขียนติดกัน ขอบเขตคำเก็บไว้ด้วย | ซึ่งมองไม่เห็นตอนแสดงผล
+   ส่วนช่องว่างที่มีจริงก็ยังต้องเห็น — ตัดทิ้งไม่ได้ เพราะเป็นวรรคตอนของต้นฉบับ  */
+function lineParts(line, spaced) {
   const out = [];
-  for (const p of SEG.segment(chunk)) if (p.segment.trim()) out.push(p.segment);
-  return out.length ? out : [chunk];
+  for (const piece of line.split(/(\s+)/)) {
+    if (!piece) continue;
+    if (/^\s+$/.test(piece)) { out.push({ sp: spaced ? " " : piece }); continue; }
+    for (const w of piece.split("|")) if (w) out.push({ w: w });
+  }
+  return out;
 }
 function splitWords(line, spaced) {
-  const chunks = line.split(/\s+/).filter(Boolean);
-  return spaced ? chunks : chunks.reduce((a, c) => a.concat(segThai(c)), []);
+  return lineParts(line, spaced).filter((p) => p.w).map((p) => p.w);
 }
 
 const CLIP_MISS = new Set();
@@ -1009,15 +1011,16 @@ function StoryReader({ story, levelLabel, spaced, onClose }) {
       {/* .ss-lines ใช้ margin:auto จัดกลาง แทน justify-content:center
           เพราะแบบหลังจะตัดบรรทัดแรกทิ้งเมื่อเรื่องยาวเกินจอ เลื่อนขึ้นไปดูไม่ได้ */}
       <div className="ss-stage">
-        <div className="ss-lines">
+        <div className={"ss-lines" + (spaced ? "" : " tight")}>
           {story.lines.map((line, li) => (
             <p key={li}>
-              {splitWords(line, spaced).map((w, k) => {
+              {lineParts(line, spaced).map((p, k) => {
+                if (p.sp) return <span key={k} className="ss-sp-gap">{p.sp}</span>;
                 counter++;
                 const idx = counter;
                 return (
                   <span key={k} className={"ss-w" + (idx === wi ? " on" : "")}
-                        onClick={() => speakFrom(idx)} title="แตะเพื่อฟังคำนี้">{w}</span>
+                        onClick={() => speakFrom(idx)} title="แตะเพื่อฟังคำนี้">{p.w}</span>
                 );
               })}
             </p>
