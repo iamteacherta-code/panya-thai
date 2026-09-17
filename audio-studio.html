@@ -190,7 +190,12 @@
   }
   var EXTRA_KEY = "panya_audio_extra_words";
   function extraWords() {
-    try { return uniq((localStorage.getItem(EXTRA_KEY) || "").split(/\s+/).filter(Boolean)); } catch (e) { return []; }
+    try {
+      // บรรทัดที่ขึ้นต้นด้วย # เป็นหมายเหตุ — word-list.txt ฝั่ง Reading Club เขียนหัวเรื่องมาแบบนั้น
+      var raw = (localStorage.getItem(EXTRA_KEY) || "").split(/\r?\n/)
+        .filter(function (l) { return l.trim().charAt(0) !== "#"; }).join(" ");
+      return uniq(raw.split(/\s+/).filter(Boolean));
+    } catch (e) { return []; }
   }
   function rebuildExtraSet() {
     var w = extraWords();
@@ -427,6 +432,8 @@
                  "   เครื่องอ่านจะหาไฟล์ตามรายการนี้ก่อน ถ้าไม่มีจึงถอยไปใช้เสียงสังเคราะห์ */\n" +
                  "window.WORD_AUDIO = " + JSON.stringify(index, null, 2) + ";\n";
         files.push({ name: "word-audio-index.js", bytes: new TextEncoder().encode(js) });
+        // แอป Reading Club เป็น Next.js อ่านสารบัญตอนรันด้วย fetch จึงต้องมีเป็น JSON ด้วย
+        files.push({ name: "audio/words/index.json", bytes: new TextEncoder().encode(JSON.stringify(index, null, 2)) });
         save(zipOf(files), "panya-word-audio.zip");
         setState("ดาวน์โหลดแล้ว — แตกไฟล์ทับลงในโฟลเดอร์โปรเจกต์ได้เลย", "on");
       });
