@@ -14,15 +14,8 @@ const Placeholder = window.Placeholder;
 // ============================================================
 window.CURRICULUM_APP_URL = "https://panyaden-thai-curriculum.web.app/";
 
-// ============================================================
-//  ★ ที่อยู่ของแอป "THAI READING CLUB" (คนละเว็บกับ Panya Thai เช่นกัน)
-//
-//  โปรแกรมฝึกอ่านออกเสียงของนักเรียน Year 4 — หนังสือ 6 เล่มของหน่วยที่ 1
-//  ฉบับอ่านบนจอ นักเรียนเข้าด้วยชื่อตัวเอง + รหัส 4 หลัก ติดตั้งลงมือถือได้
-//
-//  ย้ายเว็บเมื่อไร แก้แค่บรรทัดข้างล่างบรรทัดเดียว
-// ============================================================
-window.READING_CLUB_URL = "https://thai-reading-club-year4.p-aumporn.chatgpt.site/";
+// ที่อยู่ของแอป "THAI READING CLUB" กับคลังหนังสือรายชั้นเรียน
+// อยู่ในไฟล์ reading-club-data.js (window.READING_CLUB / window.READING_CLUB_URL)
 
 const DIGITAL_APPS = [
   { id: "mat", en: "Word Work Mat", th: "แผ่นฝึกคำ", icon: "activity", color: "var(--earth)", desc: "Build C+V and C+V+C words at the Beginner level (K2–Y2) — consonants, vowels, finals and tones." },
@@ -31,6 +24,7 @@ const DIGITAL_APPS = [
 const RESOURCES = [
   { id: "lesson", en: "Lessons", th: "บทเรียน", icon: "lesson", color: "var(--clay)", desc: "Explicit, systematic phonics units in a UFLI-style scope & sequence." },
   { id: "reading", en: "Reading Passages", th: "บทอ่าน", icon: "reading", color: "var(--sky)", desc: "Decodable passages matched to the sounds taught in each lesson." },
+  { id: "readingclub", en: "Reading Club", th: "ชมรมนักอ่าน", icon: "reading", color: "#3f7f93", desc: "Levelled story books pupils read aloud on screen, by year group — Y1 to Y4." },
   { id: "activity", en: "Activity Sheets", th: "แผ่นกิจกรรม", icon: "worksheet", color: "#8a6f3a", desc: "Hands-on practice for letter forms, sound sorts and matching." },
   { id: "worksheet", en: "Worksheets", th: "ใบงาน", icon: "worksheet", color: "#7a5fb0", desc: "Printable worksheets, dictation and quick checks for mastery." },
   { id: "game", en: "Game", th: "เกม", icon: "play", color: "var(--leaf)", desc: "Play-on-screen blending, word-building, sorting and reading games." },
@@ -205,20 +199,6 @@ function HomePage({ go }) {
         ))}
       </div>
 
-      {/* แอปพี่น้องใบที่สอง — อยู่คนละเว็บเหมือนกัน จึงใช้แถบเต็มความกว้างตามแบบเดิม
-          ไม่ปนกับการ์ดด้านบน วางไว้ท้ายหมวดสื่อการสอนเพราะเป็นสื่อสำหรับนักเรียนอ่านเอง */}
-      <a className="sister-app sky" href={window.READING_CLUB_URL} target="_blank" rel="noopener">
-        <span className="sa-ico"><Ico name="reading" /></span>
-        <span className="sa-copy">
-          <b>Thai Reading Club</b>
-          <span className="sa-th">ชมรมนักอ่านภาษาไทย · Year 4 · หน่วยที่ 1</span>
-          <span className="sa-desc">
-            หนังสือ 6 เล่มของหน่วย “ชุมชนและบทบาทหน้าที่” ฉบับอ่านบนจอ · นักเรียนเข้าด้วยชื่อตัวเองและรหัส 4 หลัก
-            ฝึกอ่านออกเสียงแล้วขึ้นสีทันทีว่าคำไหนถูกคำไหนผิด พร้อมบันทึกความก้าวหน้ารายคน
-          </span>
-        </span>
-        <span className="sa-go">เปิด <Ico name="arrow" /></span>
-      </a>
     </div>
   );
 }
@@ -704,6 +684,95 @@ const READING_COMP = [
   { en: "Comprehension · จับใจความ", th: "ใจความสำคัญ สรุป (C19–C28)", file: "activity-reading-comprehension.html#s12" },
   { en: "Writing · การเขียน", th: "ย่อความ เรียงความ (C29–C36)", file: "activity-reading-comprehension.html#s18" },
 ];
+/* ---------------- READING CLUB ----------------
+   ชั้นวางหนังสืออ่านออกเสียง แยกตามชั้นเรียน Y1–Y4
+   เนื้อหาทั้งหมดอ่านจาก reading-club-data.js ไฟล์เดียว
+   ชั้นที่ยังไม่มีข้อมูลจะขึ้นกล่องรอข้อมูลจากหลังบ้าน ไม่ใช่หน้าว่าง */
+function ReadingClubPage() {
+  const RC = window.READING_CLUB;
+  const firstReady = (RC.years.find((y) => y.status === "ready") || RC.years[0]).id;
+  const [year, setYear] = React.useState(firstReady);
+  const current = RC.years.find((y) => y.id === year) || RC.years[0];
+
+  return (
+    <div>
+      <PageHead eyebrow="Reading Club · ชมรมนักอ่าน" en="Reading Club" th="ชมรมนักอ่านภาษาไทย"
+        sub="หนังสือเรื่องสั้นแบ่งระดับให้นักเรียนอ่านออกเสียงเอง ระบบขึ้นสีทันทีว่าคำไหนถูกคำไหนผิด แล้วบันทึกความก้าวหน้ารายคนไว้ให้ครูดูย้อนหลัง" />
+
+      {/* แถบเปิดแอป — ตัวโปรแกรมอยู่คนละเว็บ จึงบอกให้ชัดว่าจะเปิดแท็บใหม่ */}
+      <a className="rc-open" href={RC.appUrl} target="_blank" rel="noopener">
+        <span className="rc-open-ico"><Ico name="reading" /></span>
+        <span className="rc-open-copy">
+          <b>เปิดโปรแกรม Reading Club</b>
+          <span>นักเรียนเข้าด้วยชื่อตัวเองและรหัส 4 หลัก · ติดตั้งลงมือถือได้ · เปิดในแท็บใหม่</span>
+        </span>
+        <span className="rc-open-go">เปิด <Ico name="arrow" /></span>
+      </a>
+
+      {/* ตัวเลือกชั้นเรียน ใช้หน้าตาเดียวกับแถบระดับของหน้าอื่น */}
+      <div className="level-bar">
+        <span className="lvl-lead">ชั้นเรียน <span className="en">· Year</span></span>
+        <div className="lvl-seg">
+          {RC.years.map((y) => (
+            <button key={y.id} className={year === y.id ? "on" : ""} onClick={() => setYear(y.id)}>
+              <span className="lvl-step">{y.n}</span>
+              <span className="lvl-txt">
+                <b>{y.en}</b>
+                <span className="th">{y.status === "ready" ? y.th : "รอข้อมูล"}</span>
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {current.status !== "ready" ? (
+        <div className="rc-empty">
+          <Ico name="leaf" style={{ width: 22, height: 22, flex: "none" }} />
+          <div>
+            <b>{current.en} · ยังไม่มีชุดหนังสือ</b>
+            <span>{current.note}</span>
+            <a href={window.CURRICULUM_APP_URL} target="_blank" rel="noopener">ไปที่หลังบ้านครู <Ico name="arrow" style={{ width: 14, height: 14 }} /></a>
+          </div>
+        </div>
+      ) : current.units.map((unit) => (
+        <div key={unit.no} className="rc-unit">
+          <div className="rc-unit-head">
+            <div>
+              <span className="eyebrow">หน่วยที่ {unit.no} · Unit {unit.no}</span>
+              <h2 className="page-title" style={{ fontSize: 22, marginTop: 4 }}>
+                {unit.title} <span className="th">· {unit.titleEn}</span>
+              </h2>
+              <p className="page-sub" style={{ marginTop: 4 }}>{unit.desc}</p>
+            </div>
+            {unit.reader && (
+              <a className="btn btn-sm btn-ghost" href={unit.reader}>
+                <Ico name="print" style={{ width: 15, height: 15 }} /> ฉบับพิมพ์ · Printable
+              </a>
+            )}
+          </div>
+
+          <div className="rc-shelf">
+            {unit.books.map((book) => (
+              <a className="rc-book" key={book.id} href={RC.appUrl} target="_blank" rel="noopener">
+                <span className="rc-cover" style={{ background: book.color }}>
+                  <img src={RC.coverUrl(book)} alt={"ปกหนังสือ " + book.title} loading="lazy"
+                       onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                  <span className="rc-level">เล่ม {book.level}</span>
+                </span>
+                <span className="rc-book-copy">
+                  <b>{book.title}</b>
+                  <span className="rc-sub">{book.subtitle}</span>
+                  <span className="rc-meta">{book.pages} หน้า · {book.words} คำศัพท์ · {book.questions} คำถาม</span>
+                </span>
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function ReadingPage() {
   const [lvl, setLvl] = React.useState("beginner");
   const [reader, setReader] = React.useState(null);
@@ -1028,5 +1097,5 @@ window.DIGITAL_APPS = DIGITAL_APPS;
 window.RESOURCES = RESOURCES;
 window.LESSON_ITEMS = LESSON_ITEMS;
 window.MAT_ITEMS = MAT_ITEMS;
-window.Pages = { HomePage, ActivityPage, LessonsPage, ReadingPage, WorksheetsPage, GamesPage };
+window.Pages = { HomePage, ActivityPage, LessonsPage, ReadingPage, ReadingClubPage, WorksheetsPage, GamesPage };
 window.Ico = Ico;

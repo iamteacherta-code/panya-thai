@@ -76,16 +76,25 @@ Default output: `D:\2026-2027 WORK\THAI FL\U1\หนังสือเรีย�
 
 ### Sister apps (separate websites)
 
-Two companion apps live on their own domains, so they are **not** mixed into the tool-card
-grids — a site on another domain gets a full-width `.sister-app` banner instead, so nobody
-mistakes it for a tool that runs here. Each one's address is a single `window.*` constant at
-the top of `pages.jsx`; move the site and only that line changes.
+The teacher back office lives on its own domain, so it is **not** mixed into the tool-card grids —
+a site on another domain gets a full-width banner instead, so nobody mistakes it for a tool that
+runs here. `CURRICULUM_APP_URL` at the top of `pages.jsx` points at it: IB + UFLI framework,
+weekly plan templates, marks and reports (K2–Y6). It sits under *Interactive tools*.
 
-| Banner | Constant | What it is |
-| --- | --- | --- |
-| Curriculum & Lesson Plans (leaf) | `CURRICULUM_APP_URL` | Teacher back office — IB + UFLI framework, weekly plan templates, marks and reports (K2–Y6). Sits under *Interactive tools*. |
-| Thai Reading Club (sky) | `READING_CLUB_URL` | The six Unit 1 books as an on-screen reader for pupils: sign in by name + 4-digit PIN, read aloud and each word turns green or red, end-of-book quiz, per-pupil progress. Sits at the end of *Lessons & materials · สื่อการสอน*, and is cross-linked from Reading Passages → Comprehension beside the printable reader, because both hold the same six books. |
+### Reading Club
 
-The Reading Club banner uses `--sky` / `--sky-l` from the shared palette rather than that app's
-own brand blue, so the home page stays one colour system. `--sky-l` was already defined in
-`activity-base.css`; it is now in `styles.css` too, with the same value.
+A section of its own under *Lessons & materials · สื่อการสอน* — levelled story books pupils read
+aloud on screen, **organised by year group**. The reading itself happens in a separate app (sign
+in by name + 4-digit PIN, each word turns green or red as it is read, per-pupil progress), so
+every book card opens that app in a new tab.
+
+- `reading-club-data.js` — the whole shelf: which years exist, which already have books, and the
+  books themselves. Each year carries `status: "ready"` or `"pending"`; a pending year shows a
+  panel saying its books are still to come from the back office, rather than an empty page. Only
+  **Y4** is filled today (Unit 1, six books); **Y1–Y3** are waiting. To add a year, flip its
+  `status` and drop the books into `units` — nothing else changes, the page reads this file alone.
+  The app's address lives here too, as `READING_CLUB_URL`.
+- `ReadingClubPage` in `pages.jsx` renders it. The year switcher reuses the same `.level-bar`
+  markup as the other pages, and covers are pulled live from the Reading Club site.
+- The printable reader for a unit is linked from that unit's heading, so the on-screen and paper
+  versions of the same six books sit together.

@@ -1,6 +1,6 @@
 /* global React, ReactDOM */
 const { useState, useEffect, useRef } = React;
-const { HomePage, ActivityPage, LessonsPage, ReadingPage, WorksheetsPage, GamesPage } = window.Pages;
+const { HomePage, ActivityPage, LessonsPage, ReadingPage, ReadingClubPage, WorksheetsPage, GamesPage } = window.Pages;
 const TOOLS = window.TOOLS;
 const Ico = window.Ico;
 const BlendingBoard = window.BlendingBoard;
@@ -107,11 +107,6 @@ function NavBar({ page, go }) {
              title="หลักสูตรและแผนการสอน · เก็บคะแนนและรายงานผล (เปิดในแท็บใหม่)">
             <Ico name="lesson" />
             <span>Lesson Plans</span>
-          </a>
-          <a className="nav-btn" href={window.READING_CLUB_URL} target="_blank" rel="noopener"
-             title="Thai Reading Club · ฝึกอ่านออกเสียงสำหรับนักเรียน Year 4 (เปิดในแท็บใหม่)">
-            <Ico name="reading" />
-            <span>Reading Club</span>
           </a>
         </nav>
       </div>
@@ -221,6 +216,7 @@ function App() {
     body = <LessonsPage grade={g} />;
   }
   else if (page === "reading") body = <ReadingPage />;
+  else if (page === "readingclub") body = <ReadingClubPage />;
   else if (page === "worksheet") body = <WorksheetsPage />;
   else if (page === "game") body = <GamesPage />;
   else body = <HomePage go={go} />;

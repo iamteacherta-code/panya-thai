@@ -38,6 +38,7 @@
     (function () {
       var v = "?v=" + Date.now();
       document.write('<script src="thai-data.js' + v + '"><\/script>');
+      document.write('<script src="reading-club-data.js' + v + '"><\/script>');
       ["ui", "tweaks-panel", "board", "wordmat", "pages", "app"].forEach(function (f) {
         document.write('<script type="text/babel" src="' + f + '.jsx' + v + '"><\/script>');
       });
