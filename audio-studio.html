@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · ห้องอัดเสียงคำอ่าน</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="activity-base.css" />
+<style>
+  body{background:var(--bg);}
+  .wrap{max-width:1120px;margin:0 auto;padding:22px 18px 70px;}
+
+  /* ---------- หัวเรื่อง ---------- */
+  .st-head{margin-bottom:16px;}
+  .st-head .kick{font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--earth-d);}
+  .st-head h1{margin:4px 0 2px;font-family:var(--font-thai);font-size:30px;font-weight:700;color:var(--ink);}
+  .st-head p{margin:0;font-family:var(--font-thai);font-size:15px;color:var(--ink-3);line-height:1.65;}
+
+  /* ---------- กล่องอธิบายวิธีทำงาน ---------- */
+  .st-how{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0 20px;}
+  .st-how div{border:1.5px solid var(--line);border-radius:14px;background:var(--surface);padding:12px 16px;}
+  .st-how b{display:block;font-family:var(--font-thai);font-size:15px;color:var(--leaf-d);margin-bottom:2px;}
+  .st-how span{font-family:var(--font-thai);font-size:13.5px;color:var(--ink-3);line-height:1.6;}
+  @media (max-width:720px){.st-how{grid-template-columns:1fr;}}
+
+  /* ---------- แถบสถานะบนสุด ---------- */
+  .st-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    border:1.5px solid var(--line);border-radius:16px;background:var(--surface);padding:12px 16px;margin-bottom:18px;}
+  .st-state{font-family:var(--font-thai);font-size:14px;color:var(--ink-2);display:flex;align-items:center;gap:8px;}
+  .st-dot{width:10px;height:10px;border-radius:50%;background:var(--ink-3);flex:none;}
+  .st-dot.on{background:var(--leaf);}
+  .st-dot.rec{background:var(--clay);animation:pulse 1s infinite;}
+  @keyframes pulse{50%{opacity:.25;}}
+  .st-bar .spacer{margin-left:auto;}
+  .st-count{font-family:var(--font-thai);font-size:14px;font-weight:700;color:var(--earth-d);
+    background:var(--earth-l);border-radius:999px;padding:4px 13px;}
+
+  /* ---------- แถบเลือกชุดคำ ---------- */
+  .set-bar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px;}
+  .set{flex:1 1 180px;text-align:left;border:1.6px solid var(--line);background:var(--surface);
+    border-radius:16px;padding:12px 15px;cursor:pointer;font-family:var(--font-thai);color:var(--ink);
+    transition:border-color .15s,background .15s,transform .1s;}
+  .set:hover{border-color:var(--line-2);transform:translateY(-1px);}
+  .set.on{background:var(--leaf);border-color:var(--leaf-d);color:#fff;box-shadow:inset 0 -3px 0 rgba(0,0,0,.14);}
+  .set b{display:block;font-size:17px;font-weight:700;}
+  .set small{display:block;font-size:12.5px;opacity:.85;margin-top:1px;}
+
+  /* ---------- แท่นอัด ---------- */
+  .booth{border:1.6px solid var(--line);border-radius:20px;background:var(--surface);
+    padding:22px 20px;margin-bottom:18px;text-align:center;}
+  .booth .pos{font-family:var(--font-thai);font-size:13px;font-weight:700;color:var(--ink-3);letter-spacing:.04em;}
+  .booth .word{font-family:var(--font-thai);font-size:64px;font-weight:700;color:var(--ink);
+    line-height:1.25;margin:6px 0 2px;word-break:break-word;}
+  .booth .word.done{color:var(--leaf-d);}
+  .booth .sub{font-family:var(--font-thai);font-size:13.5px;color:var(--ink-3);min-height:20px;}
+
+  /* มาตรวัดระดับเสียงเข้า — ให้เห็นว่าไมค์ทำงานจริง */
+  .meter{height:10px;border-radius:999px;background:var(--line);overflow:hidden;
+    max-width:420px;margin:14px auto 0;}
+  .meter i{display:block;height:100%;width:0;background:var(--leaf);transition:width .06s linear;}
+  .meter.rec i{background:var(--clay);}
+
+  .booth .acts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px;}
+  .rec-btn{font-family:var(--font-thai);font-size:17px;font-weight:700;border:none;cursor:pointer;
+    border-radius:999px;padding:13px 30px;background:var(--leaf);color:#fff;
+    box-shadow:inset 0 -3px 0 rgba(0,0,0,.16);transition:transform .1s,filter .15s;}
+  .rec-btn:hover{filter:brightness(1.06);} .rec-btn:active{transform:translateY(1px);}
+  .rec-btn.stop{background:var(--clay);}
+  .keys{font-family:var(--font-thai);font-size:12.5px;color:var(--ink-3);margin-top:12px;}
+  .keys kbd{font-family:var(--font-ui);font-size:11.5px;background:var(--ghost);border:1px solid var(--line-2);
+    border-radius:5px;padding:1px 6px;margin:0 2px;}
+
+  /* ---------- ตารางคำ ---------- */
+  .grid{display:flex;flex-wrap:wrap;gap:7px;}
+  .chip{font-family:var(--font-thai);font-size:16px;border:1.5px solid var(--line-2);background:#fff;
+    border-radius:11px;padding:6px 12px;cursor:pointer;color:var(--ink);transition:border-color .12s,background .12s;}
+  .chip:hover{border-color:var(--leaf);}
+  .chip.done{background:var(--leaf-l);border-color:var(--leaf);color:var(--leaf-d);font-weight:700;}
+  .chip.here{outline:3px solid var(--earth);outline-offset:1px;}
+
+  .card{border:1.6px solid var(--line);border-radius:18px;background:var(--surface);padding:18px 20px;margin-bottom:16px;}
+  .card > h2{margin:0 0 4px;font-family:var(--font-thai);font-size:20px;font-weight:700;}
+  .card > .hint{font-family:var(--font-thai);font-size:13.5px;color:var(--ink-3);margin:0 0 14px;line-height:1.6;}
+  .card textarea{font-family:var(--font-thai);font-size:15px;color:var(--ink);width:100%;
+    border:1.5px solid var(--line-2);border-radius:11px;background:#fff;padding:10px 12px;
+    outline:none;resize:vertical;min-height:80px;line-height:1.7;}
+  .card textarea:focus{border-color:var(--leaf);box-shadow:0 0 0 3px var(--leaf-l);}
+
+  .warn{font-family:var(--font-thai);font-size:14px;line-height:1.7;color:var(--ink-2);
+    border:1.5px solid var(--clay);background:var(--clay-l);border-radius:14px;padding:12px 16px;margin-bottom:18px;}
+  .warn b{color:var(--ink);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="st-head">
+    <div class="kick">PANYA · Thai Foundation</div>
+    <h1>ห้องอัดเสียงคำอ่าน</h1>
+    <p>อัดเสียงคุณครูเองทีละคำ แล้วให้เครื่องอ่านในบทเรียนใช้เสียงนี้แทนเสียงสังเคราะห์<br>
+       คำหนึ่งอัดครั้งเดียว ใช้ได้ทุกเรื่องที่มีคำนั้น</p>
+  </div>
+
+  <div class="st-how">
+    <div><b>๑ · อัดในหน้านี้</b><span>เสียงเก็บไว้ในเบราว์เซอร์เครื่องนี้ก่อน ปิดหน้าแล้วเปิดใหม่ก็ยังอยู่ อัดซ้ำทับได้เรื่อย ๆ จนพอใจ</span></div>
+    <div><b>๒ · ดาวน์โหลดแล้ววางลงโปรเจกต์</b><span>กด <b>ดาวน์โหลดเสียงทั้งหมด</b> จะได้ไฟล์ .zip แตกไฟล์ลงโฟลเดอร์ <code>audio/words/</code> แล้ว deploy ทุกเครื่องจึงจะได้ยิน</span></div>
+  </div>
+
+  <div class="warn" id="support"></div>
+
+  <div class="st-bar">
+    <span class="st-state"><span class="st-dot" id="dot"></span><span id="state">ยังไม่ได้เปิดไมโครโฟน</span></span>
+    <span class="st-count" id="count">—</span>
+    <span class="spacer"></span>
+    <button class="btn" id="btnMic">เปิดไมโครโฟน</button>
+    <button class="btn" id="btnZip">ดาวน์โหลดเสียงทั้งหมด (.zip)</button>
+    <button class="btn" id="btnClear">ล้างเสียงที่อัดไว้</button>
+    <a class="btn btn-home" href="Panyaden Thai Literacy.html">กลับหน้าหลัก</a>
+  </div>
+
+  <div class="set-bar" id="sets"></div>
+
+  <div class="booth">
+    <div class="pos" id="pos">—</div>
+    <div class="word" id="word">—</div>
+    <div class="sub" id="sub"></div>
+    <div class="meter" id="meter"><i></i></div>
+    <div class="acts">
+      <button class="btn" id="btnPrev">◀ ก่อนหน้า</button>
+      <button class="rec-btn" id="btnRec">● อัดเสียง</button>
+      <button class="btn" id="btnPlay">▶ ฟังที่อัด</button>
+      <button class="btn" id="btnNext">ถัดไป ▶</button>
+    </div>
+    <div class="keys">
+      <kbd>Space</kbd> เริ่ม/หยุดอัด · <kbd>P</kbd> ฟัง · <kbd>←</kbd> <kbd>→</kbd> เปลี่ยนคำ ·
+      อัดเสร็จจะเลื่อนไปคำถัดไปให้เอง
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>คำทั้งหมดในชุดนี้</h2>
+    <p class="hint">สีเขียว = อัดแล้ว · แตะคำใดก็ได้เพื่อกระโดดไปอัดคำนั้น</p>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="card">
+    <h2>เพิ่มคำเอง</h2>
+    <p class="hint">พิมพ์คำที่อยากอัดเพิ่ม คั่นด้วยเว้นวรรคหรือขึ้นบรรทัดใหม่ แล้วเลือกชุด <b>คำที่เพิ่มเอง</b> ด้านบน</p>
+    <textarea id="extra" placeholder="เช่น&#10;กบ นก ปลา&#10;บ้าน โรงเรียน"></textarea>
+    <div style="margin-top:10px;"><button class="btn btn-primary" id="btnExtra">บันทึกรายการคำ</button></div>
+  </div>
+
+</div>
+
+<script src="short-stories-data.js"></script>
+<script>
+/* ============================================================
+   ห้องอัดเสียงคำอ่าน — อัดทีละคำ เก็บลง IndexedDB แล้วส่งออกเป็น .zip
+   ไม่ใช้ไลบรารีใด ๆ: MediaRecorder สำหรับอัด, CRC32 + zip แบบ stored
+   สำหรับห่อไฟล์ (เสียง opus บีบอัดมาแล้ว บีบซ้ำไม่ได้อะไรเพิ่ม)
+   ============================================================ */
+(function () {
+  "use strict";
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* ---------- รายการคำ ---------- */
+  // แยกคำจากบรรทัด: หนังสือระดับ 02 เว้นวรรคระหว่างคำอยู่แล้ว
+  function wordsOf(lines) {
+    var out = [];
+    (lines || []).forEach(function (ln) {
+      ln.split(/\s+/).forEach(function (w) { w = w.trim(); if (w) out.push(w); });
+    });
+    return out;
+  }
+  function uniq(a) { var s = {}, o = []; a.forEach(function (w) { if (!s[w]) { s[w] = 1; o.push(w); } }); return o; }
+
+  var SETS = [];
+  var F = window.SHORT_STORIES_FILE;
+  if (F && F.levels) {
+    F.levels.forEach(function (lv) {
+      if (lv.status !== "ready") return;
+      var all = [];
+      (lv.stories || []).forEach(function (st) { all = all.concat(wordsOf(st.lines)); });
+      var u = uniq(all);
+      if (u.length) SETS.push({ id: lv.id || ("l" + lv.level), title: "14 เรื่องสั้น · Level " + (lv.level || lv.id), note: u.length + " คำไม่ซ้ำ", words: u });
+    });
+  }
+  var EXTRA_KEY = "panya_audio_extra_words";
+  function extraWords() {
+    try { return uniq((localStorage.getItem(EXTRA_KEY) || "").split(/\s+/).filter(Boolean)); } catch (e) { return []; }
+  }
+  function rebuildExtraSet() {
+    var w = extraWords();
+    var s = SETS.filter(function (x) { return x.id === "extra"; })[0];
+    if (!s) { s = { id: "extra", title: "คำที่เพิ่มเอง", note: "", words: [] }; SETS.push(s); }
+    s.words = w; s.note = w.length ? w.length + " คำ" : "ยังไม่มีคำ";
+  }
+  rebuildExtraSet();
+
+  /* ---------- ที่เก็บเสียง (IndexedDB) ---------- */
+  // localStorage เก็บ Blob ไม่ได้ และเสียง 200 คำก็เกินโควตาอยู่แล้ว
+  var DB = null;
+  function openDb() {
+    return new Promise(function (res, rej) {
+      var r = indexedDB.open("panya_word_audio", 1);
+      r.onupgradeneeded = function () { r.result.createObjectStore("clips"); };
+      r.onsuccess = function () { DB = r.result; res(DB); };
+      r.onerror = function () { rej(r.error); };
+    });
+  }
+  function tx(mode) { return DB.transaction("clips", mode).objectStore("clips"); }
+  function putClip(word, blob) {
+    return new Promise(function (res, rej) { var q = tx("readwrite").put(blob, word); q.onsuccess = function () { res(); }; q.onerror = function () { rej(q.error); }; });
+  }
+  function getClip(word) {
+    return new Promise(function (res) { var q = tx("readonly").get(word); q.onsuccess = function () { res(q.result || null); }; q.onerror = function () { res(null); }; });
+  }
+  function allKeys() {
+    return new Promise(function (res) { var q = tx("readonly").getAllKeys(); q.onsuccess = function () { res(q.result || []); }; q.onerror = function () { res([]); }; });
+  }
+  function clearAll() {
+    return new Promise(function (res) { var q = tx("readwrite").clear(); q.onsuccess = function () { res(); }; q.onerror = function () { res(); }; });
+  }
+
+  /* ---------- สถานะหน้าจอ ---------- */
+  var setIx = 0, wordIx = 0, done = {}, stream = null, rec = null, chunks = [], recording = false;
+  var EXT = "webm", MIME = "";
+  var analyser = null, rafId = 0;
+
+  function cur() { return SETS[setIx] || { words: [] }; }
+  function curWord() { return cur().words[wordIx] || ""; }
+
+  function setState(msg, cls) {
+    $("state").textContent = msg;
+    $("dot").className = "st-dot" + (cls ? " " + cls : "");
+  }
+
+  function renderSets() {
+    $("sets").innerHTML = "";
+    SETS.forEach(function (s, i) {
+      var b = document.createElement("button");
+      b.className = "set" + (i === setIx ? " on" : "");
+      b.innerHTML = "<b>" + s.title + "</b><small>" + s.note + "</small>";
+      b.onclick = function () { setIx = i; wordIx = 0; renderSets(); renderGrid(); renderBooth(); };
+      $("sets").appendChild(b);
+    });
+  }
+
+  function renderGrid() {
+    var g = $("grid"); g.innerHTML = "";
+    cur().words.forEach(function (w, i) {
+      var b = document.createElement("button");
+      b.className = "chip" + (done[w] ? " done" : "") + (i === wordIx ? " here" : "");
+      b.textContent = w;
+      b.onclick = function () { wordIx = i; renderGrid(); renderBooth(); };
+      g.appendChild(b);
+    });
+  }
+
+  function renderBooth() {
+    var w = curWord(), n = cur().words.length;
+    $("pos").textContent = n ? "คำที่ " + (wordIx + 1) + " จาก " + n : "ชุดนี้ยังไม่มีคำ";
+    $("word").textContent = w || "—";
+    $("word").className = "word" + (done[w] ? " done" : "");
+    $("sub").textContent = !w ? "" : done[w] ? "อัดไว้แล้ว — อัดใหม่ทับได้" : "ยังไม่ได้อัด";
+    var total = 0, got = 0;
+    SETS.forEach(function (s) { s.words.forEach(function (x) { total++; if (done[x]) got++; }); });
+    $("count").textContent = "อัดแล้ว " + got + " / " + total + " คำ";
+  }
+
+  function refreshDone() {
+    return allKeys().then(function (keys) { done = {}; keys.forEach(function (k) { done[k] = 1; }); });
+  }
+
+  /* ---------- ไมโครโฟน ---------- */
+  function pickMime() {
+    var want = ["audio/webm;codecs=opus", "audio/webm", "audio/ogg;codecs=opus", "audio/mp4"];
+    for (var i = 0; i < want.length; i++) {
+      if (window.MediaRecorder && MediaRecorder.isTypeSupported(want[i])) {
+        MIME = want[i];
+        EXT = want[i].indexOf("mp4") >= 0 ? "m4a" : want[i].indexOf("ogg") >= 0 ? "ogg" : "webm";
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function meterLoop() {
+    if (!analyser) return;
+    var buf = new Uint8Array(analyser.fftSize);
+    analyser.getByteTimeDomainData(buf);
+    var peak = 0;
+    for (var i = 0; i < buf.length; i++) { var d = Math.abs(buf[i] - 128); if (d > peak) peak = d; }
+    $("meter").firstElementChild.style.width = Math.min(100, (peak / 90) * 100) + "%";
+    rafId = requestAnimationFrame(meterLoop);
+  }
+
+  function openMic() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setState("เบราว์เซอร์นี้ไม่รองรับการอัดเสียง"); return;
+    }
+    if (!pickMime()) { setState("เบราว์เซอร์นี้อัดเสียงไม่ได้"); return; }
+    setState("กำลังขออนุญาตใช้ไมโครโฟน…");
+    navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+    }).then(function (s) {
+      stream = s;
+      setState("ไมโครโฟนพร้อม · บันทึกเป็น ." + EXT, "on");
+      $("btnMic").textContent = "ไมโครโฟนพร้อม";
+      $("btnMic").disabled = true;
+      try {
+        var ac = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = ac.createAnalyser(); analyser.fftSize = 1024;
+        ac.createMediaStreamSource(s).connect(analyser);
+        meterLoop();
+      } catch (e) {}
+    }).catch(function () {
+      setState("ไม่ได้รับอนุญาตให้ใช้ไมโครโฟน — กดไอคอนรูปกล้อง/ไมค์ในแถบที่อยู่เพื่ออนุญาต");
+    });
+  }
+
+  function startRec() {
+    if (!stream) { openMic(); return; }
+    if (recording || !curWord()) return;
+    chunks = [];
+    try { rec = new MediaRecorder(stream, { mimeType: MIME }); } catch (e) { rec = new MediaRecorder(stream); }
+    rec.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+    rec.onstop = function () {
+      var w = curWord();
+      var blob = new Blob(chunks, { type: MIME || "audio/webm" });
+      recording = false;
+      $("btnRec").textContent = "● อัดเสียง";
+      $("btnRec").className = "rec-btn";
+      $("meter").className = "meter";
+      if (!blob.size) { setState("ไม่ได้ยินเสียงเลย ลองใหม่อีกครั้ง", "on"); return; }
+      putClip(w, blob).then(function () {
+        done[w] = 1;
+        setState("เก็บเสียงคำ “" + w + "” แล้ว", "on");
+        renderGrid(); renderBooth();
+        // ฟังซ้ำทันทีเพื่อตรวจว่าชัดไหม แล้วค่อยเลื่อนไปคำถัดไป
+        play(blob, function () { if (wordIx < cur().words.length - 1) { wordIx++; renderGrid(); renderBooth(); } });
+      });
+    };
+    rec.start();
+    recording = true;
+    $("btnRec").textContent = "■ หยุดอัด";
+    $("btnRec").className = "rec-btn stop";
+    $("meter").className = "meter rec";
+    setState("กำลังอัด “" + curWord() + "” — พูดให้ชัด แล้วกด Space อีกครั้ง", "rec");
+  }
+
+  function stopRec() { if (recording && rec) try { rec.stop(); } catch (e) {} }
+
+  var au = null;
+  function play(blob, after) {
+    if (!blob) return;
+    if (au) { try { au.pause(); } catch (e) {} URL.revokeObjectURL(au.src); }
+    au = new Audio(URL.createObjectURL(blob));
+    au.onended = function () { if (after) after(); };
+    au.play().catch(function () { if (after) after(); });
+  }
+
+  /* ---------- ส่งออกเป็น .zip ---------- */
+  var CRC = (function () {
+    var t = new Uint32Array(256);
+    for (var n = 0; n < 256; n++) { var c = n; for (var k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; }
+    return function (buf) { var c = 0xFFFFFFFF; for (var i = 0; i < buf.length; i++) c = t[(c ^ buf[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; };
+  })();
+
+  function zipOf(files) {
+    // files: [{name, bytes}] — เก็บแบบ stored (ไม่บีบอัด) เพราะ opus บีบมาแล้ว
+    var enc = new TextEncoder(), parts = [], central = [], offset = 0;
+    function u16(v) { return [v & 255, (v >> 8) & 255]; }
+    function u32(v) { return [v & 255, (v >> 8) & 255, (v >> 16) & 255, (v >>> 24) & 255]; }
+    files.forEach(function (f) {
+      var nm = enc.encode(f.name), crc = CRC(f.bytes), sz = f.bytes.length;
+      // bit 11 = ชื่อไฟล์เป็น UTF-8 — จำเป็นสำหรับชื่อไฟล์ภาษาไทย
+      var lh = [].concat(u32(0x04034b50), u16(20), u16(0x0800), u16(0), u16(0), u16(0),
+                         u32(crc), u32(sz), u32(sz), u16(nm.length), u16(0));
+      parts.push(new Uint8Array(lh), nm, f.bytes);
+      central.push({ nm: nm, crc: crc, sz: sz, off: offset });
+      offset += lh.length + nm.length + sz;
+    });
+    var cd = [], cdSize = 0;
+    central.forEach(function (c) {
+      var h = [].concat(u32(0x02014b50), u16(20), u16(20), u16(0x0800), u16(0), u16(0), u16(0),
+                        u32(c.crc), u32(c.sz), u32(c.sz), u16(c.nm.length), u16(0), u16(0), u16(0), u16(0),
+                        u32(0), u32(c.off));
+      cd.push(new Uint8Array(h), c.nm);
+      cdSize += h.length + c.nm.length;
+    });
+    var end = new Uint8Array([].concat(u32(0x06054b50), u16(0), u16(0),
+      u16(central.length), u16(central.length), u32(cdSize), u32(offset), u16(0)));
+    return new Blob(parts.concat(cd, [end]), { type: "application/zip" });
+  }
+
+  function save(blob, name) {
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+  }
+
+  function exportZip() {
+    allKeys().then(function (keys) {
+      if (!keys.length) { setState("ยังไม่มีเสียงให้ดาวน์โหลด"); return; }
+      setState("กำลังรวมไฟล์ " + keys.length + " คำ…");
+      var files = [], index = {};
+      var chain = Promise.resolve();
+      keys.forEach(function (w) {
+        chain = chain.then(function () {
+          return getClip(w).then(function (b) {
+            if (!b) return;
+            var ext = (b.type || "").indexOf("mp4") >= 0 ? "m4a" : (b.type || "").indexOf("ogg") >= 0 ? "ogg" : "webm";
+            index[w] = ext;
+            return b.arrayBuffer().then(function (ab) {
+              files.push({ name: "audio/words/" + w + "." + ext, bytes: new Uint8Array(ab) });
+            });
+          });
+        });
+      });
+      chain.then(function () {
+        var js = "/* สร้างจาก audio-studio.html — คำไหนมีเสียงคุณครู และเป็นไฟล์นามสกุลอะไร\n" +
+                 "   เครื่องอ่านจะหาไฟล์ตามรายการนี้ก่อน ถ้าไม่มีจึงถอยไปใช้เสียงสังเคราะห์ */\n" +
+                 "window.WORD_AUDIO = " + JSON.stringify(index, null, 2) + ";\n";
+        files.push({ name: "word-audio-index.js", bytes: new TextEncoder().encode(js) });
+        save(zipOf(files), "panya-word-audio.zip");
+        setState("ดาวน์โหลดแล้ว — แตกไฟล์ทับลงในโฟลเดอร์โปรเจกต์ได้เลย", "on");
+      });
+    });
+  }
+
+  /* ---------- ปุ่มและแป้นพิมพ์ ---------- */
+  $("btnMic").onclick = openMic;
+  $("btnZip").onclick = exportZip;
+  $("btnClear").onclick = function () {
+    if (!confirm("ลบเสียงที่อัดไว้ทั้งหมดในเบราว์เซอร์นี้? กู้คืนไม่ได้")) return;
+    clearAll().then(function () { done = {}; renderGrid(); renderBooth(); setState("ล้างแล้ว", "on"); });
+  };
+  $("btnRec").onclick = function () { recording ? stopRec() : startRec(); };
+  $("btnPlay").onclick = function () { getClip(curWord()).then(function (b) { b ? play(b) : setState("คำนี้ยังไม่ได้อัด"); }); };
+  $("btnPrev").onclick = function () { if (wordIx > 0) { wordIx--; renderGrid(); renderBooth(); } };
+  $("btnNext").onclick = function () { if (wordIx < cur().words.length - 1) { wordIx++; renderGrid(); renderBooth(); } };
+  $("btnExtra").onclick = function () {
+    try { localStorage.setItem(EXTRA_KEY, $("extra").value || ""); } catch (e) {}
+    rebuildExtraSet(); renderSets(); renderGrid(); renderBooth();
+    setState("บันทึกรายการคำแล้ว", "on");
+  };
+  try { $("extra").value = localStorage.getItem(EXTRA_KEY) || ""; } catch (e) {}
+
+  document.addEventListener("keydown", function (e) {
+    if (e.target && /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+    if (e.code === "Space") { e.preventDefault(); recording ? stopRec() : startRec(); }
+    else if (e.key === "ArrowRight") { $("btnNext").click(); }
+    else if (e.key === "ArrowLeft") { $("btnPrev").click(); }
+    else if (e.key === "p" || e.key === "P") { $("btnPlay").click(); }
+  });
+
+  /* ---------- ข้อความเตือนเรื่องการเปิดไฟล์ ---------- */
+  $("support").innerHTML = location.protocol === "file:"
+    ? "<b>หน้านี้ต้องเปิดผ่านเซิร์ฟเวอร์</b> — เบราว์เซอร์ไม่ยอมให้ใช้ไมโครโฟนกับไฟล์ที่เปิดตรง ๆ สั่ง <code>node serve.js</code> แล้วเปิด <code>http://localhost:8080/audio-studio.html</code>"
+    : "<b>อัดในห้องเงียบ ๆ พูดคำเดียวชัด ๆ แล้วหยุด</b> — เว้นจังหวะหัวท้ายให้สั้น เพราะเครื่องอ่านจะเว้นจังหวะระหว่างคำให้เองอยู่แล้ว";
+
+  /* ---------- เริ่ม ---------- */
+  openDb().then(refreshDone).then(function () {
+    renderSets(); renderGrid(); renderBooth();
+  }).catch(function () {
+    setState("เบราว์เซอร์นี้เก็บเสียงไม่ได้ (IndexedDB ถูกปิด)");
+    renderSets(); renderGrid(); renderBooth();
+  });
+})();
+</script>
+</body>
+</html>

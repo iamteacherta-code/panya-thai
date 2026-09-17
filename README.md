@@ -118,6 +118,36 @@ hide that, the page works in two explicit steps:
 The generated file is plain data, so it round-trips: what the back office writes is exactly what
 `reading-club-data.js` looks like by hand.
 
+### เสียงอ่านของคุณครู — `audio-studio.html`
+
+The read-aloud prefers a **recorded teacher clip** over synthesised speech, always. Clips live in
+`audio/words/<word>.<ext>` — the same folder and the same convention the interactive games already
+use, so the 100-odd words recorded for those are picked up by the reader for free.
+
+Lookup order per word, cached for the session so a missing word is asked for once:
+
+1. `word-audio-index.js` (`window.WORD_AUDIO`) says which words have a clip and in what format.
+2. Not listed → try `.mp3` anyway, which is what the older hand-recorded library is.
+3. The file 404s or will not decode → fall back to the speech synthesiser.
+
+`audio-studio.html` is where the recording happens — one word at a time, because the reader speaks
+one word at a time and a word recorded once is reused in every story that contains it. Level 02's
+fourteen stories are 202 distinct words, so the whole set is one sitting.
+
+- It reads the word list straight out of `short-stories-data.js`, so the list can never drift from
+  the stories. There is also a free-text box for words that are not in any story.
+- `Space` records and stops, the clip plays straight back so you hear whether it was clear, and it
+  moves on to the next word by itself. A level meter shows the microphone is actually picking up.
+- Clips are held in **IndexedDB**, not `localStorage` — a `Blob` cannot go in `localStorage` and
+  200 clips would blow the quota anyway. They survive a refresh, so recording can stop and resume.
+- **ดาวน์โหลดเสียงทั้งหมด** writes a `.zip` byte by byte in the page (CRC32 + *stored* entries; Opus
+  is already compressed, so deflating it again buys nothing). Unzip it over the project root and the
+  clips and `word-audio-index.js` land where they belong. Filenames are Thai, so the zip sets bit 11
+  of the general-purpose flag — without it Windows extracts mojibake.
+
+Same two-step honesty as the Reading Club back office: a static site cannot write to shared storage,
+so step one is this browser and step two is dropping the files into the project and deploying.
+
 ### 14 Short Stories · 14 เรื่องสั้น
 
 Its own topic under *Lessons & materials · สื่อการสอน*: fourteen passages per level, graded

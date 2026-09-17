@@ -794,10 +794,22 @@ function ReadingClubPage() {
    เพราะต้นฉบับระดับนี้แบ่งคำด้วยการเว้นวรรคอยู่แล้ว และการรอให้
    เบราว์เซอร์บอกตำแหน่งคำ (onboundary) ยังไม่น่าเชื่อถือกับภาษาไทย
    สั่งอ่านทีละคำแล้วขีดเส้นตอน onstart จึงตรงกันแน่นอนทุกครั้ง     */
+/* เสียงคุณครูที่อัดเอง — audio/words/<คำ>.<นามสกุล>
+   word-audio-index.js (สร้างจาก audio-studio.html) บอกว่าคำไหนมีและเป็นไฟล์อะไร
+   ถ้าไม่มีในรายการก็ลอง .mp3 ไปตรง ๆ แบบเดียวกับที่เกมอื่นทำ แล้วค่อยถอยไปใช้
+   เสียงสังเคราะห์ คำที่หาไม่เจอจะถูกจำไว้ ไม่ให้ยิงซ้ำทุกครั้งที่อ่าน       */
+const CLIP_MISS = new Set();
+function clipUrl(w) {
+  if (CLIP_MISS.has(w)) return null;
+  const idx = typeof window !== "undefined" ? window.WORD_AUDIO : null;
+  return "audio/words/" + encodeURIComponent(w) + "." + ((idx && idx[w]) || "mp3");
+}
+
 function StoryReader({ story, levelLabel, onClose }) {
   const shellRef = React.useRef(null);
   const stopRef = React.useRef(false);
   const gapRef = React.useRef(null);      // ตัวจับเวลาช่องว่างระหว่างคำ
+  const clipRef = React.useRef(null);     // คลิปเสียงคุณครูที่กำลังเล่น
 
   /* แตกเป็นคำ พร้อมจำว่าอยู่บรรทัดไหน */
   const words = React.useMemo(() => {
@@ -812,9 +824,9 @@ function StoryReader({ story, levelLabel, onClose }) {
      ถ้าสั่งพูดติดกันรวดเดียว คำจะเกยกันจนฟังไม่ทัน แม้จะลด rate แล้วก็ตาม
      จึงเว้นจังหวะเงียบคั่นทุกคำ และเว้นยาวขึ้นอีกเมื่อจบบรรทัด             */
   const PACE = {
-    slow:   { label: "ช้ามาก",  rate: 0.55, gap: 500, lineGap: 850 },
-    normal: { label: "ช้า",     rate: 0.70, gap: 300, lineGap: 650 },
-    fast:   { label: "ปกติ",    rate: 0.88, gap: 150, lineGap: 400 },
+    slow:   { label: "ช้ามาก",  rate: 0.55, gap: 500, lineGap: 850, clipRate: 0.80 },
+    normal: { label: "ช้า",     rate: 0.70, gap: 300, lineGap: 650, clipRate: 0.90 },
+    fast:   { label: "ปกติ",    rate: 0.88, gap: 150, lineGap: 400, clipRate: 1.00 },
   };
 
   const [wi, setWi] = React.useState(-1);        // คำที่กำลังอ่าน
@@ -854,6 +866,7 @@ function StoryReader({ story, levelLabel, onClose }) {
       document.removeEventListener("keydown", onKey);
       stopRef.current = true;
       if (gapRef.current) clearTimeout(gapRef.current);
+      if (clipRef.current) { try { clipRef.current.pause(); } catch (e) {} clipRef.current = null; }
       if (synth) synth.cancel();
     };
   }, [onClose]);
@@ -862,6 +875,7 @@ function StoryReader({ story, levelLabel, onClose }) {
     if (!synth) { setVoiceMissing(true); return; }
     stopRef.current = false;
     if (gapRef.current) { clearTimeout(gapRef.current); gapRef.current = null; }
+    if (clipRef.current) { try { clipRef.current.pause(); } catch (e) {} clipRef.current = null; }
     synth.cancel();
     const voice = thaiVoice();
     if (!voice) setVoiceMissing(true);
@@ -877,13 +891,7 @@ function StoryReader({ story, levelLabel, onClose }) {
         if (!stopRef.current) setWi(-1);        // อ่านจบแล้วเอาเส้นออก
         return;
       }
-      const u = new SpeechSynthesisUtterance(words[i].text);
-      u.lang = "th-TH";
-      u.rate = p.rate;
-      u.pitch = 1;
-      if (voice) u.voice = voice;
       const here = i;
-      u.onstart = () => setWi(here);
       const after = () => {
         // ขึ้นบรรทัดใหม่ให้หยุดนานกว่าปกติ เหมือนคนอ่านจริงที่หายใจท้ายวรรค
         const endOfLine = words[i + 1] && words[i + 1].li !== words[i].li;
@@ -891,15 +899,36 @@ function StoryReader({ story, levelLabel, onClose }) {
         i++;
         gapRef.current = setTimeout(next, wait);
       };
-      u.onend = after;
-      u.onerror = after;
-      synth.speak(u);
+
+      const speak = () => {
+        const u = new SpeechSynthesisUtterance(words[here].text);
+        u.lang = "th-TH";
+        u.rate = p.rate;
+        u.pitch = 1;
+        if (voice) u.voice = voice;
+        u.onstart = () => setWi(here);
+        u.onend = after;
+        u.onerror = after;
+        synth.speak(u);
+      };
+
+      // เสียงคุณครูมาก่อนเสมอ — อัดไว้เท่าไรก็ใช้เท่านั้น ที่เหลือเครื่องอ่านให้
+      const url = clipUrl(words[here].text);
+      if (!url) { speak(); return; }
+      const a = new Audio(url);
+      clipRef.current = a;
+      a.playbackRate = p.clipRate;
+      a.onplay = () => setWi(here);
+      a.onended = () => { clipRef.current = null; after(); };
+      a.onerror = () => { clipRef.current = null; CLIP_MISS.add(words[here].text); speak(); };
+      a.play().catch(() => { clipRef.current = null; CLIP_MISS.add(words[here].text); speak(); });
     };
     next();
   }
 
   function pause() {
     stopRef.current = true;
+    if (clipRef.current) { try { clipRef.current.pause(); } catch (e) {} clipRef.current = null; }
     // ต้องล้างตัวจับเวลาช่องว่างด้วย ไม่งั้นคำถัดไปจะโผล่มาพูดเองหลังกดหยุด
     if (gapRef.current) { clearTimeout(gapRef.current); gapRef.current = null; }
     if (synth) synth.cancel();
@@ -1015,11 +1044,17 @@ function ShortStoriesPage() {
           <span className="eyebrow">{current.en} · {current.th}</span>
           <p className="page-sub" style={{ marginTop: 4 }}>{current.blurb}</p>
         </div>
-        {current.pdf && (
-          <a className="btn btn-sm btn-ghost" href={current.pdf} target="_blank" rel="noopener">
-            <Ico name="print" style={{ width: 15, height: 15 }} /> ต้นฉบับ PDF · พิมพ์ได้
+        <span className="ss-head-acts">
+          {current.pdf && (
+            <a className="btn btn-sm btn-ghost" href={current.pdf} target="_blank" rel="noopener">
+              <Ico name="print" style={{ width: 15, height: 15 }} /> ต้นฉบับ PDF · พิมพ์ได้
+            </a>
+          )}
+          {/* เครื่องมือของคุณครู — อัดเสียงอ่านเองแทนเสียงสังเคราะห์ */}
+          <a className="btn btn-sm btn-ghost" href="audio-studio.html" target="_blank" rel="noopener">
+            ● อัดเสียงอ่านเอง
           </a>
-        )}
+        </span>
       </div>
 
       {current.status !== "ready" ? (
