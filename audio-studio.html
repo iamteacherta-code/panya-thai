@@ -173,7 +173,8 @@
   function wordsOf(lines) {
     var out = [];
     (lines || []).forEach(function (ln) {
-      ln.split(/\s+/).forEach(function (w) { w = w.trim(); if (w) out.push(w); });
+      // | คือจุดตัดคำของระดับ 03 ขึ้นไป (มองไม่เห็นในหน้าอ่าน) ต้องตัดตรงนั้นด้วย
+      ln.split(/[|\s]+/).forEach(function (w) { w = w.trim(); if (w) out.push(w); });
     });
     return out;
   }
