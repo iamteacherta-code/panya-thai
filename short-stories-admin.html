@@ -112,8 +112,8 @@
    หลังบ้าน 14 เรื่องสั้น — แก้ข้อความและจุดตัดคำ
    จุดตัดคำเก็บด้วยอักขระ | ในบรรทัด มองไม่เห็นตอนแสดงผล
    ช่องว่างจริงในต้นฉบับยังเป็นช่องว่าง และนับเป็นขอบเขตคำอยู่แล้ว
-   ระดับที่ติดธง spaced (ระดับ 02) ต้นฉบับเว้นวรรคทีละคำ จึงไม่มีจุดตัด
-   ให้แก้ — และห้ามมี ไม่งั้นชื่อไฟล์เสียงที่อัดไว้จะไม่ตรง
+   ช่องว่าง = การเว้นวรรคที่เห็นบนจอ · | = จุดตัดคำที่มองไม่เห็น
+   ระดับ 02 (audio: "words") ชื่อไฟล์เสียงคำผูกกับจุดตัดคำ ย้ายแล้วอาจต้องอัดคำใหม่
    ============================================================ */
 (function () {
   "use strict";
@@ -122,19 +122,56 @@
   var FILE = window.SHORT_STORIES_FILE;
   var AUDIO = window.WORD_AUDIO || {};
 
-  var data, lvIx = 0, stIx = 0, edited = false;
+  var data, lvIx = 0, stIx = 0, edited = false, notice = "";
 
+  /* ลายนิ้วมือของไฟล์ข้อมูล — สิ่งที่แก้ในเบราว์เซอร์ผูกกับไฟล์รุ่นที่ใช้ตอนแก้
+     ถ้าไฟล์ในโปรเจกต์เปลี่ยนไปแล้ว (เช่นเพิ่ม Level ใหม่ หรือรวมที่แก้เข้าไฟล์แล้ว)
+     ของเก่าในเบราว์เซอร์ต้องไม่ทับไฟล์ใหม่ — เคยทำให้ Level 04–05 หายไปทั้งหมด */
+  function sig(o) {
+    var s = JSON.stringify(o), h = 0;
+    for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+    return String(h);
+  }
+  var FILE_SIG = sig(FILE);
   function load() {
     try {
       var raw = localStorage.getItem(KEY);
-      if (raw) { data = JSON.parse(raw); edited = true; return; }
+      if (raw) {
+        var saved = JSON.parse(raw);
+        if (saved && saved.base === FILE_SIG && saved.data) { data = saved.data; edited = true; return; }
+        // ของเก่าที่แก้จากไฟล์รุ่นก่อน — ไม่เอามาทับ ใช้ไฟล์ล่าสุด
+        localStorage.removeItem(KEY);
+        notice = "ไฟล์ข้อมูลในโปรเจกต์ใหม่กว่าสิ่งที่เคยแก้ไว้ในเบราว์เซอร์นี้ จึงเปิดจากไฟล์ล่าสุด";
+      }
     } catch (e) {}
     data = JSON.parse(JSON.stringify(FILE));
     edited = false;
   }
-  function save() {
-    try { localStorage.setItem(KEY, JSON.stringify(data)); edited = true; } catch (e) {}
-    paint();
+  function saveQuiet() {
+    try { localStorage.setItem(KEY, JSON.stringify({ base: FILE_SIG, data: data })); edited = true; } catch (e) {}
+    $("dot").className = "bo-dot on";
+    $("state").textContent = "กำลังแสดงข้อมูลที่แก้ในเบราว์เซอร์นี้ ยังไม่ได้ลงไฟล์จริง";
+  }
+  function save() { saveQuiet(); paint(); }
+
+  /* หาจุดตัดคำให้บรรทัดที่เพิ่งพิมพ์แก้ — ตัวตัดคำของเบราว์เซอร์ แล้วห้ามชิ้นที่ขึ้นต้นด้วย
+     สระหลัง/สระบนล่าง/วรรณยุกต์ (ต่อกับชิ้นหน้า) ปรับต่อเองได้ที่แถวตัวอักษร */
+  var SEG = null;
+  try { SEG = new Intl.Segmenter("th", { granularity: "word" }); } catch (e) {}
+  var NO_START = /^[ะ-ฺๅ็-๎]/;
+  var PUNCT = /^[,.“”"'?!():…]+$/;
+  function autoCut(text) {
+    text = String(text).split("|").join("").replace(/\s+/g, " ").trim();
+    if (!SEG) return text;
+    return text.split(/(\s+)/).map(function (c) {
+      if (!c || /^\s+$/.test(c) || c === "/") return c;
+      var parts = [];
+      for (var it = SEG.segment(c)[Symbol.iterator](), r = it.next(); !r.done; r = it.next()) {
+        var w = r.value.segment; if (!w.trim()) continue;
+        if (parts.length && (NO_START.test(w) || PUNCT.test(w))) parts[parts.length - 1] += w; else parts.push(w);
+      }
+      return parts.join("|");
+    }).join("");
   }
 
   var lv = function () { return data.levels[lvIx] || data.levels[0]; };
@@ -186,13 +223,12 @@
         '<p class="hint">ถอดข้อความจากต้นฉบับเข้ามาก่อน แล้วค่อยมาแก้จุดตัดคำที่นี่</p></div>';
       return;
     }
-    var spaced = !!lv().spaced;
+    var wordAudio = lv().audio === "words";
     var card = document.createElement("div");
     card.className = "card";
     card.innerHTML = "<h2>" + s.no + ". " + s.title + "</h2>" +
-      '<p class="hint">' + (spaced
-        ? "ระดับนี้ต้นฉบับเว้นวรรคทีละคำอยู่แล้ว ช่องว่างคือจุดตัดคำ แก้ได้จากช่องข้อความโดยตรง"
-        : "กดที่ช่องว่างระหว่างตัวอักษรเพื่อเพิ่มหรือเอาจุดตัดคำออก · คำที่ยังไม่มีเสียงอ่านจะขึ้นสีส้ม") +
+      '<p class="hint">ช่องว่างในช่องข้อความ = การเว้นวรรคที่เห็นบนจอ · กดที่ช่องระหว่างตัวอักษรเพื่อเพิ่ม/เอาจุดตัดคำออก (เส้นเขียว)' +
+      (wordAudio ? " · คำที่ยังไม่มีเสียงอ่านจะขึ้นสีส้ม" : " · ระดับนี้อัดเสียงทีละบรรทัด จุดตัดคำใช้กับเส้นใต้เท่านั้น") +
       "</p>";
     box.appendChild(card);
 
@@ -206,21 +242,20 @@
 
       var inp = document.createElement("input");
       inp.value = line.split("|").join("");
-      inp.oninput = function () {
-        // พิมพ์แก้ข้อความ — รักษาจุดตัดเดิมไม่ได้ จึงตัดใหม่ตามช่องว่างไปก่อน
-        s.lines[li] = inp.value;
-        save();
-      };
+      // พิมพ์ไปเรื่อย ๆ ไม่วาดหน้าใหม่ทุกตัวอักษร (เคยทำให้เคอร์เซอร์หลุดทุกครั้งที่พิมพ์)
+      // พิมพ์เสร็จ (ออกจากช่อง) ค่อยหาจุดตัดคำให้ใหม่ — ข้อความเปลี่ยน จุดตัดเดิมใช้ต่อไม่ได้
+      inp.oninput = function () { s.lines[li] = inp.value; saveQuiet(); };
+      inp.onchange = function () { s.lines[li] = autoCut(inp.value); save(); };
       row.appendChild(inp);
 
-      if (!spaced) row.appendChild(cutRow(s, li));
+      row.appendChild(cutRow(s, li));
 
       var wl = document.createElement("div");
       wl.className = "wl";
       wordsOf(s.lines[li]).forEach(function (w) {
         var e = document.createElement("span");
         e.textContent = w;
-        if (!AUDIO[w]) e.className = "no-audio";
+        if (wordAudio && !AUDIO[w]) e.className = "no-audio";
         wl.appendChild(e);
       });
       row.appendChild(wl);
@@ -266,25 +301,26 @@
     paintLevels(); paintStories(); paintEdit();
     var ws = allWords(lv());
     var miss = ws.filter(function (w) { return !AUDIO[w]; });
-    $("cnt").textContent = "Level " + lv().n + " · คำไม่ซ้ำ " + ws.length + " · ยังไม่มีเสียง " + miss.length;
+    $("cnt").textContent = "Level " + lv().n + " · คำไม่ซ้ำ " + ws.length +
+      (lv().audio === "words" ? " · ยังไม่มีเสียง " + miss.length : " · อัดเสียงทีละบรรทัดที่ line-studio.html");
     $("dot").className = "bo-dot" + (edited ? " on" : "");
     $("state").textContent = edited
       ? "กำลังแสดงข้อมูลที่แก้ในเบราว์เซอร์นี้ ยังไม่ได้ลงไฟล์จริง"
-      : "ตรงกับไฟล์ short-stories-data.js";
+      : (notice || "ตรงกับไฟล์ short-stories-data.js");
   }
 
   /* ---------- ส่งออก ---------- */
   function q(s) { return '"' + String(s).replace(/\\/g, "\\\\").replace(/"/g, '\\"') + '"'; }
   function toSource() {
     var out = "/* 14 เรื่องสั้น — ข้อมูลล้วน ไม่มีตรรกะ\n" +
-      "   ระดับ 02 ต้นฉบับเว้นวรรคทีละคำ (spaced: true) ช่องว่างคือขอบเขตคำ ห้ามซอยซ้ำ\n" +
-      "   ระดับ 03 ขึ้นไปเขียนติดกัน ขอบเขตคำเก็บด้วย | ซึ่งไม่แสดงผล\n" +
+      "   ช่องว่าง = การเว้นวรรคที่เห็นบนจอ · | = จุดตัดคำที่มองไม่เห็น (ใช้กับเส้นใต้และเสียง)\n" +
+      "   audio: \"words\" = อ่านทีละคำจากคลังเสียงคำ (ระดับ 02) · ไม่ระบุ = เสียงคุณครูทีละบรรทัด\n" +
       "   ไฟล์นี้สร้างทับได้จาก short-stories-admin.html */\n" +
       "window.SHORT_STORIES_FILE = {\n  levels: [\n";
     data.levels.forEach(function (l) {
       out += "    {\n";
       out += "      id: " + q(l.id) + ", n: " + q(l.n) + ", en: " + q(l.en) + ", th: " + q(l.th) + ",\n";
-      if (l.spaced) out += "      spaced: true,   // ต้นฉบับเว้นวรรคทีละคำ ห้ามซอยคำซ้ำ ชื่อไฟล์เสียงผูกกับการตัดแบบนี้\n";
+      if (l.audio) out += "      audio: " + q(l.audio) + ",\n";
       out += "      status: " + q(l.status) + ",\n";
       out += "      blurb: " + q(l.blurb) + ",\n";
       out += "      pdf: " + q(l.pdf || "") + ",\n";
@@ -317,6 +353,7 @@
   $("btnWords").onclick = function () {
     var need = [];
     data.levels.forEach(function (l) {
+      if (l.audio !== "words") return;          // ระดับอื่นอัดทีละบรรทัด ไม่ใช่ทีละคำ
       allWords(l).forEach(function (w) { if (!AUDIO[w] && need.indexOf(w) < 0) need.push(w); });
     });
     if (!need.length) { $("state").textContent = "ทุกคำมีเสียงครบแล้ว"; return; }

@@ -171,9 +171,15 @@ Its own topic under *Lessons & materials · สื่อการสอน*: fou
   every word with a space so beginners can see word boundaries, so the lines are copied exactly
   and rendered with `white-space: pre-wrap`. Tidying those spaces away would undo the point of
   the exercise.
-- **Level 02 is word-spaced, 03 is not.** The booklet for 02 puts a space between every word so a
-  beginner can see where words end; that level carries `spaced: true`, the space *is* the word
-  boundary, and it must stay that way — the recorded clip filenames are keyed to exactly that split.
+- **Spacing and word boundaries are separate things.** A space is what the reader *sees* — the
+  teacher groups words into reading phrases (`กาบี้ เป็นเด็กดี`). A `|` is an invisible word boundary
+  used for the underline and, in Level 02, for which word clip to play. (Level 02 used to be
+  "word-spaced" with `spaced: true`; the teacher re-spaced it by phrase, so the boundaries were
+  rebuilt by longest-match against the words already recorded — every existing clip still plays.)
+- `audio: "words"` (Level 02) reads word by word from the word-clip library; any other level reads
+  the teacher's per-line recordings.
+- No piece may start with a following vowel, an above/below vowel or a tone mark — such a piece is
+  glued to the one before. The old booklet spacing had produced clips like `มาย` + `า` and `โต` + `้`.
 - **From Level 03 the text runs on**, so the word boundaries are written into the data as `|`:
 
   ```js

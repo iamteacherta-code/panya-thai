@@ -119,7 +119,7 @@
   var $ = function (id) { return document.getElementById(id); };
   var F = window.SHORT_STORIES_FILE;
   var HAVE = window.LINE_AUDIO || {};          // ที่อยู่ในโปรเจกต์แล้ว
-  var LEVELS = F.levels.filter(function (l) { return !l.spaced && (l.stories || []).length; });
+  var LEVELS = F.levels.filter(function (l) { return l.audio !== "words" && (l.stories || []).length; });
   var lvIx = 0, stIx = 0, lnIx = 0, done = {};
 
   var clean = function (s) { return String(s).split("|").join("").trim(); };

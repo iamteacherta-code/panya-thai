@@ -833,7 +833,7 @@ function clipUrl(w) {
   return "audio/words/" + encodeURIComponent(w) + "." + ((idx && idx[w]) || "mp3");
 }
 
-function StoryReader({ story, levelLabel, levelId, spaced, onClose }) {
+function StoryReader({ story, levelLabel, levelId, spaced, wordAudio, onClose }) {
   const shellRef = React.useRef(null);
   const stopRef = React.useRef(false);
   const gapRef = React.useRef(null);      // ตัวจับเวลาช่องว่างระหว่างคำ
@@ -961,7 +961,7 @@ function StoryReader({ story, levelLabel, levelId, spaced, onClose }) {
      เป็นค่าประมาณ ไม่ใช่จังหวะจริงของแต่ละคำ แต่ไม่ต้องอัดทีละคำเป็นพัน ๆ คลิป
      บรรทัดที่ยังไม่ได้อัด หรืออัดไว้แต่ข้อความเปลี่ยนไปแล้ว จะถูกข้าม              */
   const lineInfo = React.useMemo(() => {
-    if (spaced) return [];
+    if (wordAudio) return [];
     const idx = (typeof window !== "undefined" && window.LINE_AUDIO) || {};
     let g = 0;
     return story.lines.map((line, li) => {
@@ -977,7 +977,7 @@ function StoryReader({ story, levelLabel, levelId, spaced, onClose }) {
       marks.forEach((m) => { m.at = total ? m.at / total : 0; });
       return { key, rec, marks };
     });
-  }, [story, spaced, levelId]);
+  }, [story, spaced, wordAudio, levelId]);
   const missingLines = lineInfo.filter((l) => !l.rec).length;
   const rafRef = React.useRef(0);
 
@@ -1019,7 +1019,8 @@ function StoryReader({ story, levelLabel, levelId, spaced, onClose }) {
     };
     next();
   }
-  const go = spaced ? speakFrom : playLines;
+  // ระดับ 02 อ่านทีละคำจากคลังเสียงคำ · ระดับอื่นเสียงคุณครูทีละบรรทัด
+  const go = wordAudio ? speakFrom : playLines;
 
   function pause() {
     stopRef.current = true;
@@ -1070,13 +1071,13 @@ function StoryReader({ story, levelLabel, levelId, spaced, onClose }) {
         {playing
           ? <button className="btn btn-sm" onClick={pause}>⏸ หยุด</button>
           : <button className="btn btn-sm btn-leaf" onClick={() => go(wi < 0 ? 0 : wi)}
-                    disabled={!spaced && missingLines === lineInfo.length}>▶ อ่านออกเสียง</button>}
+                    disabled={!wordAudio && missingLines === lineInfo.length}>▶ อ่านออกเสียง</button>}
         <button className="btn btn-sm" onClick={restart}>↺ เริ่มใหม่</button>
         <button className="btn btn-sm" onClick={toggleFull}>⛶ เต็มจอ</button>
         <button className="btn btn-sm" onClick={onClose}>✕ ปิด</button>
       </div>
 
-      {!spaced && missingLines > 0 && (
+      {!wordAudio && missingLines > 0 && (
         <p className="ss-warn">
           {missingLines === lineInfo.length
             ? "เรื่องนี้ยังไม่ได้อัดเสียงคุณครู — อัดได้ที่ line-studio.html"
@@ -1084,7 +1085,7 @@ function StoryReader({ story, levelLabel, levelId, spaced, onClose }) {
         </p>
       )}
 
-      {spaced && voiceMissing && (
+      {wordAudio && voiceMissing && (
         <p className="ss-warn">
           เครื่องนี้ยังไม่มีเสียงอ่านภาษาไทย ระบบจะใช้เสียงที่มีอยู่แทน — คำยังขีดเส้นตามปกติ
           (Windows เพิ่มเสียงไทยได้ที่ Settings → Time &amp; language → Speech)
@@ -1104,7 +1105,7 @@ function StoryReader({ story, levelLabel, levelId, spaced, onClose }) {
                 return (
                   <span key={k} className={"ss-w" + (idx === wi ? " on" : "")}
                         onClick={() => go(idx)}
-                        title={spaced ? "แตะเพื่อฟังคำนี้" : "แตะเพื่อฟังตั้งแต่บรรทัดนี้"}>{p.w}</span>
+                        title={wordAudio ? "แตะเพื่อฟังคำนี้" : "แตะเพื่อฟังตั้งแต่บรรทัดนี้"}>{p.w}</span>
                 );
               })}
             </p>
@@ -1167,7 +1168,7 @@ function ShortStoriesPage() {
           )}
           {/* เครื่องมือของคุณครู — อัดเสียงอ่านเองแทนเสียงสังเคราะห์ */}
           {/* ระดับ 02 อัดทีละคำ · ระดับ 03 ขึ้นไปอัดทีละบรรทัด */}
-          <a className="btn btn-sm btn-ghost" href={current.spaced ? "audio-studio.html" : "line-studio.html"}
+          <a className="btn btn-sm btn-ghost" href={current.audio === "words" ? "audio-studio.html" : "line-studio.html"}
              target="_blank" rel="noopener">
             ● อัดเสียงอ่านเอง
           </a>
@@ -1204,7 +1205,7 @@ function ShortStoriesPage() {
       )}
 
       {open && (
-        <StoryReader story={open} levelLabel={current.en + " · " + current.th} spaced={!!current.spaced} levelId={current.id}
+        <StoryReader story={open} levelLabel={current.en + " · " + current.th} spaced={!!current.spaced} wordAudio={current.audio === "words"} levelId={current.id}
                      onClose={() => setOpen(null)} />
       )}
     </div>

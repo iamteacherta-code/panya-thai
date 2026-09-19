@@ -186,6 +186,8 @@
   if (F && F.levels) {
     F.levels.forEach(function (lv) {
       if (lv.status !== "ready") return;
+      // ห้องนี้อัดทีละคำ — เฉพาะระดับที่อ่านทีละคำ (02) ระดับ 03 ขึ้นไปอัดทีละบรรทัดที่ line-studio.html
+      if (lv.audio !== "words") return;
       var all = [];
       (lv.stories || []).forEach(function (st) { all = all.concat(wordsOf(st.lines)); });
       var u = uniq(all);
