@@ -84,8 +84,8 @@
   </div>
 
   <div class="bo-how">
-    <div><b>๑ · แก้ในหน้านี้</b><span>พิมพ์แก้ข้อความได้ตรง ๆ และ<b>กดที่ช่องว่างระหว่างตัวอักษร</b>เพื่อเพิ่มหรือเอาจุดตัดคำออก เส้นเขียวคือจุดตัด บันทึกให้อัตโนมัติ</span></div>
-    <div><b>๒ · ดาวน์โหลดแล้ววางทับ</b><span>กด <b>ดาวน์โหลดไฟล์ข้อมูล</b> จะได้ <code>short-stories-data.js</code> วางทับไฟล์เดิมในโปรเจกต์แล้ว deploy</span></div>
+    <div><b>๑ · แก้ในหน้านี้</b><span>พิมพ์แก้ชื่อเรื่องและข้อความได้ตรง ๆ และ<b>กดที่ช่องระหว่างตัวอักษร</b>เพื่อเพิ่ม/เอาจุดตัดคำออก (เส้นเขียว)</span></div>
+    <div><b>๒ · บันทึกให้อัตโนมัติ</b><span>แก้แล้วเขียนลง <code>short-stories-data.js</code> ในโปรเจกต์ทันที ดูสถานะ <b>✓ บันทึกลงไฟล์แล้ว</b> ด้านล่าง ไม่ต้องดาวน์โหลดเอง ทุกครั้งที่บันทึกจะเก็บรุ่นก่อนหน้าไว้ในโฟลเดอร์ backups</span></div>
   </div>
 
   <div class="warn" id="warn"></div>
@@ -94,7 +94,7 @@
     <span class="bo-state"><span class="bo-dot" id="dot"></span><span id="state">กำลังโหลด…</span></span>
     <span class="cnt" id="cnt">—</span>
     <span class="spacer"></span>
-    <button class="btn" id="btnData">ดาวน์โหลดไฟล์ข้อมูล</button>
+    <button class="btn" id="btnData">ดาวน์โหลดสำเนาไฟล์</button>
     <button class="btn" id="btnWords">ดาวน์โหลดรายการคำที่ต้องอัด</button>
     <button class="btn" id="btnReset">คืนค่าตามไฟล์</button>
     <a class="btn btn-home" href="Panyaden Thai Literacy.html">กลับหน้าหลัก</a>
@@ -125,35 +125,90 @@
 
   var data, lvIx = 0, stIx = 0, edited = false, notice = "";
 
-  /* ลายนิ้วมือของไฟล์ข้อมูล — สิ่งที่แก้ในเบราว์เซอร์ผูกกับไฟล์รุ่นที่ใช้ตอนแก้
-     ถ้าไฟล์ในโปรเจกต์เปลี่ยนไปแล้ว (เช่นเพิ่ม Level ใหม่ หรือรวมที่แก้เข้าไฟล์แล้ว)
-     ของเก่าในเบราว์เซอร์ต้องไม่ทับไฟล์ใหม่ — เคยทำให้ Level 04–05 หายไปทั้งหมด */
-  function sig(o) {
-    var s = JSON.stringify(o), h = 0;
-    for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
-    return String(h);
+  /* ---------- การบันทึก ----------
+     บันทึกจริงคือเขียนลง short-stories-data.js ในโปรเจกต์ผ่าน node serve.js
+     (POST /api/save/short-stories) — แก้แล้วรอ 0.8 วินาทีก็เขียนให้เอง
+     สำเนาในเบราว์เซอร์ (localStorage) เป็นแค่ตาข่ายกันตก ใช้ตอนเซิร์ฟเวอร์ติดต่อไม่ได้
+     และเก็บ "ต้นฉบับตอนเริ่มแก้" ไว้ด้วย เพื่อรวมกับไฟล์รุ่นใหม่แบบบรรทัดต่อบรรทัด
+     — ห้ามทิ้งสิ่งที่คุณครูแก้ไว้ ไม่ว่าไฟล์จะเปลี่ยนไปแค่ไหน                  */
+  var clone = function (o) { return JSON.parse(JSON.stringify(o)); };
+  var base;                         // ข้อมูลในไฟล์ ณ ตอนที่เริ่มแก้ชุดที่ยังไม่ได้ลงไฟล์
+  var serverOk = false, timer = null, saving = false, again = false;
+
+  // รวมสามทาง: บรรทัดไหนคุณครูแก้ (ต่างจาก base) ใช้ของคุณครู นอกนั้นใช้ไฟล์ล่าสุด
+  function merge(file, local, b) {
+    var out = clone(file);
+    out.levels.forEach(function (L) {
+      var lo = (local.levels || []).find(function (x) { return x.id === L.id; });
+      var bo = b && (b.levels || []).find(function (x) { return x.id === L.id; });
+      if (!lo || !(lo.stories || []).length) return;
+      (L.stories || []).forEach(function (S, i) {
+        var ls = lo.stories[i], bs = bo && (bo.stories || [])[i];
+        if (!ls) return;
+        var changed = function (a, c) { return !bs || JSON.stringify(a) !== JSON.stringify(c); };
+        if (changed(ls.title, bs && bs.title)) S.title = ls.title;
+        if (JSON.stringify(ls.lines) !== JSON.stringify(bs && bs.lines)) {
+          if (!bs || ls.lines.length !== bs.lines.length || S.lines.length !== bs.lines.length) S.lines = ls.lines.slice();
+          else S.lines = S.lines.map(function (fl, j) { return ls.lines[j] !== bs.lines[j] ? ls.lines[j] : fl; });
+        }
+      });
+    });
+    return out;
   }
-  var FILE_SIG = sig(FILE);
+
   function load() {
+    data = clone(FILE); base = clone(FILE); edited = false;
     try {
       var raw = localStorage.getItem(KEY);
-      if (raw) {
-        var saved = JSON.parse(raw);
-        if (saved && saved.base === FILE_SIG && saved.data) { data = saved.data; edited = true; return; }
-        // ของเก่าที่แก้จากไฟล์รุ่นก่อน — ไม่เอามาทับ ใช้ไฟล์ล่าสุด
-        localStorage.removeItem(KEY);
-        notice = "ไฟล์ข้อมูลในโปรเจกต์ใหม่กว่าสิ่งที่เคยแก้ไว้ในเบราว์เซอร์นี้ จึงเปิดจากไฟล์ล่าสุด";
-      }
+      if (!raw) return;
+      var saved = JSON.parse(raw);
+      var local = saved && saved.data ? saved.data : saved;
+      var b = saved && typeof saved.base === "object" ? saved.base : null;
+      if (!local || !local.levels) return;
+      data = merge(FILE, local, b);
+      edited = JSON.stringify(data) !== JSON.stringify(FILE);
+      if (edited) notice = "พบสิ่งที่แก้ไว้ในเบราว์เซอร์นี้ที่ยังไม่ได้ลงไฟล์ — รวมเข้ากับไฟล์ล่าสุดแล้ว";
     } catch (e) {}
-    data = JSON.parse(JSON.stringify(FILE));
-    edited = false;
   }
+
+  function status(msg, on) { $("dot").className = "bo-dot" + (on ? " on" : ""); $("state").textContent = msg; }
+  function hhmm() { var d = new Date(); return d.toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit", second: "2-digit" }); }
+
+  function pushToFile() {
+    if (!serverOk) return;
+    if (saving) { again = true; return; }
+    saving = true;
+    var body = toSource();
+    fetch("/api/save/short-stories", { method: "POST", headers: { "Content-Type": "text/plain; charset=utf-8" }, body: body })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (!j.ok) throw new Error(j.error);
+        base = clone(data); edited = false;
+        try { localStorage.removeItem(KEY); } catch (e) {}
+        status("✓ บันทึกลงไฟล์ในโปรเจกต์แล้ว · " + hhmm(), false);
+      })
+      .catch(function (e) { status("บันทึกลงไฟล์ไม่สำเร็จ: " + (e.message || e) + " — ยังเก็บไว้ในเบราว์เซอร์นี้", true); })
+      .then(function () { saving = false; if (again) { again = false; pushToFile(); } });
+  }
+
   function saveQuiet() {
-    try { localStorage.setItem(KEY, JSON.stringify({ base: FILE_SIG, data: data })); edited = true; } catch (e) {}
-    $("dot").className = "bo-dot on";
-    $("state").textContent = "กำลังแสดงข้อมูลที่แก้ในเบราว์เซอร์นี้ ยังไม่ได้ลงไฟล์จริง";
+    edited = true;
+    try { localStorage.setItem(KEY, JSON.stringify({ base: base, data: data })); } catch (e) {}
+    if (serverOk) {
+      status("กำลังบันทึก…", true);
+      clearTimeout(timer); timer = setTimeout(pushToFile, 800);
+    } else {
+      status("เก็บไว้ในเบราว์เซอร์นี้แล้ว แต่ยังไม่ลงไฟล์ — เปิดหน้านี้ผ่าน node serve.js จึงจะบันทึกลงไฟล์ได้", true);
+    }
   }
   function save() { saveQuiet(); paint(); }
+
+  // ปิดหน้าไปก่อนครบ 0.8 วินาที ก็ยังต้องบันทึก
+  window.addEventListener("pagehide", function () {
+    if (!serverOk || !edited) return;
+    clearTimeout(timer);
+    try { navigator.sendBeacon("/api/save/short-stories", new Blob([toSource()], { type: "text/plain;charset=utf-8" })); } catch (e) {}
+  });
 
   /* หาจุดตัดคำให้บรรทัดที่เพิ่งพิมพ์แก้ — ตัวตัดคำของเบราว์เซอร์ แล้วห้ามชิ้นที่ขึ้นต้นด้วย
      สระหลัง/สระบนล่าง/วรรณยุกต์ (ต่อกับชิ้นหน้า) ปรับต่อเองได้ที่แถวตัวอักษร */
@@ -317,9 +372,7 @@
     $("cnt").textContent = "Level " + lv().n + " · คำไม่ซ้ำ " + ws.length +
       (lv().audio === "words" ? " · ยังไม่มีเสียง " + miss.length : " · อัดเสียงทีละบรรทัดที่ line-studio.html");
     $("dot").className = "bo-dot" + (edited ? " on" : "");
-    $("state").textContent = edited
-      ? "กำลังแสดงข้อมูลที่แก้ในเบราว์เซอร์นี้ ยังไม่ได้ลงไฟล์จริง"
-      : (notice || "ตรงกับไฟล์ short-stories-data.js");
+    // ข้อความสถานะการบันทึกตั้งโดย saveQuiet / pushToFile — paint ไม่แตะ
   }
 
   /* ---------- ส่งออก ---------- */
@@ -375,9 +428,9 @@
           "รายการอัดเสียง.txt");
   };
   $("btnReset").onclick = function () {
-    if (!confirm("ทิ้งสิ่งที่แก้ในเบราว์เซอร์นี้ แล้วกลับไปใช้ข้อมูลตามไฟล์?")) return;
+    if (!confirm("ทิ้งสิ่งที่แก้ไว้แต่ยังไม่ได้ลงไฟล์ แล้วเปิดจากไฟล์ในโปรเจกต์?\n(สิ่งที่บันทึกลงไฟล์แล้วไม่หาย)")) return;
     try { localStorage.removeItem(KEY); } catch (e) {}
-    load(); paint();
+    location.reload();
   };
 
   $("warn").innerHTML = Object.keys(AUDIO).length
@@ -385,6 +438,14 @@
     : "<b>ยังไม่พบสารบัญเสียง</b> (word-audio-index.js) — แก้ข้อความและจุดตัดคำได้ตามปกติ แต่จะไม่รู้ว่าคำไหนมีเสียงแล้ว";
 
   load(); paint();
+  status("กำลังตรวจการเชื่อมต่อ…", false);
+  fetch("/api/ping", { cache: "no-store" }).then(function (r) { return r.json(); }).then(function (j) {
+    serverOk = !!(j && j.ok);
+  }).catch(function () { serverOk = false; }).then(function () {
+    if (serverOk && edited) { status(notice + " · กำลังบันทึกลงไฟล์…", true); pushToFile(); }
+    else if (serverOk) status("พร้อม · แก้แล้วบันทึกลงไฟล์ในโปรเจกต์ให้อัตโนมัติ", false);
+    else status("หน้านี้บันทึกลงไฟล์ไม่ได้ (ไม่ได้เปิดผ่าน node serve.js) — สิ่งที่แก้เก็บไว้ในเบราว์เซอร์นี้ และกดดาวน์โหลดไฟล์ข้อมูลได้", true);
+  });
 })();
 </script>
 </body>

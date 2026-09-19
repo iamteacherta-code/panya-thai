@@ -13,3 +13,6 @@ Thumbs.db
 *.swp
 .idea/
 .vscode/
+
+# สำเนาไฟล์ข้อมูลก่อนหลังบ้านบันทึกทับ (serve.js)
+backups/

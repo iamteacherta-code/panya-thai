@@ -226,7 +226,7 @@ skipped (the reader says how many), and a story with none has its play button di
 
 #### Back office — `short-stories-admin.html`
 
-No sign-in, same two steps as the Reading Club one. Pick a level and a story, then per line:
+No sign-in. **Edits save straight into `short-stories-data.js`** through `node serve.js` (`POST /api/save/short-stories`), 0.8 s after the last change, and the status line says *✓ บันทึกลงไฟล์ในโปรเจกต์แล้ว* with the time. It used to work like the Reading Club office — keep edits in the browser, download a file, copy it over — and a teacher lost a morning of edits to it: the download was never copied in, and the browser copy was later discarded when the data file changed underneath it. So now: the server checks the file is complete and **refuses one that would drop a level's stories**, keeps the previous version in `backups/` (git-ignored) and swaps the file in atomically. The browser copy is only a safety net for when the server is unreachable, and it carries the version it was edited from, so it is merged line by line into a newer file instead of being thrown away. Closing the tab mid-edit flushes with `sendBeacon`. Opened without `serve.js` (e.g. GitHub Pages) the page says it cannot save to the file. Pick a level and a story, then per line:
 
 - the **text** is an ordinary input — fix a typo and it saves as you type;
 - underneath, the line is laid out character by character with a **clickable gap between each pair**.
