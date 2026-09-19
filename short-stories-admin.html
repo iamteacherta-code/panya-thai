@@ -51,6 +51,7 @@
   .ln input{font-family:var(--font-thai);font-size:16px;color:var(--ink);width:100%;
     border:1.5px solid var(--line-2);border-radius:10px;background:#fff;padding:8px 11px;outline:none;margin:4px 0 8px;}
   .ln input:focus{border-color:var(--leaf);box-shadow:0 0 0 3px var(--leaf-l);}
+  .ln input.title-in{font-size:20px;font-weight:700;}
 
   /* แถวตัดคำ — ช่องว่างระหว่างตัวอักษรกดได้ */
   .cut{font-family:var(--font-thai);font-size:26px;line-height:2.1;color:var(--ink);
@@ -231,6 +232,18 @@
       (wordAudio ? " · คำที่ยังไม่มีเสียงอ่านจะขึ้นสีส้ม" : " · ระดับนี้อัดเสียงทีละบรรทัด จุดตัดคำใช้กับเส้นใต้เท่านั้น") +
       "</p>";
     box.appendChild(card);
+
+    // ชื่อเรื่องแก้ได้ — เสียงที่อัดไว้ผูกกับเลขเรื่อง ไม่ใช่ชื่อ แก้ชื่อแล้วเสียงไม่หาย
+    var tRow = document.createElement("div");
+    tRow.className = "ln";
+    tRow.innerHTML = '<div class="no">ชื่อเรื่อง</div>';
+    var tIn = document.createElement("input");
+    tIn.className = "title-in";
+    tIn.value = s.title;
+    tIn.oninput = function () { s.title = tIn.value; saveQuiet(); };
+    tIn.onchange = function () { s.title = tIn.value.replace(/\s+/g, " ").trim() || s.title; save(); };
+    tRow.appendChild(tIn);
+    card.appendChild(tRow);
 
     s.lines.forEach(function (line, li) {
       var row = document.createElement("div");
