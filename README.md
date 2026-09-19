@@ -187,6 +187,15 @@ Its own topic under *Lessons & materials · สื่อการสอน*: fou
   punctuation its own word, and is inconsistent (`สีน้ำเงิน` whole but `สี·เขียว` split). Since every
   word is an audio filename, that inconsistency would be baked into the recordings.
 
+- **Levels 04 and 05** are in too (14 and 18 stories — the Level 05 booklet has 18). Two things
+  they add:
+  - Level 05 prints `/` between reading chunks, as a fluency cue. It is kept exactly, rendered, and
+    never treated as a word: `lineParts` turns any punctuation-only piece into a non-word, so it
+    is not spoken, not underlined, and not in any recording list.
+  - Stories may carry `moral` (ข้อคิด) and `questions` (คำถามชวนคิด). They show under the story in the
+    reader but sit outside `lines`, so the word-by-word read-aloud never reads the questions out.
+    The back office writes both fields back when it regenerates the data file.
+
 #### Back office — `short-stories-admin.html`
 
 No sign-in, same two steps as the Reading Club one. Pick a level and a story, then per line:

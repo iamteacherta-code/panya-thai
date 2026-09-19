@@ -464,6 +464,11 @@
    ส่วน .ss-sp-gap คือช่องว่างที่มีจริงในต้นฉบับ ต้องเห็นตามเดิม */
 .ss-lines.tight .ss-w { padding-left: 0; padding-right: 0; }
 .ss-sp-gap { white-space: pre; }
+/* ข้อคิดและคำถามชวนคิดท้ายเรื่อง (ระดับ 04–05) — อ่านบนจอ ไม่อ่านออกเสียง */
+.ss-moral { font-size: .82em; color: var(--leaf-d); margin-top: .6em; }
+.ss-qs { font-size: .72em; color: var(--ink-2); margin-top: .8em; text-align: left; }
+.ss-qs ul { margin: .3em 0 0 1.2em; padding: 0; }
+.ss-text .ss-moral { font-size: 1em; }
 .ss-w:hover { border-bottom-color: var(--line-2); }
 /* คำที่กำลังอ่าน — เน้นด้วย "เส้นสีเขียวใต้คำ" เป็นหลัก ไม่ทำเป็นกล่องทึบ
    เพราะสระบนล่างของไทยทำให้กล่องสูงเกินจนดูเทอะทะ */

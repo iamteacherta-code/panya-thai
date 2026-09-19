@@ -812,10 +812,16 @@ function lineParts(line, spaced) {
   for (const piece of line.split(/(\s+)/)) {
     if (!piece) continue;
     if (/^\s+$/.test(piece)) { out.push({ sp: spaced ? " " : piece }); continue; }
-    for (const w of piece.split("|")) if (w) out.push({ w: w });
+    for (const w of piece.split("|")) {
+      if (!w) continue;
+      // เครื่องหมาย / ของระดับ 05 แบ่งช่วงอ่าน — ต้องเห็น แต่ไม่ใช่คำ ไม่ต้องอ่านออกเสียง
+      if (NOT_A_WORD.test(w)) out.push({ sp: w });
+      else out.push({ w: w });
+    }
   }
   return out;
 }
+const NOT_A_WORD = /^[\/,.“”"'?!():…]+$/;
 function splitWords(line, spaced) {
   return lineParts(line, spaced).filter((p) => p.w).map((p) => p.w);
 }
@@ -1025,6 +1031,14 @@ function StoryReader({ story, levelLabel, spaced, onClose }) {
               })}
             </p>
           ))}
+          {/* ข้อคิดและคำถามชวนคิด — ให้อ่านบนจอ แต่ไม่รวมในการอ่านออกเสียงคำต่อคำ */}
+          {story.moral && <p className="ss-moral"><b>ข้อคิด:</b> {story.moral}</p>}
+          {story.questions && (
+            <div className="ss-qs">
+              <b>คำถามชวนคิด</b>
+              <ul>{story.questions.map((q, i) => <li key={i}>{q}</li>)}</ul>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -1100,7 +1114,9 @@ function ShortStoriesPage() {
               </header>
               {/* เว้นวรรคทีละคำตามต้นฉบับ — ห้ามรวบช่องไฟ */}
               <div className="ss-text">
-                {s.lines.map((line, i) => <p key={i}>{line}</p>)}
+                {/* | คือจุดตัดคำที่มองไม่เห็น — ตัดออกก่อนแสดง */}
+                {s.lines.map((line, i) => <p key={i}>{line.split("|").join("")}</p>)}
+                {s.moral && <p className="ss-moral"><b>ข้อคิด:</b> {s.moral}</p>}
               </div>
             </article>
           ))}

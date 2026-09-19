@@ -174,7 +174,8 @@
     var out = [];
     (lines || []).forEach(function (ln) {
       // | คือจุดตัดคำของระดับ 03 ขึ้นไป (มองไม่เห็นในหน้าอ่าน) ต้องตัดตรงนั้นด้วย
-      ln.split(/[|\s]+/).forEach(function (w) { w = w.trim(); if (w) out.push(w); });
+      // / และวรรคตอนล้วน ๆ ไม่ใช่คำ ไม่ต้องอัด
+      ln.split(/[|\s]+/).forEach(function (w) { w = w.trim(); if (w && !/^[\/,.“”"'?!():…]+$/.test(w)) out.push(w); });
     });
     return out;
   }

@@ -141,7 +141,10 @@
   var st = function () { return (lv().stories || [])[stIx]; };
 
   /* ---------- คำในบรรทัด ---------- */
-  function wordsOf(line) { return line.split(/[|\s]+/).filter(Boolean); }
+  function wordsOf(line) {
+    // / และวรรคตอนล้วน ๆ ไม่ใช่คำ ไม่ต้องอัดเสียง
+    return line.split(/[|\s]+/).filter(function (w) { return w && !/^[\/,.“”"'?!():…]+$/.test(w); });
+  }
   function allWords(level) {
     var s = {};
     (level.stories || []).forEach(function (x) {
@@ -288,7 +291,11 @@
       if (l.note) out += "      note: " + q(l.note) + ",\n";
       out += "      stories: [\n";
       (l.stories || []).forEach(function (s) {
-        out += "        { no: " + s.no + ", title: " + q(s.title) + ", lines: [\n";
+        // ข้อคิดและคำถามชวนคิดต้องติดไปด้วย ไม่งั้นดาวน์โหลดทีไรหายทุกที
+        out += "        { no: " + s.no + ", title: " + q(s.title) + ",\n";
+        if (s.moral) out += "          moral: " + q(s.moral) + ",\n";
+        if (s.questions) out += "          questions: [" + s.questions.map(q).join(", ") + "],\n";
+        out += "          lines: [\n";
         s.lines.forEach(function (ln, i) {
           out += "          " + q(ln) + (i === s.lines.length - 1 ? " ] }," : ",") + "\n";
         });
