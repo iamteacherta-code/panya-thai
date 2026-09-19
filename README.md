@@ -196,6 +196,28 @@ Its own topic under *Lessons & materials · สื่อการสอน*: fou
     reader but sit outside `lines`, so the word-by-word read-aloud never reads the questions out.
     The back office writes both fields back when it regenerates the data file.
 
+#### Read-aloud from Level 03 up — teacher's voice only, line by line (`line-studio.html`)
+
+Level 02 reads word by word from word clips. From Level 03 the passages are long and are read by
+the teacher **one line per clip**, with **no speech synthesis at all**: a line with no clip is
+skipped (the reader says how many), and a story with none has its play button disabled.
+
+- Clips: `audio/lines/<level>/<story>/<line>.webm`, listed in `line-audio-index.js`
+  (`window.LINE_AUDIO["l04/1/3"] = { ext, text, dur, s, e }`).
+- `text` is the line as it was when recorded. If the line is later edited, the clip no longer
+  matches and is treated as missing — the studio marks it *ข้อความเปลี่ยน ต้องอัดใหม่* — instead of
+  playing the wrong words.
+- `s` / `e` are where speech starts and stops, found by decoding the clip in the studio (MediaRecorder
+  WebM has no duration in its header, and leading silence would otherwise put the underline ahead of
+  the voice). The reader spreads the green underline across `s → e` in proportion to word length,
+  with a longer share for each `/`. It is an **estimate** — close, not word-exact.
+- Tapping a word plays from the start of its line; recorded WebM is not reliably seekable.
+- The studio guards the two ways a take goes wrong: holding Space (auto-repeat is ignored), and
+  pressing Space again while the last take is still playing back, which would otherwise record over
+  the line just done — it now moves on first.
+- Exporting merges with what is already in `line-audio-index.js`, so recording on another day or
+  another machine adds to the set instead of replacing it.
+
 #### Back office — `short-stories-admin.html`
 
 No sign-in, same two steps as the Reading Club one. Pick a level and a story, then per line:

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PANYA · ห้องอัดเสียงอ่านทีละบรรทัด</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="activity-base.css" />
+<style>
+  body{background:var(--bg);}
+  .wrap{max-width:1120px;margin:0 auto;padding:22px 18px 70px;}
+  .hd .kick{font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--earth-d);}
+  .hd h1{margin:4px 0 2px;font-family:var(--font-thai);font-size:30px;font-weight:700;color:var(--ink);}
+  .hd p{margin:0 0 14px;font-family:var(--font-thai);font-size:15px;color:var(--ink-3);line-height:1.65;}
+
+  .bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border:1.5px solid var(--line);border-radius:16px;
+    background:var(--surface);padding:12px 16px;margin-bottom:16px;}
+  .state{font-family:var(--font-thai);font-size:14px;color:var(--ink-2);display:flex;align-items:center;gap:8px;}
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--ink-3);flex:none;}
+  .dot.on{background:var(--leaf);} .dot.rec{background:var(--clay);animation:pulse 1s infinite;}
+  @keyframes pulse{50%{opacity:.25;}}
+  .bar .spacer{margin-left:auto;}
+  .cnt{font-family:var(--font-thai);font-size:13.5px;font-weight:700;color:var(--earth-d);background:var(--earth-l);
+    border-radius:999px;padding:4px 13px;}
+
+  .seg{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+  .seg button{text-align:left;border:1.6px solid var(--line);background:var(--surface);border-radius:14px;
+    padding:9px 14px;cursor:pointer;font-family:var(--font-thai);color:var(--ink);}
+  .seg button:hover{border-color:var(--line-2);}
+  .seg button.on{background:var(--leaf);border-color:var(--leaf-d);color:#fff;}
+  .seg b{display:block;font-size:15px;} .seg small{display:block;font-size:12px;opacity:.85;}
+
+  .booth{border:1.6px solid var(--line);border-radius:20px;background:var(--surface);padding:20px;margin:6px 0 16px;text-align:center;}
+  .pos{font-family:var(--font-thai);font-size:13px;font-weight:700;color:var(--ink-3);}
+  .line{font-family:var(--font-thai);font-size:34px;line-height:1.55;color:var(--ink);margin:8px 0 4px;}
+  .line.done{color:var(--leaf-d);}
+  .line .cut{color:var(--earth);font-weight:700;padding:0 .12em;}
+  .sub{font-family:var(--font-thai);font-size:13.5px;color:var(--ink-3);min-height:20px;}
+  .meter{height:10px;border-radius:999px;background:var(--line);overflow:hidden;max-width:420px;margin:12px auto 0;}
+  .meter i{display:block;height:100%;width:0;background:var(--leaf);transition:width .06s linear;}
+  .meter.rec i{background:var(--clay);}
+  .acts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px;}
+  .rec-btn{font-family:var(--font-thai);font-size:17px;font-weight:700;border:none;cursor:pointer;border-radius:999px;
+    padding:13px 30px;background:var(--leaf);color:#fff;box-shadow:inset 0 -3px 0 rgba(0,0,0,.16);}
+  .rec-btn.stop{background:var(--clay);}
+  .keys{font-family:var(--font-thai);font-size:12.5px;color:var(--ink-3);margin-top:10px;}
+  .keys kbd{font-family:var(--font-ui);font-size:11.5px;background:var(--ghost);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;}
+
+  .list{border:1.6px solid var(--line);border-radius:18px;background:var(--surface);padding:10px 14px;}
+  .row{display:flex;gap:10px;align-items:baseline;padding:7px 6px;border-radius:10px;cursor:pointer;
+    font-family:var(--font-thai);font-size:16px;color:var(--ink);}
+  .row:hover{background:var(--ghost);}
+  .row.here{outline:3px solid var(--earth);outline-offset:-1px;}
+  .row .n{font-family:var(--font-ui);font-size:12px;color:var(--ink-3);min-width:26px;}
+  .row .tag{margin-left:auto;flex:none;font-size:12px;font-weight:700;border-radius:999px;padding:2px 10px;}
+  .tag.ok{background:var(--leaf-l);color:var(--leaf-d);}
+  .tag.have{background:var(--sky-l);color:var(--ink-2);}
+  .tag.stale{background:var(--clay-l);color:var(--ink);}
+  .tag.none{background:var(--ghost);color:var(--ink-3);}
+  .warn{font-family:var(--font-thai);font-size:14px;line-height:1.7;color:var(--ink-2);border:1.5px solid var(--earth);
+    background:var(--earth-l);border-radius:14px;padding:11px 15px;margin-bottom:14px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd">
+    <div class="kick">PANYA · Thai Foundation</div>
+    <h1>ห้องอัดเสียงอ่าน · ทีละบรรทัด</h1>
+    <p>สำหรับ 14 เรื่องสั้น Level 03 ขึ้นไป — คุณครูอ่านทีละบรรทัดอย่างเป็นธรรมชาติ<br>
+       หน้าอ่านจะเล่นเสียงคุณครูล้วน ๆ <b>ไม่มีเสียงสังเคราะห์แทรก</b> บรรทัดที่ยังไม่ได้อัดจะถูกข้ามไป</p>
+  </div>
+
+  <div class="warn" id="warn">อัดเสร็จแล้วกด <b>ดาวน์โหลดเสียงทั้งหมด (.zip)</b> แล้วแตกไฟล์ทับที่โฟลเดอร์โปรเจกต์ — เสียงเก็บไว้ในเบราว์เซอร์นี้ก่อน ปิดหน้าแล้วยังอยู่</div>
+
+  <div class="bar">
+    <span class="state"><span class="dot" id="dot"></span><span id="state">ยังไม่ได้เปิดไมโครโฟน</span></span>
+    <span class="cnt" id="cnt">—</span>
+    <span class="spacer"></span>
+    <button class="btn" id="btnMic">เปิดไมโครโฟน</button>
+    <button class="btn" id="btnZip">ดาวน์โหลดเสียงทั้งหมด (.zip)</button>
+    <button class="btn" id="btnClear">ล้างเสียงที่อัดไว้</button>
+    <a class="btn btn-home" href="Panyaden Thai Literacy.html">กลับหน้าหลัก</a>
+  </div>
+
+  <div class="seg" id="levels"></div>
+  <div class="seg" id="stories"></div>
+
+  <div class="booth">
+    <div class="pos" id="pos">—</div>
+    <div class="line" id="line">—</div>
+    <div class="sub" id="sub"></div>
+    <div class="meter" id="meter"><i></i></div>
+    <div class="acts">
+      <button class="btn" id="btnPrev">◀ บรรทัดก่อน</button>
+      <button class="rec-btn" id="btnRec">● อัดบรรทัดนี้</button>
+      <button class="btn" id="btnPlay">▶ ฟังที่อัด</button>
+      <button class="btn" id="btnNext">บรรทัดถัดไป ▶</button>
+    </div>
+    <div class="keys"><kbd>Space</kbd> กดหนึ่งครั้งเริ่ม กดอีกครั้งหยุด (<b>อย่ากดค้าง</b>) · <kbd>P</kbd> ฟัง · <kbd>←</kbd> <kbd>→</kbd> เปลี่ยนบรรทัด ·
+      อัดเสร็จจะเล่นให้ฟังแล้วเลื่อนไปบรรทัดถัดไปเอง · เครื่องหมาย <b style="color:var(--earth)">/</b> คือจุดเว้นจังหวะตามต้นฉบับ</div>
+  </div>
+
+  <div class="list" id="list"></div>
+</div>
+
+<script src="short-stories-data.js"></script>
+<script src="line-audio-index.js"></script>
+<script>
+/* ============================================================
+   ห้องอัดเสียงอ่านทีละบรรทัด (Level 03 ขึ้นไป)
+   คีย์ของแต่ละบรรทัดคือ "l03/1/2" = ระดับ/เรื่องที่/บรรทัดที่
+   เก็บข้อความของบรรทัดไว้คู่กับเสียงด้วย ถ้าภายหลังแก้ข้อความ
+   เสียงเก่าจะถูกนับว่า "ข้อความเปลี่ยน ต้องอัดใหม่" ไม่ใช่เล่นผิดบรรทัด
+   ============================================================ */
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var F = window.SHORT_STORIES_FILE;
+  var HAVE = window.LINE_AUDIO || {};          // ที่อยู่ในโปรเจกต์แล้ว
+  var LEVELS = F.levels.filter(function (l) { return !l.spaced && (l.stories || []).length; });
+  var lvIx = 0, stIx = 0, lnIx = 0, done = {};
+
+  var clean = function (s) { return String(s).split("|").join("").trim(); };
+  var lv = function () { return LEVELS[lvIx]; };
+  var st = function () { return lv().stories[stIx]; };
+  var key = function (l, s, i) { return l.id + "/" + s.no + "/" + (i + 1); };
+  var curKey = function () { return key(lv(), st(), lnIx); };
+  var curText = function () { return clean(st().lines[lnIx]); };
+
+  function status(l, s, i) {
+    var k = key(l, s, i), t = clean(s.lines[i]);
+    if (done[k]) return done[k] === t ? "ok" : "stale";
+    if (HAVE[k]) return HAVE[k].text === t ? "have" : "stale";
+    return "none";
+  }
+  var LABEL = { ok: "อัดแล้ว", have: "มีในโปรเจกต์", stale: "ข้อความเปลี่ยน ต้องอัดใหม่", none: "ยังไม่ได้อัด" };
+
+  /* ---------- IndexedDB ---------- */
+  var DB;
+  function openDb() {
+    return new Promise(function (res, rej) {
+      var r = indexedDB.open("panya_line_audio", 1);
+      r.onupgradeneeded = function () { r.result.createObjectStore("clips"); };
+      r.onsuccess = function () { DB = r.result; res(); };
+      r.onerror = function () { rej(r.error); };
+    });
+  }
+  function store(m) { return DB.transaction("clips", m).objectStore("clips"); }
+  function put(k, v) { return new Promise(function (r) { store("readwrite").put(v, k).onsuccess = r; }); }
+  function get(k) { return new Promise(function (r) { var q = store("readonly").get(k); q.onsuccess = function () { r(q.result || null); }; q.onerror = function () { r(null); }; }); }
+  function all() { return new Promise(function (r) { var o = {}, q = store("readonly").openCursor(); q.onsuccess = function () { var c = q.result; if (c) { o[c.key] = c.value; c.continue(); } else r(o); }; }); }
+
+  /* ---------- วาดหน้า ---------- */
+  function paint() {
+    $("levels").innerHTML = "";
+    LEVELS.forEach(function (l, i) {
+      var b = document.createElement("button"); b.className = i === lvIx ? "on" : "";
+      var n = 0, got = 0;
+      l.stories.forEach(function (s) { s.lines.forEach(function (_, j) { n++; var x = status(l, s, j); if (x === "ok" || x === "have") got++; }); });
+      b.innerHTML = "<b>Level " + l.n + "</b><small>" + got + " / " + n + " บรรทัด</small>";
+      b.onclick = function () { pendingMove = false; lvIx = i; stIx = 0; lnIx = 0; paint(); };
+      $("levels").appendChild(b);
+    });
+    $("stories").innerHTML = "";
+    lv().stories.forEach(function (s, i) {
+      var b = document.createElement("button"); b.className = i === stIx ? "on" : "";
+      var n = s.lines.length, got = s.lines.filter(function (_, j) { var x = status(lv(), s, j); return x === "ok" || x === "have"; }).length;
+      b.innerHTML = "<b>" + s.no + ". " + s.title + "</b><small>" + got + " / " + n + "</small>";
+      b.onclick = function () { pendingMove = false; stIx = i; lnIx = 0; paint(); };
+      $("stories").appendChild(b);
+    });
+    var s = st(), stt = status(lv(), s, lnIx);
+    $("pos").textContent = "Level " + lv().n + " · " + s.title + " · บรรทัดที่ " + (lnIx + 1) + " จาก " + s.lines.length;
+    $("line").innerHTML = curText().replace(/[&<>]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]; })
+      .replace(/\//g, '<span class="cut">/</span>');
+    $("line").className = "line" + (stt === "ok" || stt === "have" ? " done" : "");
+    $("sub").textContent = LABEL[stt];
+    $("list").innerHTML = "";
+    s.lines.forEach(function (ln, j) {
+      var x = status(lv(), s, j), r = document.createElement("div");
+      r.className = "row" + (j === lnIx ? " here" : "");
+      r.innerHTML = '<span class="n">' + (j + 1) + '</span><span></span><span class="tag ' + x + '">' + LABEL[x] + "</span>";
+      r.children[1].textContent = clean(ln);
+      r.onclick = function () { pendingMove = false; lnIx = j; paint(); };
+      $("list").appendChild(r);
+    });
+    var tot = 0, got = 0;
+    LEVELS.forEach(function (l) { l.stories.forEach(function (s2) { s2.lines.forEach(function (_, j) { tot++; var y = status(l, s2, j); if (y === "ok" || y === "have") got++; }); }); });
+    $("cnt").textContent = "มีเสียงแล้ว " + got + " / " + tot + " บรรทัด";
+  }
+  function setState(m, c) { $("state").textContent = m; $("dot").className = "dot" + (c ? " " + c : ""); }
+  function move(d) {
+    pendingMove = false;
+    var n = st().lines.length;
+    if (lnIx + d >= 0 && lnIx + d < n) lnIx += d;
+    else if (d > 0 && stIx < lv().stories.length - 1) { stIx++; lnIx = 0; }
+    else if (d < 0 && stIx > 0) { stIx--; lnIx = st().lines.length - 1; }
+    paint();
+  }
+
+  /* ---------- ไมค์และการอัด ---------- */
+  var stream, rec, chunks, recording = false, MIME = "", analyser, t0 = 0, pendingMove = false;
+  function pickMime() {
+    var w = ["audio/webm;codecs=opus", "audio/webm", "audio/ogg;codecs=opus", "audio/mp4"];
+    for (var i = 0; i < w.length; i++) if (window.MediaRecorder && MediaRecorder.isTypeSupported(w[i])) { MIME = w[i]; return true; }
+    return false;
+  }
+  function meter() {
+    if (!analyser) return;
+    var b = new Uint8Array(analyser.fftSize); analyser.getByteTimeDomainData(b);
+    var p = 0; for (var i = 0; i < b.length; i++) p = Math.max(p, Math.abs(b[i] - 128));
+    $("meter").firstElementChild.style.width = Math.min(100, p / 90 * 100) + "%";
+    requestAnimationFrame(meter);
+  }
+  function openMic() {
+    if (!navigator.mediaDevices || !pickMime()) { setState("เบราว์เซอร์นี้อัดเสียงไม่ได้"); return; }
+    if (location.protocol === "file:") { setState("ต้องเปิดผ่าน node serve.js ไมโครโฟนจึงจะทำงาน"); return; }
+    navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } })
+      .then(function (s) {
+        stream = s; setState("ไมโครโฟนพร้อม", "on"); $("btnMic").disabled = true;
+        try { var ac = new (window.AudioContext || window.webkitAudioContext)(); analyser = ac.createAnalyser(); analyser.fftSize = 1024; ac.createMediaStreamSource(s).connect(analyser); meter(); } catch (e) {}
+      }).catch(function () { setState("ไม่ได้รับอนุญาตให้ใช้ไมโครโฟน — กดไอคอนไมค์ที่แถบที่อยู่เพื่ออนุญาต"); });
+  }
+
+  /* ถอดคลิปเพื่อรู้ความยาวจริง จุดเริ่มพูด และจุดหยุดพูด
+     MediaRecorder ไม่เขียนความยาวไว้ในหัวไฟล์ และหน้าอ่านต้องใช้ช่วงที่พูดจริง
+     มากระจายเส้นใต้ไปตามคำ ไม่งั้นช่วงเงียบหัวท้ายจะทำให้เส้นนำหน้าเสียง */
+  var dctx;
+  function analyse(blob) {
+    return blob.arrayBuffer().then(function (ab) {
+      dctx = dctx || new (window.AudioContext || window.webkitAudioContext)();
+      return dctx.decodeAudioData(ab);
+    }).then(function (buf) {
+      var d = buf.getChannelData(0), sr = buf.sampleRate, peak = 0, i;
+      for (i = 0; i < d.length; i++) peak = Math.max(peak, Math.abs(d[i]));
+      var th = Math.max(0.015, peak * 0.12), win = Math.round(sr * 0.02), s = 0, e = d.length;
+      function loud(at) { var m = 0; for (var j = at; j < Math.min(d.length, at + win); j++) m = Math.max(m, Math.abs(d[j])); return m > th; }
+      for (i = 0; i < d.length; i += win) if (loud(i)) { s = i; break; }
+      for (i = d.length - win; i > s; i -= win) if (loud(i)) { e = i + win; break; }
+      return { dur: buf.duration, peak: peak, s: +(s / sr).toFixed(2), e: +(Math.min(e, d.length) / sr).toFixed(2) };
+    }).catch(function () { return null; });
+  }
+  function verdict(a) {
+    if (!a) return null;
+    if (a.dur < 0.8) return "สั้นเกินไป (" + a.dur.toFixed(2) + " วินาที) — กด Space ครั้งเดียวเพื่อเริ่ม อ่านทั้งบรรทัด แล้วกดอีกครั้งเพื่อหยุด";
+    if (a.peak < 0.02) return "แทบไม่มีเสียง — ไมโครโฟนอาจถูกปิด หรือเลือกไมค์ผิดตัว";
+    return null;
+  }
+  function startRec() {
+    if (!stream) { openMic(); return; }
+    if (recording) return;
+    if (pendingMove) { pendingMove = false; if (au) { try { au.pause(); } catch (e) {} } move(1); }
+    chunks = [];
+    try { rec = new MediaRecorder(stream, { mimeType: MIME }); } catch (e) { rec = new MediaRecorder(stream); }
+    var k = curKey(), text = curText();
+    rec.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+    rec.onstop = function () {
+      recording = false; $("btnRec").textContent = "● อัดบรรทัดนี้"; $("btnRec").className = "rec-btn"; $("meter").className = "meter";
+      var blob = new Blob(chunks, { type: MIME || "audio/webm" });
+      analyse(blob).then(function (a) {
+        var no = verdict(a);
+        if (no) { setState(no); return; }
+        return put(k, { blob: blob, text: text, dur: a && a.dur, s: a && a.s, e: a && a.e }).then(function () {
+          done[k] = text;
+          setState("เก็บบรรทัดนี้แล้ว · " + (a ? a.dur.toFixed(1) + " วินาที" : ""), "on");
+          paint();
+          // ฟังซ้ำแล้วค่อยเลื่อน — แต่ถ้าคุณครูกด Space อัดต่อระหว่างที่ยังเล่นอยู่
+          // ต้องเลื่อนก่อนอัด ไม่งั้นจะอัดทับบรรทัดที่เพิ่งอัดเสร็จ
+          pendingMove = true;
+          play(blob, function () { if (pendingMove) { pendingMove = false; move(1); } });
+        });
+      });
+    };
+    rec.start(); recording = true; t0 = Date.now();
+    $("btnRec").textContent = "■ หยุดอัด"; $("btnRec").className = "rec-btn stop"; $("meter").className = "meter rec";
+    setState("กำลังอัด — อ่านทั้งบรรทัดให้จบ แล้วกด Space อีกครั้ง", "rec");
+  }
+  function stopRec() { if (recording && rec) try { rec.stop(); } catch (e) {} }
+  var au;
+  function play(blob, after) {
+    if (au) { try { au.pause(); } catch (e) {} }
+    au = new Audio(URL.createObjectURL(blob));
+    au.onended = function () { if (after) after(); };
+    au.onerror = function () { setState("เล่นเสียงไม่ได้ — ลองอัดบรรทัดนี้ใหม่"); };
+    au.play().catch(function () { if (after) after(); });
+  }
+
+  /* ---------- zip แบบ stored + CRC32 ---------- */
+  var CRC = (function () { var t = new Uint32Array(256); for (var n = 0; n < 256; n++) { var c = n; for (var k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; }
+    return function (b) { var c = 0xFFFFFFFF; for (var i = 0; i < b.length; i++) c = t[(c ^ b[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }; })();
+  function zipOf(files) {
+    var enc = new TextEncoder(), parts = [], cen = [], off = 0;
+    var u16 = function (v) { return [v & 255, (v >> 8) & 255]; }, u32 = function (v) { return [v & 255, (v >> 8) & 255, (v >> 16) & 255, (v >>> 24) & 255]; };
+    files.forEach(function (f) {
+      var nm = enc.encode(f.name), crc = CRC(f.bytes), sz = f.bytes.length;
+      var h = [].concat(u32(0x04034b50), u16(20), u16(0x0800), u16(0), u16(0), u16(0), u32(crc), u32(sz), u32(sz), u16(nm.length), u16(0));
+      parts.push(new Uint8Array(h), nm, f.bytes); cen.push({ nm: nm, crc: crc, sz: sz, off: off }); off += h.length + nm.length + sz;
+    });
+    var cd = [], cs = 0;
+    cen.forEach(function (c) { var h = [].concat(u32(0x02014b50), u16(20), u16(20), u16(0x0800), u16(0), u16(0), u16(0), u32(c.crc), u32(c.sz), u32(c.sz), u16(c.nm.length), u16(0), u16(0), u16(0), u16(0), u32(0), u32(c.off)); cd.push(new Uint8Array(h), c.nm); cs += h.length + c.nm.length; });
+    return new Blob(parts.concat(cd, [new Uint8Array([].concat(u32(0x06054b50), u16(0), u16(0), u16(cen.length), u16(cen.length), u32(cs), u32(off), u16(0)))]), { type: "application/zip" });
+  }
+  function exportZip() {
+    all().then(function (clips) {
+      var keys = Object.keys(clips);
+      if (!keys.length) { setState("ยังไม่มีเสียงให้ดาวน์โหลด"); return; }
+      // สารบัญ = ของเดิมในโปรเจกต์ + ของที่อัดใหม่ในเบราว์เซอร์นี้ (ของใหม่ทับของเดิม)
+      var index = JSON.parse(JSON.stringify(HAVE)), files = [], chain = Promise.resolve();
+      keys.forEach(function (k) {
+        chain = chain.then(function () {
+          var c = clips[k], t = c.blob.type || "";
+          var ext = t.indexOf("mp4") >= 0 ? "m4a" : t.indexOf("ogg") >= 0 ? "ogg" : "webm";
+          index[k] = { ext: ext, text: c.text, dur: c.dur, s: c.s, e: c.e };
+          return c.blob.arrayBuffer().then(function (ab) { files.push({ name: "audio/lines/" + k + "." + ext, bytes: new Uint8Array(ab) }); });
+        });
+      });
+      chain.then(function () {
+        var js = "/* เสียงคุณครูอ่านทีละบรรทัด — สร้างจาก line-studio.html\n   คีย์ \"l03/1/2\" = ระดับ/เรื่องที่/บรรทัดที่ · text ใช้ตรวจว่าข้อความยังตรงกับเสียง */\nwindow.LINE_AUDIO = " + JSON.stringify(index, null, 1) + ";\n";
+        files.push({ name: "line-audio-index.js", bytes: new TextEncoder().encode(js) });
+        var a = document.createElement("a"); a.href = URL.createObjectURL(zipOf(files)); a.download = "panya-line-audio.zip";
+        document.body.appendChild(a); a.click(); setTimeout(function () { a.remove(); }, 2000);
+        setState("ดาวน์โหลดแล้ว " + keys.length + " บรรทัด — แตกไฟล์ทับที่โฟลเดอร์โปรเจกต์", "on");
+      });
+    });
+  }
+
+  /* ---------- ปุ่ม ---------- */
+  $("btnMic").onclick = openMic;
+  $("btnZip").onclick = exportZip;
+  $("btnRec").onclick = function () { recording ? stopRec() : startRec(); };
+  $("btnPlay").onclick = function () {
+    get(curKey()).then(function (c) {
+      if (c) play(c.blob);
+      else if (HAVE[curKey()]) {
+        // มีในโปรเจกต์แล้ว (อัดจากเครื่องอื่นหรือรอบก่อน) — เล่นจากไฟล์จริง
+        if (au) { try { au.pause(); } catch (e) {} }
+        au = new Audio("audio/lines/" + curKey() + "." + HAVE[curKey()].ext);
+        au.play().catch(function () { setState("เล่นไฟล์ในโปรเจกต์ไม่ได้"); });
+      }
+      else setState("บรรทัดนี้ยังไม่ได้อัด");
+    });
+  };
+  $("btnPrev").onclick = function () { move(-1); };
+  $("btnNext").onclick = function () { move(1); };
+  $("btnClear").onclick = function () {
+    if (!confirm("ลบเสียงที่อัดไว้ในเบราว์เซอร์นี้ทั้งหมด? (ไฟล์ที่อยู่ในโปรเจกต์แล้วไม่หาย)")) return;
+    store("readwrite").clear().onsuccess = function () { done = {}; paint(); setState("ล้างแล้ว", "on"); };
+  };
+  document.addEventListener("keydown", function (e) {
+    if (e.repeat) return;           // กด Space ค้าง แป้นพิมพ์ยิงซ้ำ จะสลับเริ่ม/หยุดรัว ๆ
+    if (e.code === "Space") { e.preventDefault(); recording ? stopRec() : startRec(); }
+    else if (e.key === "ArrowRight") move(1);
+    else if (e.key === "ArrowLeft") move(-1);
+    else if (e.key === "p" || e.key === "P") $("btnPlay").click();
+  });
+
+  openDb().then(all).then(function (c) { Object.keys(c).forEach(function (k) { done[k] = c[k].text; }); paint(); })
+    .catch(function () { setState("เบราว์เซอร์นี้เก็บเสียงไม่ได้ (IndexedDB ถูกปิด)"); paint(); });
+})();
+</script>
+</body>
+</html>

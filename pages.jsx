@@ -833,7 +833,7 @@ function clipUrl(w) {
   return "audio/words/" + encodeURIComponent(w) + "." + ((idx && idx[w]) || "mp3");
 }
 
-function StoryReader({ story, levelLabel, spaced, onClose }) {
+function StoryReader({ story, levelLabel, levelId, spaced, onClose }) {
   const shellRef = React.useRef(null);
   const stopRef = React.useRef(false);
   const gapRef = React.useRef(null);      // ตัวจับเวลาช่องว่างระหว่างคำ
@@ -895,6 +895,7 @@ function StoryReader({ story, levelLabel, spaced, onClose }) {
       stopRef.current = true;
       if (gapRef.current) clearTimeout(gapRef.current);
       if (clipRef.current) { try { clipRef.current.pause(); } catch (e) {} clipRef.current = null; }
+      cancelAnimationFrame(rafRef.current);
       if (synth) synth.cancel();
     };
   }, [onClose]);
@@ -954,8 +955,75 @@ function StoryReader({ story, levelLabel, spaced, onClose }) {
     next();
   }
 
+  /* ---------- ระดับ 03 ขึ้นไป: เสียงคุณครูอ่านทีละบรรทัด ไม่มีเสียงสังเคราะห์ ----------
+     แต่ละบรรทัดมีคลิปของตัวเองใน audio/lines/<ระดับ>/<เรื่อง>/<บรรทัด>
+     เส้นใต้ไล่ไปตามคำโดยกระจายช่วง "ที่พูดจริง" (s → e) ตามความยาวของแต่ละคำ
+     เป็นค่าประมาณ ไม่ใช่จังหวะจริงของแต่ละคำ แต่ไม่ต้องอัดทีละคำเป็นพัน ๆ คลิป
+     บรรทัดที่ยังไม่ได้อัด หรืออัดไว้แต่ข้อความเปลี่ยนไปแล้ว จะถูกข้าม              */
+  const lineInfo = React.useMemo(() => {
+    if (spaced) return [];
+    const idx = (typeof window !== "undefined" && window.LINE_AUDIO) || {};
+    let g = 0;
+    return story.lines.map((line, li) => {
+      const key = levelId + "/" + story.no + "/" + (li + 1);
+      const text = line.split("|").join("").trim();
+      const rec = idx[key] && idx[key].text === text ? idx[key] : null;
+      // น้ำหนักเวลา: คำตามจำนวนตัวอักษร ช่องว่างเล็กน้อย เครื่องหมาย / คือจุดหยุดหายใจ
+      let total = 0; const marks = [];
+      for (const p of lineParts(line, spaced)) {
+        if (p.w) { marks.push({ at: total, idx: g++ }); total += p.w.length; }
+        else total += p.sp.trim() === "/" ? 4 : 1;
+      }
+      marks.forEach((m) => { m.at = total ? m.at / total : 0; });
+      return { key, rec, marks };
+    });
+  }, [story, spaced, levelId]);
+  const missingLines = lineInfo.filter((l) => !l.rec).length;
+  const rafRef = React.useRef(0);
+
+  function playLines(startWord) {
+    stopRef.current = false;
+    if (gapRef.current) { clearTimeout(gapRef.current); gapRef.current = null; }
+    if (clipRef.current) { try { clipRef.current.pause(); } catch (e) {} clipRef.current = null; }
+    cancelAnimationFrame(rafRef.current);
+    if (!lineInfo.some((l) => l.rec)) { setPlaying(false); return; }
+    setPlaying(true); setTicking(true);
+    const p = PACE[pace] || PACE.normal;
+    let li = words[startWord] ? words[startWord].li : 0;
+    const finish = () => { setPlaying(false); setTicking(false); if (!stopRef.current) setWi(-1); };
+    const next = () => {
+      if (stopRef.current) return;
+      while (li < lineInfo.length && !lineInfo[li].rec) li++;      // ข้ามบรรทัดที่ยังไม่มีเสียง
+      if (li >= lineInfo.length) { finish(); return; }
+      const L = lineInfo[li], r = L.rec;
+      const a = new Audio("audio/lines/" + L.key + "." + r.ext);
+      clipRef.current = a;
+      a.playbackRate = p.clipRate;
+      const s = r.s || 0, e = r.e && r.e > s ? r.e : (r.dur || 0);
+      const tick = () => {
+        if (clipRef.current !== a) return;
+        const f = e > s ? (a.currentTime - s) / (e - s) : 0;
+        let w = L.marks.length ? L.marks[0].idx : -1;
+        for (const m of L.marks) if (f >= m.at) w = m.idx;
+        if (w >= 0) setWi(w);
+        rafRef.current = requestAnimationFrame(tick);
+      };
+      a.onplay = () => { rafRef.current = requestAnimationFrame(tick); };
+      a.onended = () => {
+        cancelAnimationFrame(rafRef.current); clipRef.current = null; li++;
+        gapRef.current = setTimeout(next, li < lineInfo.length ? p.lineGap : 0);
+      };
+      // ไฟล์หาย/เล่นไม่ได้ ก็ข้ามบรรทัดนั้น — ไม่ถอยไปใช้เสียงสังเคราะห์
+      a.onerror = () => { clipRef.current = null; li++; next(); };
+      a.play().catch(() => { clipRef.current = null; li++; next(); });
+    };
+    next();
+  }
+  const go = spaced ? speakFrom : playLines;
+
   function pause() {
     stopRef.current = true;
+    cancelAnimationFrame(rafRef.current);
     if (clipRef.current) { try { clipRef.current.pause(); } catch (e) {} clipRef.current = null; }
     // ต้องล้างตัวจับเวลาช่องว่างด้วย ไม่งั้นคำถัดไปจะโผล่มาพูดเองหลังกดหยุด
     if (gapRef.current) { clearTimeout(gapRef.current); gapRef.current = null; }
@@ -1001,13 +1069,22 @@ function StoryReader({ story, levelLabel, spaced, onClose }) {
         </label>
         {playing
           ? <button className="btn btn-sm" onClick={pause}>⏸ หยุด</button>
-          : <button className="btn btn-sm btn-leaf" onClick={() => speakFrom(wi < 0 ? 0 : wi)}>▶ อ่านออกเสียง</button>}
+          : <button className="btn btn-sm btn-leaf" onClick={() => go(wi < 0 ? 0 : wi)}
+                    disabled={!spaced && missingLines === lineInfo.length}>▶ อ่านออกเสียง</button>}
         <button className="btn btn-sm" onClick={restart}>↺ เริ่มใหม่</button>
         <button className="btn btn-sm" onClick={toggleFull}>⛶ เต็มจอ</button>
         <button className="btn btn-sm" onClick={onClose}>✕ ปิด</button>
       </div>
 
-      {voiceMissing && (
+      {!spaced && missingLines > 0 && (
+        <p className="ss-warn">
+          {missingLines === lineInfo.length
+            ? "เรื่องนี้ยังไม่ได้อัดเสียงคุณครู — อัดได้ที่ line-studio.html"
+            : "ยังไม่ได้อัดเสียง " + missingLines + " บรรทัด ระบบจะข้ามบรรทัดเหล่านั้น (ไม่ใช้เสียงสังเคราะห์)"}
+        </p>
+      )}
+
+      {spaced && voiceMissing && (
         <p className="ss-warn">
           เครื่องนี้ยังไม่มีเสียงอ่านภาษาไทย ระบบจะใช้เสียงที่มีอยู่แทน — คำยังขีดเส้นตามปกติ
           (Windows เพิ่มเสียงไทยได้ที่ Settings → Time &amp; language → Speech)
@@ -1026,7 +1103,8 @@ function StoryReader({ story, levelLabel, spaced, onClose }) {
                 const idx = counter;
                 return (
                   <span key={k} className={"ss-w" + (idx === wi ? " on" : "")}
-                        onClick={() => speakFrom(idx)} title="แตะเพื่อฟังคำนี้">{p.w}</span>
+                        onClick={() => go(idx)}
+                        title={spaced ? "แตะเพื่อฟังคำนี้" : "แตะเพื่อฟังตั้งแต่บรรทัดนี้"}>{p.w}</span>
                 );
               })}
             </p>
@@ -1088,7 +1166,9 @@ function ShortStoriesPage() {
             </a>
           )}
           {/* เครื่องมือของคุณครู — อัดเสียงอ่านเองแทนเสียงสังเคราะห์ */}
-          <a className="btn btn-sm btn-ghost" href="audio-studio.html" target="_blank" rel="noopener">
+          {/* ระดับ 02 อัดทีละคำ · ระดับ 03 ขึ้นไปอัดทีละบรรทัด */}
+          <a className="btn btn-sm btn-ghost" href={current.spaced ? "audio-studio.html" : "line-studio.html"}
+             target="_blank" rel="noopener">
             ● อัดเสียงอ่านเอง
           </a>
         </span>
@@ -1124,7 +1204,7 @@ function ShortStoriesPage() {
       )}
 
       {open && (
-        <StoryReader story={open} levelLabel={current.en + " · " + current.th} spaced={!!current.spaced}
+        <StoryReader story={open} levelLabel={current.en + " · " + current.th} spaced={!!current.spaced} levelId={current.id}
                      onClose={() => setOpen(null)} />
       )}
     </div>
