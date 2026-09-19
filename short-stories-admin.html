@@ -57,10 +57,16 @@
   .cut{font-family:var(--font-thai);font-size:26px;line-height:2.1;color:var(--ink);
     background:var(--ghost);border-radius:12px;padding:8px 10px;user-select:none;}
   .cut .ch{white-space:pre;}
-  .cut .gap{display:inline-block;width:8px;height:1.35em;vertical-align:-.32em;cursor:pointer;position:relative;}
-  .cut .gap::after{content:"";position:absolute;left:3px;top:6%;width:2px;height:88%;border-radius:2px;background:transparent;}
-  .cut .gap:hover::after{background:var(--line-2);}
-  .cut .gap.cutp::after{background:var(--leaf);}
+  /* ช่องกดกว้าง 16px ให้กดโดนง่าย และเห็นเป็นเส้นประจาง ๆ ตลอด ไม่ต้องเดา */
+  .cut .gap{display:inline-block;width:16px;height:1.35em;vertical-align:-.32em;cursor:pointer;position:relative;}
+  .cut .gap::after{content:"";position:absolute;left:7px;top:6%;width:0;height:88%;border-left:2px dotted var(--line-2);}
+  .cut .gap:hover::after{border-left:3px solid var(--earth);left:6px;}
+  .cut .gap.cutp::after{border-left:3px solid var(--leaf);left:6px;}
+  .wl span.join{cursor:pointer;}
+  .wl span.join:hover{outline:2px solid var(--earth);outline-offset:1px;}
+  .wl span.join::after{content:" +";opacity:.45;font-weight:400;}
+  /* แถบสถานะติดบนจอเสมอ จะได้เห็น ✓ บันทึกแล้ว ตลอดเวลา */
+  .bo-bar{position:sticky;top:0;z-index:5;box-shadow:0 4px 14px rgba(0,0,0,.06);}
   .cut .sp{display:inline-block;width:.55em;}
 
   .wl{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;}
@@ -133,7 +139,7 @@
      — ห้ามทิ้งสิ่งที่คุณครูแก้ไว้ ไม่ว่าไฟล์จะเปลี่ยนไปแค่ไหน                  */
   var clone = function (o) { return JSON.parse(JSON.stringify(o)); };
   var base;                         // ข้อมูลในไฟล์ ณ ตอนที่เริ่มแก้ชุดที่ยังไม่ได้ลงไฟล์
-  var serverOk = false, timer = null, saving = false, again = false;
+  var serverOk = false, timer = null, saving = false, again = false, fileHash = "";
 
   // รวมสามทาง: บรรทัดไหนคุณครูแก้ (ต่างจาก base) ใช้ของคุณครู นอกนั้นใช้ไฟล์ล่าสุด
   function merge(file, local, b) {
@@ -179,10 +185,21 @@
     if (saving) { again = true; return; }
     saving = true;
     var body = toSource();
-    fetch("/api/save/short-stories", { method: "POST", headers: { "Content-Type": "text/plain; charset=utf-8" }, body: body })
+    fetch("/api/save/short-stories", { method: "POST", headers: { "Content-Type": "text/plain; charset=utf-8", "X-Base": fileHash }, body: body })
       .then(function (r) { return r.json(); })
       .then(function (j) {
+        if (j.conflict) {
+          // อีกหน้าต่าง/อีกแท็บบันทึกไปก่อน — รวมของเขากับของเราทีละบรรทัด แล้วส่งใหม่
+          var box = { SHORT_STORIES_FILE: null };
+          new Function("window", j.text)(box);
+          data = merge(box.SHORT_STORIES_FILE, data, base);
+          base = clone(box.SHORT_STORIES_FILE); fileHash = j.hash;
+          paint(); again = true;
+          status("มีการแก้จากอีกหน้าต่าง — รวมกันแล้ว กำลังบันทึกใหม่…", true);
+          return;
+        }
         if (!j.ok) throw new Error(j.error);
+        fileHash = j.hash;
         base = clone(data); edited = false;
         try { localStorage.removeItem(KEY); } catch (e) {}
         status("✓ บันทึกลงไฟล์ในโปรเจกต์แล้ว · " + hhmm(), false);
@@ -216,17 +233,46 @@
   try { SEG = new Intl.Segmenter("th", { granularity: "word" }); } catch (e) {}
   var NO_START = /^[ะ-ฺๅ็-๎]/;
   var PUNCT = /^[,.“”"'?!():…]+$/;
-  function autoCut(text) {
-    text = String(text).split("|").join("").replace(/\s+/g, " ").trim();
-    if (!SEG) return text;
+  /* ตัดคำอัตโนมัติ — ใช้ "คำที่รู้จักแล้ว" ก่อนเสมอ (ยาวสุดก่อน):
+     คำที่มีเสียงคุณครูอัดไว้ + ทุกคำที่ตัดไว้แล้วในข้อมูลชุดนี้
+     ตัวตัดคำของเบราว์เซอร์ไม่รู้จักชื่อเฉพาะ ถ้าใช้มันก่อน กาบี้ จะกลายเป็น กา|บี้
+     ส่วนที่ไม่รู้จักเลยจึงค่อยให้ตัวตัดคำช่วย                                    */
+  function knownWords(exS, exLi) {
+    var k = {};
+    Object.keys(AUDIO).forEach(function (w) { k[w] = 1; });
+    data.levels.forEach(function (l) { (l.stories || []).forEach(function (s) {
+      // ไม่นับบรรทัดที่กำลังพิมพ์ — คำที่พิมพ์ค้างครึ่งจะกลายเป็น "คำที่รู้จัก" ผิด ๆ
+      s.lines.forEach(function (ln, j) { if (s === exS && j === exLi) return; wordsOf(ln).forEach(function (w) { if (w.length > 1) k[w] = 1; }); });
+    }); });
+    return k;
+  }
+  function segment(chunk) {
+    var out = [];
+    if (!SEG) return [chunk];
+    for (var it = SEG.segment(chunk)[Symbol.iterator](), r = it.next(); !r.done; r = it.next()) {
+      if (r.value.segment.trim()) out.push(r.value.segment);
+    }
+    return out;
+  }
+  function autoCut(text, exS, exLi) {
+    text = String(text).split("|").join("").replace(/\s+/g, " ").replace(/^\s+/, "");
+    var K = knownWords(exS, exLi), max = 0;
+    Object.keys(K).forEach(function (w) { if (w.length > max) max = w.length; });
     return text.split(/(\s+)/).map(function (c) {
       if (!c || /^\s+$/.test(c) || c === "/") return c;
-      var parts = [];
-      for (var it = SEG.segment(c)[Symbol.iterator](), r = it.next(); !r.done; r = it.next()) {
-        var w = r.value.segment; if (!w.trim()) continue;
-        if (parts.length && (NO_START.test(w) || PUNCT.test(w))) parts[parts.length - 1] += w; else parts.push(w);
+      var parts = [], i = 0, junk = "";
+      var flush = function () { if (junk) { parts = parts.concat(segment(junk)); junk = ""; } };
+      while (i < c.length) {
+        var hit = "";
+        for (var n = Math.min(max, c.length - i); n > 1; n--) { var w = c.substr(i, n); if (K[w]) { hit = w; break; } }
+        if (hit) { flush(); parts.push(hit); i += hit.length; } else { junk += c[i]; i++; }
       }
-      return parts.join("|");
+      flush();
+      var glued = [];
+      parts.forEach(function (w) {
+        if (glued.length && (NO_START.test(w) || PUNCT.test(w))) glued[glued.length - 1] += w; else glued.push(w);
+      });
+      return glued.join("|");
     }).join("");
   }
 
@@ -311,19 +357,29 @@
       var inp = document.createElement("input");
       inp.value = line.split("|").join("");
       // พิมพ์ไปเรื่อย ๆ ไม่วาดหน้าใหม่ทุกตัวอักษร (เคยทำให้เคอร์เซอร์หลุดทุกครั้งที่พิมพ์)
-      // พิมพ์เสร็จ (ออกจากช่อง) ค่อยหาจุดตัดคำให้ใหม่ — ข้อความเปลี่ยน จุดตัดเดิมใช้ต่อไม่ได้
-      inp.oninput = function () { s.lines[li] = inp.value; saveQuiet(); };
-      inp.onchange = function () { s.lines[li] = autoCut(inp.value); save(); };
+      // แต่หาจุดตัดคำให้ทุกครั้งที่พิมพ์ ข้อมูลที่ลงไฟล์จึงมีจุดตัดเสมอ ไม่ต้องรอออกจากช่อง
+      inp.oninput = function () { s.lines[li] = autoCut(inp.value, s, li); saveQuiet(); };
+      // ออกจากช่องแล้ววาดแถวตัวอักษรและชิปคำใหม่เสมอ ให้ตรงกับที่บันทึกลงไฟล์
+      inp.onchange = function () { paint(); };
       row.appendChild(inp);
 
       row.appendChild(cutRow(s, li));
 
+      // ชิปคำ — แตะคำเพื่อรวมกับคำถัดไป (เอาจุดตัดระหว่างสองคำออก)
       var wl = document.createElement("div");
       wl.className = "wl";
-      wordsOf(s.lines[li]).forEach(function (w) {
+      var pieces = s.lines[li].split(/(\s+|\|)/);          // คำ, "|", หรือช่องว่าง สลับกัน
+      pieces.forEach(function (p, pi) {
+        if (!p || p === "|" || /^\s+$/.test(p) || /^[\/,.“”"'?!():…]+$/.test(p)) return;
         var e = document.createElement("span");
-        e.textContent = w;
-        if (wordAudio && !AUDIO[w]) e.className = "no-audio";
+        e.textContent = p;
+        var joinable = pieces[pi + 1] === "|";
+        e.className = (wordAudio && !AUDIO[p] ? "no-audio" : "") + (joinable ? " join" : "");
+        e.title = joinable ? "แตะเพื่อรวมกับคำถัดไป" : "";
+        if (joinable) e.onclick = function () {
+          pieces.splice(pi + 1, 1);                          // เอา | ที่อยู่ถัดคำนี้ออก
+          s.lines[li] = pieces.join(""); save();
+        };
         wl.appendChild(e);
       });
       row.appendChild(wl);
@@ -332,12 +388,16 @@
     });
   }
 
-  // แถวตัวอักษรพร้อมช่องกดตัดคำ
+  /* แถวตัวอักษรพร้อมช่องกดตัดคำ
+     วาดเป็น "กลุ่มตัวอักษร" (พยัญชนะ + สระบนล่าง/วรรณยุกต์ที่เกาะอยู่) ไม่ใช่ทีละตัว
+     เดิมวาดทีละตัวแล้ววรรณยุกต์หลุดจากตัวของมัน (บี ้) และมีช่องให้กดในที่ที่ตัดไม่ได้
+     ตอนนี้มีช่องเฉพาะที่ตัดได้จริง: ห้ามก่อนสระหลัง/สระบนล่าง/วรรณยุกต์ และห้ามหลังสระหน้า */
+  var MARK = /[ัิ-ฺ็-๎]/;
+  var LEAD = /[เ-ไ]/;
   function cutRow(s, li) {
     var wrap = document.createElement("div");
     wrap.className = "cut";
     var raw = s.lines[li];
-    // ไล่ทีละตัวอักษรของข้อความจริง จำไว้ว่าตำแหน่งไหนมี | คั่น
     var chars = [], cuts = {};
     for (var i = 0, n = 0; i < raw.length; i++) {
       if (raw[i] === "|") { cuts[n] = 1; continue; }
@@ -349,18 +409,29 @@
       s.lines[li] = out;
       save();
     };
+    // รวมเป็นกลุ่ม: ตัวอักษรหลัก + เครื่องหมายที่ตามมา
+    var clusters = [];
     chars.forEach(function (ch, k) {
-      if (k > 0 && !/\s/.test(ch) && !/\s/.test(chars[k - 1])) {
+      if (clusters.length && MARK.test(ch)) clusters[clusters.length - 1].text += ch;
+      else clusters.push({ at: k, text: ch });
+    });
+    clusters.forEach(function (c, ci) {
+      var prev = clusters[ci - 1];
+      var canCut = prev && !/\s/.test(c.text) && !/\s/.test(prev.text) &&
+        !NO_START.test(c.text) && !LEAD.test(prev.text[prev.text.length - 1]) &&
+        prev.text !== "/" && c.text !== "/";
+      if (prev && (canCut || cuts[c.at])) {
+        var k = c.at;
         var g = document.createElement("span");
         g.className = "gap" + (cuts[k] ? " cutp" : "");
-        g.title = cuts[k] ? "เอาจุดตัดออก" : "ตัดคำตรงนี้";
+        g.title = cuts[k] ? "แตะเพื่อเอาจุดตัดออก (รวมคำ)" : "แตะเพื่อตัดคำตรงนี้";
         g.onclick = function () { if (cuts[k]) delete cuts[k]; else cuts[k] = 1; rebuild(); };
         wrap.appendChild(g);
       }
-      var c = document.createElement("span");
-      c.className = /\s/.test(ch) ? "sp" : "ch";
-      c.textContent = /\s/.test(ch) ? " " : ch;
-      wrap.appendChild(c);
+      var e = document.createElement("span");
+      e.className = /\s/.test(c.text) ? "sp" : "ch";
+      e.textContent = /\s/.test(c.text) ? " " : c.text;
+      wrap.appendChild(e);
     });
     return wrap;
   }
@@ -440,7 +511,7 @@
   load(); paint();
   status("กำลังตรวจการเชื่อมต่อ…", false);
   fetch("/api/ping", { cache: "no-store" }).then(function (r) { return r.json(); }).then(function (j) {
-    serverOk = !!(j && j.ok);
+    serverOk = !!(j && j.ok); fileHash = (j && j.hash) || "";
   }).catch(function () { serverOk = false; }).then(function () {
     if (serverOk && edited) { status(notice + " · กำลังบันทึกลงไฟล์…", true); pushToFile(); }
     else if (serverOk) status("พร้อม · แก้แล้วบันทึกลงไฟล์ในโปรเจกต์ให้อัตโนมัติ", false);

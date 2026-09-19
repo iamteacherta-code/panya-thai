@@ -49,6 +49,8 @@ function checkData(text) {
   return F;
 }
 
+const hashOf = (text) => require("crypto").createHash("sha1").update(text, "utf8").digest("hex");
+
 function save(req, res) {
   let body = "";
   req.setEncoding("utf8");
@@ -56,6 +58,14 @@ function save(req, res) {
   req.on("end", () => {
     const reply = (code, obj) => { res.writeHead(code, { "Content-Type": TYPES[".json"] }); res.end(JSON.stringify(obj)); };
     try {
+      // ถ้ามีอีกหน้าต่างบันทึกไปก่อน (ไฟล์ไม่ใช่รุ่นที่หน้านี้แก้ต่อจาก) ห้ามเขียนทับ
+      // ส่งไฟล์ปัจจุบันกลับไปให้หน้านั้นรวมบรรทัดต่อบรรทัดแล้วส่งมาใหม่
+      const cur = fs.readFileSync(DATA_FILE, "utf8");
+      const baseHash = req.headers["x-base"];
+      if (baseHash && baseHash !== hashOf(cur)) {
+        reply(409, { ok: false, conflict: true, hash: hashOf(cur), text: cur });
+        return;
+      }
       checkData(body);
       fs.mkdirSync(BACKUPS, { recursive: true });
       const stamp = new Date().toISOString().replace(/[:.]/g, "-");
@@ -64,7 +74,7 @@ function save(req, res) {
       const tmp = DATA_FILE + ".tmp";
       fs.writeFileSync(tmp, body, "utf8");
       fs.renameSync(tmp, DATA_FILE);
-      reply(200, { ok: true, savedAt: new Date().toISOString() });
+      reply(200, { ok: true, savedAt: new Date().toISOString(), hash: hashOf(body) });
     } catch (e) {
       reply(400, { ok: false, error: String(e.message || e) });
     }
@@ -75,8 +85,9 @@ http
   .createServer((req, res) => {
     if (req.method === "POST" && req.url.split("?")[0] === "/api/save/short-stories") return save(req, res);
     if (req.method === "GET" && req.url.split("?")[0] === "/api/ping") {
-      res.writeHead(200, { "Content-Type": TYPES[".json"] });
-      res.end('{"ok":true}');
+      // ส่งลายนิ้วมือของไฟล์ข้อมูลกลับไปด้วย หน้าหลังบ้านใช้บอกว่าตัวเองแก้ต่อจากรุ่นไหน
+      res.writeHead(200, { "Content-Type": TYPES[".json"], "Cache-Control": "no-store" });
+      res.end(JSON.stringify({ ok: true, hash: hashOf(fs.readFileSync(DATA_FILE, "utf8")) }));
       return;
     }
     let rel = decodeURIComponent(req.url.split("?")[0]);
