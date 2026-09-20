@@ -204,7 +204,11 @@
         try { localStorage.removeItem(KEY); } catch (e) {}
         status("✓ บันทึกลงไฟล์ในโปรเจกต์แล้ว · " + hhmm(), false);
       })
-      .catch(function (e) { status("บันทึกลงไฟล์ไม่สำเร็จ: " + (e.message || e) + " — ยังเก็บไว้ในเบราว์เซอร์นี้", true); })
+      .catch(function () {
+        // เซิร์ฟเวอร์ดับหรือยังไม่ได้เปิด — ของที่แก้ยังอยู่ในเบราว์เซอร์ และจะลองใหม่เองเรื่อย ๆ
+        serverOk = false;
+        status("⚠ ยังไม่ได้บันทึกลงไฟล์ — สิ่งที่แก้อยู่ในเบราว์เซอร์นี้ กำลังลองเชื่อมต่อใหม่ทุก 8 วินาที", true);
+      })
       .then(function () { saving = false; if (again) { again = false; pushToFile(); } });
   }
 
@@ -219,6 +223,22 @@
     }
   }
   function save() { saveQuiet(); paint(); }
+
+  /* ต่อกลับเอง — ถ้ามีของที่ยังไม่ได้ลงไฟล์ ให้ลองทักเซิร์ฟเวอร์ทุก 8 วินาที
+     พอเซิร์ฟเวอร์กลับมา (เช่นเพิ่งสั่ง node serve.js) ก็บันทึกให้ทันทีโดยไม่ต้องทำอะไร */
+  setInterval(function () {
+    if (!edited || saving) return;
+    fetch("/api/ping", { cache: "no-store" })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (!j || !j.ok) return;
+        var back = !serverOk;
+        serverOk = true; fileHash = j.hash || fileHash;
+        if (back) status("เชื่อมต่อได้แล้ว · กำลังบันทึกสิ่งที่แก้ค้างไว้…", true);
+        pushToFile();
+      })
+      .catch(function () {});
+  }, 8000);
 
   // ปิดหน้าไปก่อนครบ 0.8 วินาที ก็ยังต้องบันทึก
   window.addEventListener("pagehide", function () {
