@@ -176,8 +176,7 @@ Its own topic under *Lessons & materials · สื่อการสอน*: fou
   used for the underline and, in Level 02, for which word clip to play. (Level 02 used to be
   "word-spaced" with `spaced: true`; the teacher re-spaced it by phrase, so the boundaries were
   rebuilt by longest-match against the words already recorded — every existing clip still plays.)
-- `audio: "words"` (Level 02) reads word by word from the word-clip library; any other level reads
-  the teacher's per-line recordings.
+- `audio: "words"` makes a level read word by word from the word-clip library. **No level uses it now**: the teacher re-spaced Level 02 into reading phrases, which merged its words, so only 30 of the 202 word clips still matched. All four levels are read line by line in the teacher's voice instead.
 - No piece may start with a following vowel, an above/below vowel or a tone mark — such a piece is
   glued to the one before. The old booklet spacing had produced clips like `มาย` + `า` and `โต` + `้`.
 - **From Level 03 the text runs on**, so the word boundaries are written into the data as `|`:
