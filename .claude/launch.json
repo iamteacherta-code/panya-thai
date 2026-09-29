@@ -4,9 +4,28 @@
     {
       "name": "panya",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["serve.js"],
+      "runtimeArgs": [
+        "serve.js"
+      ],
       "port": 8080,
       "autoPort": true
+    },
+    {
+      "name": "reading-club-cf",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "C:/Users/iamte/App project/thai-reading-club-cf/node_modules/wrangler/bin/wrangler.js",
+        "dev",
+        "--config",
+        "C:/Users/iamte/App project/thai-reading-club-cf/wrangler.jsonc",
+        "--persist-to",
+        "C:/Users/iamte/App project/thai-reading-club-cf/.wrangler/state",
+        "--port",
+        "8787",
+        "--ip",
+        "127.0.0.1"
+      ],
+      "port": 8787
     }
   ]
 }

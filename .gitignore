@@ -16,3 +16,6 @@ Thumbs.db
 
 # สำเนาไฟล์ข้อมูลก่อนหลังบ้านบันทึกทับ (serve.js)
 backups/
+
+# wrangler local state
+.wrangler/
