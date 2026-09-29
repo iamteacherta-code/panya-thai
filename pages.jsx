@@ -28,6 +28,9 @@ const RESOURCES = [
   { id: "shortstories", en: "14 Short Stories", th: "14 เรื่องสั้น", icon: "reading", color: "#a2603f", desc: "Fourteen short passages per level (02–05), word-spaced for beginners and building to full paragraphs." },
   { id: "activity", en: "Activity Sheets", th: "แผ่นกิจกรรม", icon: "worksheet", color: "#8a6f3a", desc: "Hands-on practice for letter forms, sound sorts and matching." },
   { id: "worksheet", en: "Worksheets", th: "ใบงาน", icon: "worksheet", color: "#7a5fb0", desc: "Printable worksheets, dictation and quick checks for mastery." },
+  // การ์ดนี้เปิดหน้าเว็บของตัวเอง (writing-workshop.html) ไม่ใช่หน้าในแอป จึงมี href
+  { id: "writing", en: "Writing Workshop", th: "คลังกลยุทธ์การเขียน", icon: "write", color: "#2f7d7b", href: "writing-workshop.html",
+    desc: "Eleven writing strategies with A3 posters — planning, paragraphs, using evidence and revising." },
   { id: "game", en: "Game", th: "เกม", icon: "play", color: "var(--leaf)", desc: "Play-on-screen blending, word-building, sorting and reading games." },
 ];
 const TOOLS = DIGITAL_APPS.concat(RESOURCES);
@@ -189,15 +192,21 @@ function HomePage({ go }) {
         <h2 className="page-title" style={{ fontSize: 24, marginTop: 6 }}>Lessons &amp; materials <span className="th">· สื่อการสอน</span></h2>
       </div>
       <div className="tool-grid">
-        {RESOURCES.map((t) => (
-          <button key={t.id} className="tool-card" onClick={() => go(t.id)}>
-            <span className="tool-ico" style={{ background: t.color }}><Ico name={t.icon} /></span>
-            <span className="t-en">{t.en}</span>
-            <span className="t-th">{t.th}</span>
-            <span className="t-desc">{t.desc}</span>
-            <span className="t-go">Open <Ico name="arrow" /></span>
-          </button>
-        ))}
+        {RESOURCES.map((t) => {
+          const inside = (
+            <>
+              <span className="tool-ico" style={{ background: t.color }}><Ico name={t.icon} /></span>
+              <span className="t-en">{t.en}</span>
+              <span className="t-th">{t.th}</span>
+              <span className="t-desc">{t.desc}</span>
+              <span className="t-go">Open <Ico name="arrow" /></span>
+            </>
+          );
+          // การ์ดที่มี href เปิดเป็นหน้าเว็บของตัวเองในแท็บใหม่ ที่เหลือเปลี่ยนหน้าในแอปเหมือนเดิม
+          return t.href
+            ? <a key={t.id} className="tool-card" href={t.href} target="_blank" rel="noopener">{inside}</a>
+            : <button key={t.id} className="tool-card" onClick={() => go(t.id)}>{inside}</button>;
+        })}
       </div>
 
     </div>

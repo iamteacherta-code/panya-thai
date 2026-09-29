@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Writing Workshop · คลังกลยุทธ์การเขียน</title>
+<meta name="description" content="คลังกลยุทธ์การเขียน 11 แบบสำหรับนักเรียนประถม เลือกเครื่องมือที่เหมาะกับงานของเรา ตั้งแต่คิดหัวข้อ เขียนย่อหน้า ไปจนถึงอ่านทวนและปรับปรุง" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  /* ---------- สีและค่าพื้นฐาน ---------- */
+  :root{
+    --teal:#2f7d7b; --teal-d:#1f5f5d; --orange:#e8843c; --yellow:#f3c033;
+    --blue:#4a9dd9; --pink:#ef7d9d;
+    --ink:#20343a; --soft:#5d7278; --bg:#fdf8ef; --card:#ffffff; --line:#e6ded0;
+    --shadow:0 10px 26px rgba(32,52,58,.10);
+    --radius:22px;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Sarabun","Noto Sans Thai",Tahoma,sans-serif; font-size:18px; line-height:1.65;
+  }
+  .wrap{max-width:1180px; margin:0 auto; padding:0 20px}
+  a{color:inherit}
+
+  /* ---------- แถบบนสุด ---------- */
+  .top{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 0}
+  .back{
+    display:inline-flex; align-items:center; gap:8px; text-decoration:none;
+    background:#fff; border:2px solid var(--line); border-radius:999px;
+    padding:10px 18px; font-weight:700; font-size:16px; min-height:46px; white-space:nowrap;
+  }
+  .back:hover{border-color:var(--teal); color:var(--teal-d)}
+  .top .eyebrow{font-size:14px; font-weight:800; letter-spacing:2px; color:var(--soft)}
+
+  /* ---------- หัวเรื่อง ---------- */
+  header.hero{padding:26px 0 8px; text-align:center}
+  .write{display:flex; justify-content:center; gap:10px; margin-bottom:22px; flex-wrap:wrap}
+  .write span{
+    display:grid; place-items:center; width:78px; height:78px; border-radius:20px;
+    color:#fff; font-size:44px; font-weight:800; line-height:1; box-shadow:var(--shadow);
+  }
+  .write span:nth-child(1){background:var(--teal);   transform:rotate(-7deg)}
+  .write span:nth-child(2){background:var(--orange); transform:rotate(5deg)}
+  .write span:nth-child(3){background:var(--yellow); transform:rotate(-4deg); color:#4a3a06}
+  .write span:nth-child(4){background:var(--blue);   transform:rotate(6deg)}
+  .write span:nth-child(5){background:var(--pink);   transform:rotate(-6deg)}
+  h1{margin:0; font-size:46px; font-weight:800; letter-spacing:-.5px}
+  .hero p{max-width:720px; margin:14px auto 0; font-size:20px; color:var(--soft)}
+
+  /* ---------- ปุ่มเลือกหมวด ---------- */
+  .filters{display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin:30px 0 8px}
+  .chip{
+    border:2px solid var(--line); background:#fff; color:var(--ink);
+    border-radius:999px; padding:12px 22px; font-size:17px; font-weight:700;
+    font-family:inherit; cursor:pointer; min-height:52px;
+  }
+  .chip:hover{border-color:var(--teal)}
+  .chip[aria-pressed="true"]{background:var(--teal); border-color:var(--teal); color:#fff}
+  .count{text-align:center; color:var(--soft); font-size:16px; margin:6px 0 0}
+
+  /* ---------- การ์ดกลยุทธ์ ---------- */
+  .grid{display:grid; gap:20px; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); padding:22px 0 40px}
+  .card{
+    background:var(--card); border:2px solid var(--line); border-radius:var(--radius);
+    padding:22px; display:flex; flex-direction:column; gap:10px; box-shadow:var(--shadow);
+    border-top:10px solid var(--c);
+  }
+  .card .name{font-size:32px; font-weight:800; color:var(--c); line-height:1.15}
+  .card .th{font-size:20px; font-weight:700}
+  .card .desc{color:var(--soft); font-size:17px; flex:1}
+  .card .tag{
+    align-self:flex-start; background:#f3f0e7; border-radius:999px;
+    padding:4px 14px; font-size:14px; font-weight:700; color:var(--soft);
+  }
+  .card button{
+    margin-top:6px; width:100%; min-height:56px; border:none; border-radius:16px;
+    background:var(--c); color:#fff; font-family:inherit; font-size:18px; font-weight:800; cursor:pointer;
+  }
+  .card button:hover{filter:brightness(.93)}
+  .card.yellow button, .card.yellow .name{color:#7a5c05}
+  .card.yellow button{background:var(--yellow); color:#4a3a06}
+
+  /* ---------- หน้ารายละเอียด ---------- */
+  dialog{
+    border:none; border-radius:26px; padding:0; width:min(1000px,94vw); max-height:92vh;
+    background:var(--card); color:var(--ink); box-shadow:0 30px 70px rgba(16,32,38,.35);
+  }
+  dialog::backdrop{background:rgba(24,40,46,.55)}
+  .sheet{display:flex; flex-direction:column; max-height:92vh}
+  .sheet-top{
+    display:flex; align-items:flex-start; gap:16px; padding:22px 24px;
+    background:var(--c); color:#fff; position:sticky; top:0;
+  }
+  .sheet-top.yellow{color:#4a3a06}
+  .sheet-top h2{margin:0; font-size:34px; font-weight:800; line-height:1.15}
+  .sheet-top .sub{font-size:19px; opacity:.95}
+  .close{
+    margin-left:auto; background:rgba(255,255,255,.22); color:inherit; border:none; cursor:pointer;
+    border-radius:14px; min-width:52px; min-height:52px; font-size:24px; font-weight:800; font-family:inherit;
+  }
+  .close:hover{background:rgba(255,255,255,.35)}
+  .sheet-body{padding:22px 24px 26px; overflow:auto; display:grid; gap:24px; grid-template-columns:1.05fr .95fr}
+  .letters{display:flex; flex-direction:column; gap:12px; margin:0; padding:0; list-style:none}
+  .letters li{display:flex; gap:14px; align-items:flex-start; background:#f7f4ec; border-radius:16px; padding:12px 16px}
+  .letters .k{
+    display:grid; place-items:center; flex:none; width:48px; height:48px; border-radius:50%;
+    background:var(--c); color:#fff; font-size:24px; font-weight:800;
+  }
+  .letters.yellow .k{color:#4a3a06}
+  .letters .en{font-size:19px; font-weight:800}
+  .letters .th{color:var(--soft); font-size:17px}
+  .poster{display:flex; flex-direction:column; gap:12px}
+  /* โปสเตอร์เป็นแนวตั้ง A3 — จำกัดความสูงไว้ ปุ่มจะได้ไม่ตกไปอยู่ไกลจนเด็กหาไม่เจอ */
+  .poster img{width:100%; max-height:56vh; object-fit:contain; object-position:top; border:2px solid var(--line); border-radius:16px; display:block; background:#fff}
+  .poster .btns{display:flex; flex-wrap:wrap; gap:10px}
+  .poster .btns a{
+    flex:1 1 180px; text-align:center; text-decoration:none; min-height:54px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    border-radius:16px; font-weight:800; font-size:17px; padding:10px 16px;
+  }
+  .btn-open{background:var(--teal); color:#fff}
+  .btn-pdf{background:#fff; color:var(--teal-d); border:2px solid var(--teal)}
+
+  /* ---------- ดาวน์โหลดทั้งชุด ---------- */
+  .bundle{
+    display:flex; flex-wrap:wrap; align-items:center; gap:16px; justify-content:space-between;
+    background:#fff; border:2px dashed var(--line); border-radius:var(--radius);
+    padding:22px 24px; margin-bottom:40px;
+  }
+  .bundle b{font-size:21px}
+  .bundle p{margin:4px 0 0; color:var(--soft); font-size:17px}
+  .bundle a{
+    text-decoration:none; background:var(--orange); color:#fff; font-weight:800; font-size:18px;
+    border-radius:16px; padding:14px 26px; min-height:56px; display:flex; align-items:center;
+  }
+  footer{padding:0 0 40px; color:var(--soft); font-size:15px; text-align:center}
+
+  /* ---------- จอเล็ก ---------- */
+  @media (max-width:820px){
+    .sheet-body{grid-template-columns:1fr}
+    h1{font-size:34px}
+    .hero p{font-size:18px}
+    .write span{width:58px; height:58px; font-size:32px; border-radius:16px}
+    .sheet-top h2{font-size:28px}
+    .grid{grid-template-columns:1fr}
+    .top .eyebrow{font-size:12px; letter-spacing:1px}
+    .sheet-top{padding:16px 18px}
+    .sheet-body{padding:16px 18px 22px}
+    .poster img{max-height:60vh}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a class="back" href="Panyaden Thai Literacy.html">← กลับหน้าหลัก</a>
+    <span class="eyebrow">PANYADEN · THAI LITERACY</span>
+  </div>
+
+  <header class="hero">
+    <div class="write" aria-hidden="true"><span>W</span><span>R</span><span>I</span><span>T</span><span>E</span></div>
+    <h1>Writing Workshop</h1>
+    <p>เลือกเครื่องมือที่เหมาะกับงานของเรา ตั้งแต่คิดหัวข้อ เขียนย่อหน้า ไปจนถึงอ่านทวนและปรับปรุง</p>
+  </header>
+
+  <nav class="filters" id="filters" aria-label="เลือกหมวดกลยุทธ์"></nav>
+  <p class="count" id="count"></p>
+
+  <main class="grid" id="grid"></main>
+
+  <section class="bundle">
+    <div>
+      <b>โปสเตอร์ A3 ทั้ง 11 แผ่น</b>
+      <p>ไฟล์ PDF ชุดเดียวจบ พิมพ์ติดผนังห้องเรียนได้เลย</p>
+    </div>
+    <a href="writing/Writing-Workshop-11-Posters-A3-TH.pdf" download>⬇ ดาวน์โหลด PDF ทั้งชุด</a>
+  </section>
+
+  <footer>Writing Workshop · คลังกลยุทธ์การเขียนสำหรับนักเรียนประถม</footer>
+</div>
+
+<dialog id="sheet" aria-label="รายละเอียดกลยุทธ์"></dialog>
+
+<script>
+/* ---------- ข้อมูลกลยุทธ์ 11 แบบ ----------
+   poster = ชื่อไฟล์โปสเตอร์ A3 ของกลยุทธ์นั้น (อยู่ในโฟลเดอร์ writing/posters) */
+var TEAL = "#2f7d7b", ORANGE = "#e8843c", YELLOW = "#f3c033", BLUE = "#4a9dd9", PINK = "#ef7d9d";
+var GROUPS = [
+  { id: "all",     name: "ทั้งหมด" },
+  { id: "plan",    name: "วางแผน" },
+  { id: "para",    name: "เขียนย่อหน้า" },
+  { id: "evidence",name: "ใช้หลักฐาน" },
+  { id: "revise",  name: "ปรับปรุง" }
+];
+var STRATEGIES = [
+  { key:"POW", th:"เริ่มเขียนอย่างมั่นใจ", group:"plan", color:TEAL, poster:"pow",
+    desc:"สามขั้นง่าย ๆ สำหรับเริ่มต้นงานเขียน คิด จัด แล้วลงมือ",
+    letters:[["P","Pick Ideas","เลือกความคิด — ระดมความคิดและเลือกเรื่องที่จะเขียน"],
+             ["O","Organize","จัดความคิด — แยกหัวข้อหรือส่วนของเรื่อง แล้วจดรายละเอียด"],
+             ["W","Write","ลงมือเขียน — เขียนตามแผนและเล่าเพิ่มให้ผู้อ่านเข้าใจ"]] },
+  { key:"PLANS", th:"วางแผนก่อนเขียน", group:"plan", color:BLUE, poster:"plans",
+    desc:"ห้าขั้นวางแผนให้ครบก่อนเริ่มเขียนจริง",
+    letters:[["P","Preview","สำรวจหัวข้อ"],["L","List","รวบรวมความคิด"],["A","Assign","จัดลำดับ"],
+             ["N","Note","เขียนร่าง"],["S","Search","ตรวจทาน"]] },
+  { key:"POWER", th:"กระบวนการเขียน 5 ขั้น", group:"plan", color:PINK, poster:"power",
+    desc:"ภาพรวมของงานเขียนทั้งชิ้น ตั้งแต่วางแผนจนปรับปรุงเสร็จ",
+    letters:[["P","Plan","วางแผน"],["O","Organize","จัดระเบียบ"],["W","Write","เขียน"],
+             ["E","Edit","ตรวจแก้"],["R","Revise","ปรับปรุง"]] },
+  { key:"PLEASE", th:"วางแผนย่อหน้าให้ครบ", group:"para", color:ORANGE, poster:"please",
+    desc:"ไล่ตั้งแต่เลือกหัวข้อจนจบย่อหน้าอย่างเป็นขั้นตอน",
+    letters:[["P","Pick a Topic","เลือกหัวข้อ"],["L","List Ideas","จดความคิด"],["E","Evaluate","คัดเลือก"],
+             ["A","Activate","เริ่มย่อหน้า"],["S","Supply Supporting Sentences","เติมประโยคสนับสนุน"],
+             ["E","End","จบย่อหน้า"]] },
+  { key:"Hamburger", th:"ย่อหน้าแฮมเบอร์เกอร์", group:"para", color:YELLOW, poster:"hamburger",
+    desc:"มองย่อหน้าเป็นแฮมเบอร์เกอร์ มีขนมปังบน ไส้ และขนมปังล่าง",
+    letters:[["1","Main Idea","ใจความสำคัญ — ขนมปังชิ้นบน บอกว่าย่อหน้านี้พูดเรื่องอะไร"],
+             ["2","Juicy Details","รายละเอียดสนับสนุน — ไส้แฮมเบอร์เกอร์ เล่าเพิ่มทีละอย่าง"],
+             ["3","Bottom Bun","ประโยคปิดท้าย — ขนมปังชิ้นล่าง สรุปย่อหน้าให้จบ"]] },
+  { key:"FUEL", th:"เติมพลังให้ย่อหน้า", group:"para", color:TEAL, poster:"fuel",
+    desc:"ทำให้ย่อหน้ามีน้ำหนักด้วยการขยายความและใส่หลักฐาน",
+    letters:[["F","Fact","ประเด็น"],["U","Understanding","ขยายความ"],["E","Evidence","หลักฐาน"],
+             ["L","Link","เชื่อมโยง"]] },
+  { key:"TIDE", th:"เขียนย่อหน้าให้ข้อมูล", group:"para", color:BLUE, poster:"tide",
+    desc:"โครงย่อหน้าให้ข้อมูลที่ครบทั้งใจความ หลักฐาน คำอธิบาย และบทปิด",
+    letters:[["T","Topic Sentence","ประโยคใจความสำคัญ"],["I","Important Evidence","หลักฐานสำคัญ"],
+             ["D","Detailed Explanation","คำอธิบายเพิ่มเติม"],["E","Ending Sentence","ประโยคปิดท้าย"]] },
+  { key:"CER", th:"อ้างเหตุผลจากหลักฐาน", group:"evidence", color:ORANGE, poster:"cer",
+    desc:"เขียนคำตอบที่มีข้อกล่าวอ้าง หลักฐาน และเหตุผลครบ",
+    letters:[["C","Claim","ข้อกล่าวอ้าง"],["E","Evidence","หลักฐาน"],
+             ["R","Reasoning","เหตุผลที่เชื่อมหลักฐานกับข้อกล่าวอ้าง"]] },
+  { key:"STAR", th:"ตอบคำถามจากบทอ่าน", group:"evidence", color:PINK, poster:"star",
+    desc:"ตอบคำถามจากเรื่องที่อ่านให้ครบถ้วนและมีหลักฐานอ้างอิง",
+    letters:[["S","Set Up","ตั้งต้นคำตอบ"],["T","Text Evidence","หลักฐานจากเรื่อง"],
+             ["A","Analyze","วิเคราะห์"],["R","Restate","กล่าวย้ำ"]] },
+  { key:"ARMS", th:"ปรับปรุงงานเขียน", group:"revise", color:TEAL, poster:"arms",
+    desc:"สี่วิธีแก้งานเขียนให้ดีขึ้นหลังเขียนร่างแรกเสร็จ",
+    letters:[["A","Add","เพิ่ม"],["R","Remove","ตัดออก"],["M","Move","ย้าย"],["S","Substitute","แทนที่"]] },
+  { key:"CDO", th:"อ่าน ตรวจ แล้วแก้", group:"revise", color:YELLOW, poster:"cdo",
+    desc:"อ่านทวนงานของตัวเอง หาจุดที่ยังไม่ชัด แล้วลงมือแก้",
+    letters:[["C","Compare","เปรียบเทียบ"],["D","Diagnose","วิเคราะห์ปัญหา"],["O","Operate","ลงมือแก้"]] }
+];
+
+var PDF = "writing/Writing-Workshop-11-Posters-A3-TH.pdf";
+var posterUrl = function (s) { return "writing/posters/" + s.poster + ".webp"; };
+var isYellow = function (s) { return s.color === YELLOW; };
+var groupName = function (id) {
+  for (var i = 0; i < GROUPS.length; i++) if (GROUPS[i].id === id) return GROUPS[i].name;
+  return "";
+};
+
+var current = "all";
+var filters = document.getElementById("filters");
+var grid = document.getElementById("grid");
+var count = document.getElementById("count");
+var sheet = document.getElementById("sheet");
+
+/* ---------- ปุ่มเลือกหมวด ---------- */
+GROUPS.forEach(function (g) {
+  var b = document.createElement("button");
+  b.className = "chip";
+  b.type = "button";
+  b.textContent = g.name;
+  b.setAttribute("aria-pressed", g.id === current ? "true" : "false");
+  b.onclick = function () {
+    current = g.id;
+    [].forEach.call(filters.children, function (c) { c.setAttribute("aria-pressed", c === b ? "true" : "false"); });
+    render();
+  };
+  filters.appendChild(b);
+});
+
+/* ---------- การ์ดกลยุทธ์ ---------- */
+function render() {
+  var list = STRATEGIES.filter(function (s) { return current === "all" || s.group === current; });
+  grid.innerHTML = "";
+  list.forEach(function (s) {
+    var card = document.createElement("article");
+    card.className = "card" + (isYellow(s) ? " yellow" : "");
+    card.style.setProperty("--c", s.color);
+    card.innerHTML =
+      '<span class="tag">' + groupName(s.group) + "</span>" +
+      '<span class="name">' + s.key + "</span>" +
+      '<span class="th">' + s.th + "</span>" +
+      '<span class="desc">' + s.desc + "</span>";
+    var b = document.createElement("button");
+    b.type = "button";
+    b.textContent = "ดูวิธีใช้และโปสเตอร์";
+    b.onclick = function () { open(s); };
+    card.appendChild(b);
+    grid.appendChild(card);
+  });
+  count.textContent = current === "all"
+    ? "ทั้งหมด " + list.length + " กลยุทธ์"
+    : groupName(current) + " · " + list.length + " กลยุทธ์";
+}
+
+/* ---------- หน้ารายละเอียด + โปสเตอร์ ---------- */
+function open(s) {
+  var y = isYellow(s) ? " yellow" : "";
+  var rows = s.letters.map(function (l) {
+    return '<li><span class="k">' + l[0] + "</span><span><span class=\"en\">" + l[1] +
+           '</span><br><span class="th">' + l[2] + "</span></span></li>";
+  }).join("");
+  sheet.innerHTML =
+    '<div class="sheet">' +
+      '<div class="sheet-top' + y + '" style="--c:' + s.color + '">' +
+        "<div><h2>" + s.key + '</h2><div class="sub">' + s.th + "</div></div>" +
+        '<button class="close" type="button" aria-label="ปิด">✕</button>' +
+      "</div>" +
+      '<div class="sheet-body">' +
+        '<div><ul class="letters' + y + '" style="--c:' + s.color + '">' + rows + "</ul></div>" +
+        '<div class="poster">' +
+          '<img src="' + posterUrl(s) + '" alt="โปสเตอร์ A3 กลยุทธ์ ' + s.key + " " + s.th + '" />' +
+          '<div class="btns">' +
+            '<a class="btn-open" href="' + posterUrl(s) + '" target="_blank" rel="noopener">เปิดโปสเตอร์แผ่นนี้</a>' +
+            '<a class="btn-pdf" href="' + PDF + '" download>⬇ PDF ทั้งชุด</a>' +
+          "</div>" +
+        "</div>" +
+      "</div>" +
+    "</div>";
+  sheet.querySelector(".close").onclick = function () { sheet.close(); };
+  if (sheet.showModal) sheet.showModal(); else sheet.setAttribute("open", "");
+  sheet.scrollTop = 0;
+}
+
+/* คลิกนอกกล่องเพื่อปิด — เด็กกดพลาดง่าย จึงปิดได้ทั้งปุ่ม Esc และพื้นที่ว่าง */
+sheet.addEventListener("click", function (e) { if (e.target === sheet) sheet.close(); });
+
+render();
+</script>
+</body>
+</html>

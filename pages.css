@@ -80,6 +80,8 @@
   border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px;
   display: flex; flex-direction: column; gap: 12px; min-height: 168px;
   transition: transform .12s, box-shadow .2s, border-color .2s; color: inherit;
+  /* การ์ดบางใบเป็นลิงก์ไปหน้าเว็บของตัวเอง — ไม่ให้ขึ้นเส้นใต้เหมือนลิงก์ทั่วไป */
+  text-decoration: none; cursor: pointer;
 }
 .tool-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--line-2); }
 .tool-ico {

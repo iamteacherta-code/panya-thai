@@ -23,6 +23,7 @@
     reading: (p) => S(p, [P("M12 6c-2-1.5-5-1.5-7-0.5v12c2-1 5-1 7 .5 2-1.5 5-1.5 7-.5v-12c-2-1-5-1-7 .5z"), L(12, 6, 12, 18)].map((e, i) => React.cloneElement(e, { key: i }))),
     worksheet: (p) => S(p, [P("M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"), P("M14 3v5h5"), P("M16 13l-5 5-2.5-2.5")].map((e, i) => React.cloneElement(e, { key: i }))),
     leaf: (p) => S(p, [P("M5 19C5 11 11 5 19 5c0 8-6 14-14 14z"), P("M5 19c3-3 6-6 11-9")].map((e, i) => React.cloneElement(e, { key: i }))),
+    write: (p) => S(p, [P("M5 19h3.4L19 8.4 15.6 5 5 15.6z"), L(14.4, 6.2, 17.8, 9.6), L(5, 19, 8.4, 19)].map((e, i) => React.cloneElement(e, { key: i }))),
     print: (p) => S(p, [P("M6 9V3h12v6"), P("M6 18H4v-7h16v7h-2"), R(8, 14, 8, 6, 1)].map((e, i) => React.cloneElement(e, { key: i }))),
     play: (p) => S(p, [P("M8 5v14l11-7z")].map((e, i) => React.cloneElement(e, { key: i }))),
     arrow: (p) => S(p, [L(5, 12, 19, 12), P("M13 6l6 6-6 6")].map((e, i) => React.cloneElement(e, { key: i }))),
