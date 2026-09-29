@@ -46,6 +46,13 @@ const RC = {
   edited: !!stored,
   savedAt: stored ? stored.savedAt : null,
 
+  /* ลิงก์เปิดหนังสือเล่มนั้นในโปรแกรม Reading Club — เข้าโหมดอ่านพร้อมเสียงคุณครูเลย */
+  bookUrl(book) {
+    const base = String(FILE.appUrl || "").replace(/\/$/, "");
+    const id = book && book.id;
+    return id ? base + "/?book=" + encodeURIComponent(id) : base + "/";
+  },
+
   /* ที่อยู่รูปปกแบบเต็ม — รับทั้ง /books/x.webp และ https://... */
   coverUrl(book) {
     const c = String((book && book.cover) || "");
@@ -97,5 +104,7 @@ const RC = {
 };
 
 root.READING_CLUB = RC;
+// การ์ดในหน้าอื่นใช้ที่อยู่นี้ตรง ๆ — ย้ายเว็บเมื่อไรก็ตามมาจาก appUrl ที่เดียว
+root.READING_CLUB_URL = RC.appUrl;
 
 })(window);

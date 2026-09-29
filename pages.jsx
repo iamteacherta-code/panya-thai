@@ -772,8 +772,9 @@ function ReadingClubPage() {
           </div>
 
           <div className="rc-shelf">
+            {/* กดเล่มไหน เปิดเล่มนั้นในโปรแกรม Reading Club แล้วเข้าโหมดอ่านพร้อมเสียงคุณครูทันที */}
             {unit.books.map((book) => (
-              <a className="rc-book" key={book.id} href={RC.appUrl} target="_blank" rel="noopener">
+              <a className="rc-book" key={book.id} href={RC.bookUrl(book)} target="_blank" rel="noopener">
                 <span className="rc-cover" style={{ background: book.color }}>
                   <img src={RC.coverUrl(book)} alt={"ปกหนังสือ " + book.title} loading="lazy"
                        onError={(e) => { e.currentTarget.style.display = "none"; }} />

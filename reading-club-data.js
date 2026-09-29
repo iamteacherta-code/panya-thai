@@ -38,7 +38,7 @@ window.READING_CLUB_FILE = {
 
   /* ★ ที่อยู่ของแอป Reading Club (อยู่คนละเว็บกับ Panya Thai)
        ย้ายเว็บเมื่อไร แก้แค่บรรทัดนี้บรรทัดเดียว */
-  appUrl: "https://thai-reading-club-year4.p-aumporn.chatgpt.site/",
+  appUrl: "https://thai-reading-club.thai-reading-club.workers.dev/",
 
   years: [
     {
