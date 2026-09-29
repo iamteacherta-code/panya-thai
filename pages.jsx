@@ -981,6 +981,75 @@ function StoryReader({ story, levelLabel, levelId, spaced, wordAudio, onClose })
   const missingLines = lineInfo.filter((l) => !l.rec).length;
   const rafRef = React.useRef(0);
 
+  /* ---------- เสียงคุณครูจาก Reading Club ----------
+     Reading Club เก็บไฟล์เสียงไว้เรื่องละไฟล์ (คุณครูอ่านชื่อเรื่องนำก่อนแล้วอ่านทั้งเรื่องรวด)
+     เว็บนี้จึงไม่ต้องอัดซ้ำ — ดึงไฟล์เดียวกันมาเล่น แล้วไล่เส้นใต้ตามเสียงจริงด้วยวิธีเดียวกัน */
+  const CLUB = typeof window !== "undefined" ? window.CLUB_AUDIO : null;
+  const [clubClip, setClubClip] = React.useState(null);
+  React.useEffect(() => {
+    if (!CLUB) return;
+    let alive = true;
+    CLUB.load().then(() => { if (alive) setClubClip(CLUB.clip(levelId, story.no)); });
+    return () => { alive = false; };
+  }, [levelId, story.no]);
+
+  /* ตำแหน่งตัวอักษรเริ่ม-จบของแต่ละคำ และจำนวนตัวอักษรรายบรรทัด
+     บรรทัดแรกคือชื่อเรื่องที่คุณครูอ่านนำ ต้องนับด้วย ไม่งั้นเส้นจะเริ่มก่อนเสียง */
+  const clubLayout = React.useMemo(() => {
+    if (!CLUB) return null;
+    const heading = "เรื่องที่ " + story.no + " " + story.title;
+    const lineChars = [CLUB.countChars(heading)];
+    const spans = [];
+    let at = lineChars[0];
+    story.lines.forEach((line) => {
+      const start = at;
+      splitWords(line, spaced).forEach((w) => { const from = at; at += CLUB.countChars(w); spans.push({ from: from, to: at }); });
+      // บรรทัดว่างไม่นับ ไม่งั้นจะไปแย่งจุดหยุดหายใจ แล้วเส้นใต้จะกระโดดไปท้ายเรื่องก่อนเวลา
+      if (at > start) lineChars.push(at - start);
+    });
+    return { lineChars: lineChars, spans: spans, total: at };
+  }, [story, spaced]);
+
+  const clubSync = React.useMemo(
+    () => (CLUB && clubClip && clubLayout ? CLUB.makeSync(clubLayout.lineChars, clubClip.voiced || [], clubClip.duration) : null),
+    [clubClip, clubLayout]
+  );
+
+  function playClub(startWord) {
+    stopRef.current = false;
+    if (gapRef.current) { clearTimeout(gapRef.current); gapRef.current = null; }
+    if (clipRef.current) { try { clipRef.current.pause(); } catch (e) {} clipRef.current = null; }
+    cancelAnimationFrame(rafRef.current);
+    if (!clubSync) { setPlaying(false); return; }
+    setPlaying(true); setTicking(true);
+    const p = PACE[pace] || PACE.normal;
+    const spans = clubLayout.spans;
+    const startAt = spans[startWord] ? spans[startWord].from : 0;
+    const a = new Audio(CLUB.clipUrl(levelId, story.no, clubClip));
+    clipRef.current = a;
+    a.playbackRate = p.clipRate;
+    const done = (keepWord) => {
+      cancelAnimationFrame(rafRef.current);
+      clipRef.current = null;
+      setPlaying(false); setTicking(false);
+      if (!keepWord && !stopRef.current) setWi(-1);
+    };
+    const tick = () => {
+      if (clipRef.current !== a) return;
+      const pos = clubSync.toPos(a.currentTime);
+      let w = -1;
+      for (let i = 0; i < spans.length && pos >= spans[i].from; i++) w = i;
+      setWi(w);
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    // ต้องรอให้รู้ความยาวไฟล์ก่อนถึงจะกระโดดไปคำที่แตะได้
+    a.addEventListener("loadedmetadata", () => { if (startAt > 0) { try { a.currentTime = clubSync.toTime(startAt); } catch (e) {} } }, { once: true });
+    a.onplay = () => { rafRef.current = requestAnimationFrame(tick); };
+    a.onended = () => done(false);
+    a.onerror = () => done(true);
+    a.play().catch(() => done(true));
+  }
+
   function playLines(startWord) {
     stopRef.current = false;
     if (gapRef.current) { clearTimeout(gapRef.current); gapRef.current = null; }
@@ -1019,8 +1088,9 @@ function StoryReader({ story, levelLabel, levelId, spaced, wordAudio, onClose })
     };
     next();
   }
-  // ระดับ 02 อ่านทีละคำจากคลังเสียงคำ · ระดับอื่นเสียงคุณครูทีละบรรทัด
-  const go = wordAudio ? speakFrom : playLines;
+  /* เสียงคุณครูจาก Reading Club มาก่อนเสมอ (อัดที่เดียวใช้ได้ทุกหน้า)
+     ไม่มีค่อยใช้คลิปรายบรรทัดในเครื่อง · ระดับ 02 ยังใช้คลังเสียงคำได้เหมือนเดิม */
+  const go = clubSync ? playClub : (wordAudio ? speakFrom : playLines);
 
   function pause() {
     stopRef.current = true;
@@ -1071,16 +1141,16 @@ function StoryReader({ story, levelLabel, levelId, spaced, wordAudio, onClose })
         {playing
           ? <button className="btn btn-sm" onClick={pause}>⏸ หยุด</button>
           : <button className="btn btn-sm btn-leaf" onClick={() => go(wi < 0 ? 0 : wi)}
-                    disabled={!wordAudio && missingLines === lineInfo.length}>▶ อ่านออกเสียง</button>}
+                    disabled={!clubSync && !wordAudio && missingLines === lineInfo.length}>▶ อ่านออกเสียง</button>}
         <button className="btn btn-sm" onClick={restart}>↺ เริ่มใหม่</button>
         <button className="btn btn-sm" onClick={toggleFull}>⛶ เต็มจอ</button>
         <button className="btn btn-sm" onClick={onClose}>✕ ปิด</button>
       </div>
 
-      {!wordAudio && missingLines > 0 && (
+      {!clubSync && !wordAudio && missingLines > 0 && (
         <p className="ss-warn">
           {missingLines === lineInfo.length
-            ? "เรื่องนี้ยังไม่ได้อัดเสียงคุณครู — อัดได้ที่ line-studio.html"
+            ? "เรื่องนี้ยังไม่ได้อัดเสียงคุณครู — อัดได้ที่ห้องอัดเสียงของ Reading Club"
             : "ยังไม่ได้อัดเสียง " + missingLines + " บรรทัด ระบบจะข้ามบรรทัดเหล่านั้น (ไม่ใช้เสียงสังเคราะห์)"}
         </p>
       )}
